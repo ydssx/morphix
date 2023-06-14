@@ -1,0 +1,148 @@
+syntax = "proto3";
+
+package user;
+
+option go_package="github.com/ydssx/morphix/app/user/api;user";
+
+import "google/api/annotations.proto";
+
+import "google/protobuf/empty.proto";
+
+service UserService {
+  rpc Register(RegistrationRequest) returns (User) {
+    option (google.api.http) = {
+      post: "/users/register"
+      body: "*"
+    };
+  }
+
+  rpc Login(LoginRequest) returns (AuthenticationResponse) {
+    option (google.api.http) = {
+      post: "/users/login"
+      body: "*"
+    };
+  }
+
+  rpc Logout(LogoutRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/users/logout"
+      body: "*"
+    };
+  }
+
+  rpc UpdateProfile(UpdateProfileRequest) returns (User) {
+    option (google.api.http) = {
+      patch: "/users/profile/{user_id}"
+      body: "*"
+    };
+  }
+
+  rpc ResetPassword(ResetPasswordRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/users/resetPassword"
+      body: "*"
+    };
+  }
+
+  rpc Authenticate(google.protobuf.Empty) returns (AuthenticationResponse) {
+    option (google.api.http) = {
+      post: "/users/authenticate"
+      body: "*"
+    };
+  }
+
+  rpc Authorize(AuthorizationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/users/authorize"
+      body: "*"
+    };
+  }
+
+  rpc GetUserList(google.protobuf.Empty) returns (UserListResponse) {
+    option (google.api.http) = {
+      get: "/users"
+    };
+  }
+
+  rpc ManageUserPermission(ManageUserPermissionRequest) returns (User) {
+    option (google.api.http) = {
+      post: "/users/managePermission"
+      body: "*"
+    };
+  }
+
+  rpc LogActivity(LogEntry) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/users/logActivity"
+      body: "*"
+    };
+  }
+}
+
+message User {
+  string id = 1;
+  string username = 2;
+  string password = 3;
+  string email = 4;
+  string phone = 5;
+  // 其他个人信息字段...
+}
+
+message RegistrationRequest {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+  string phone = 4;
+  // 其他注册信息字段...
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LogoutRequest {
+  string user_id = 1;
+}
+
+message UpdateProfileRequest {
+  string user_id = 1;
+  string email = 2;
+  string phone = 3;
+  // 其他需要更新的个人信息字段...
+}
+
+message ResetPasswordRequest {
+  string username = 1;
+  string verification_code = 2;
+  string new_password = 3;
+}
+
+message AuthenticationResponse {
+  string user_id = 1;
+  string token = 2;
+}
+
+message AuthorizationRequest {
+  string user_id = 1;
+  string resource = 2;
+  repeated string actions = 3;
+}
+
+message UserListResponse {
+  repeated User users = 1;
+}
+
+message ManageUserPermissionRequest {
+  string user_id = 1;
+  repeated string roles = 2;
+  repeated string permissions = 3;
+}
+
+message LogEntry {
+  string user_id = 1;
+  string action = 2;
+  string timestamp = 3;
+  // 其他日志信息字段...
+}
+
