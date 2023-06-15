@@ -7,21 +7,31 @@ import (
 	"net/http"
 
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/ydssx/morphix/app/gateway/conf"
 	user "github.com/ydssx/morphix/app/user/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func newGateway(ctx context.Context, conn *grpc.ClientConn, opts []gwruntime.ServeMuxOption) (http.Handler, error) {
+type registerF func(ctx context.Context, mux *gwruntime.ServeMux, endpoint string, opts []grpc.DialOption) (err error)
+
+var handlers = make(map[string]registerF)
+
+func registerRpcServer(c conf.Config) {
+	handlers[c.UserRpc.Addr] = user.RegisterUserServiceHandlerFromEndpoint
+}
+
+func newGateway(ctx context.Context, opts []gwruntime.ServeMuxOption) (http.Handler, error) {
 	mux := gwruntime.NewServeMux(opts...)
 
-	for _, f := range []func(context.Context, *gwruntime.ServeMux, *grpc.ClientConn) error{
-		user.RegisterUserServiceHandler,
-	} {
-		if err := f(ctx, mux, conn); err != nil {
+	dialOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+
+	for endpoint, f := range handlers {
+		if err := f(ctx, mux, endpoint, dialOpts); err != nil {
 			return nil, err
 		}
 	}
+
 	return mux, nil
 }
 

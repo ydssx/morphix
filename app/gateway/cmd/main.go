@@ -2,20 +2,23 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"net/http"
 	"path"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/ydssx/morphix/app/gateway/conf"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 )
 
 // Endpoint describes a gRPC endpoint
 type Endpoint struct {
-	Network, Addr string
+	Name, Network, Addr string
 }
 
 // Options is a set of options to be passed to Run
@@ -24,7 +27,7 @@ type Options struct {
 	Addr string
 
 	// GRPCServer defines an endpoint of a gRPC service
-	GRPCServer Endpoint
+	GRPCServer []Endpoint
 
 	// OpenAPIDir is a path to a directory from which the server
 	// serves OpenAPI specs.
@@ -36,47 +39,32 @@ type Options struct {
 
 // Run starts a HTTP server and blocks while running if successful.
 // The server will be shutdown when "ctx" is canceled.
-func Run(ctx context.Context, opts Options) error {
+func Run(ctx context.Context, c conf.Config) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	conn, err := dial(ctx, opts.GRPCServer.Network, opts.GRPCServer.Addr)
+	server := gin.New()
+	server.Use(gin.Logger())
+	// mux.HandleFunc("/openapiv2/", openAPIServer(opts.OpenAPIDir))
+	// mux.HandleFunc("/healthz", healthzServer(conn))
+	opts := []gwruntime.ServeMuxOption{}
+
+	registerRpcServer(c)
+
+	gw, err := newGateway(ctx, opts)
 	if err != nil {
 		return err
 	}
-	go func() {
-		<-ctx.Done()
-		if err := conn.Close(); err != nil {
-			glog.Errorf("Failed to close a client connection to the gRPC server: %v", err)
-		}
-	}()
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/openapiv2/", openAPIServer(opts.OpenAPIDir))
-	mux.HandleFunc("/healthz", healthzServer(conn))
+	// server.GET("/test", func(c *gin.Context) {
+	// 	c.String(http.StatusOK, "Ok")
+	// })
 
-	gw, err := newGateway(ctx, conn, opts.Mux)
+	server.Any("*any", gin.WrapH(gw))
+
+	err = server.Run(c.Addr)
 	if err != nil {
-		return err
-	}
-	mux.Handle("/", gw)
-
-	s := &http.Server{
-		Addr:    opts.Addr,
-		Handler: allowCORS(mux),
-	}
-	go func() {
-		<-ctx.Done()
-		glog.Infof("Shutting down the http server")
-		if err := s.Shutdown(context.Background()); err != nil {
-			glog.Errorf("Failed to shutdown http server: %v", err)
-		}
-	}()
-
-	glog.Infof("Starting listening at %s", opts.Addr)
-	if err := s.ListenAndServe(); err != http.ErrServerClosed {
-		glog.Errorf("Failed to listen and serve: %v", err)
-		return err
+		panic(err)
 	}
 	return nil
 }
@@ -91,7 +79,7 @@ func openAPIServer(dir string) http.HandlerFunc {
 		}
 
 		glog.Infof("Serving %s", r.URL.Path)
-		p := strings.TrimPrefix(r.URL.Path, "/openapiv2/")
+		p := strings.TrimPrefix(r.URL.Path, "docs/")
 		p = path.Join(dir, p)
 		http.ServeFile(w, r, p)
 	}
@@ -132,5 +120,16 @@ func healthzServer(conn *grpc.ClientConn) http.HandlerFunc {
 			return
 		}
 		fmt.Fprintln(w, "ok")
+	}
+}
+
+var configFile = flag.String("f", "../configs/config.yaml", "the config file")
+
+func main() {
+	var config conf.Config
+	conf.MustLoad(*configFile, &config)
+
+	if err := Run(context.Background(), config); err != nil {
+		panic(err)
 	}
 }
