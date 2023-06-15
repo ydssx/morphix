@@ -4,20 +4,18 @@ import (
 	"context"
 
 	"github.com/ydssx/morphix/app/user/internal/biz"
-
-	"github.com/go-kratos/kratos/v2/log"
 )
 
 type greeterRepo struct {
 	data *Data
-	log  *log.Helper
 }
 
+var _ biz.UserRepo = (*greeterRepo)(nil)
+
 // NewGreeterRepo .
-func NewGreeterRepo(data *Data, logger log.Logger) biz.GreeterRepo {
+func NewGreeterRepo(data *Data) biz.UserRepo {
 	return &greeterRepo{
 		data: data,
-		log:  log.NewHelper(logger),
 	}
 }
 

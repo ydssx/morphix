@@ -9,8 +9,8 @@ type Greeter struct {
 	Hello string
 }
 
-// GreeterRepo is a Greater repo.
-type GreeterRepo interface {
+// UserRepo is a Greater repo.
+type UserRepo interface {
 	Save(context.Context, *Greeter) (*Greeter, error)
 	Update(context.Context, *Greeter) (*Greeter, error)
 	FindByID(context.Context, int64) (*Greeter, error)
@@ -18,17 +18,17 @@ type GreeterRepo interface {
 	ListAll(context.Context) ([]*Greeter, error)
 }
 
-// GreeterUsecase is a Greeter usecase.
-type GreeterUsecase struct {
-	repo GreeterRepo
+// UserUsecase is a Greeter usecase.
+type UserUsecase struct {
+	repo UserRepo
 }
 
 // NewGreeterUsecase new a Greeter usecase.
-func NewGreeterUsecase(repo GreeterRepo) *GreeterUsecase {
-	return &GreeterUsecase{repo: repo}
+func NewGreeterUsecase(repo UserRepo) *UserUsecase {
+	return &UserUsecase{repo: repo}
 }
 
 // CreateGreeter creates a Greeter, and returns the new Greeter.
-func (uc *GreeterUsecase) CreateGreeter(ctx context.Context, g *Greeter) (*Greeter, error) {
+func (uc *UserUsecase) CreateGreeter(ctx context.Context, g *Greeter) (*Greeter, error) {
 	return uc.repo.Save(ctx, g)
 }

@@ -9,10 +9,10 @@ import (
 type UserService struct {
 	user.UnimplementedUserServiceServer
 
-	uc *biz.GreeterUsecase
+	uc *biz.UserUsecase
 }
 
 // NewUserService new a greeter service.
-func NewUserService() *UserService {
-	return &UserService{}
+func NewUserService(uc *biz.UserUsecase) *UserService {
+	return &UserService{uc: uc}
 }
