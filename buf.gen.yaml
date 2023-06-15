@@ -1,20 +1,38 @@
 version: v1
+
 plugins:
   - plugin: buf.build/protocolbuffers/go
     out: .
-    opt: paths=source_relative
+    opt:
+      - paths=source_relative
 
   - plugin: buf.build/grpc/go
     out: .
     opt:
-    - paths=source_relative
-    - require_unimplemented_servers=false
-
-  - plugin: buf.build/bufbuild/validate-go
-    out: .
-    opt: paths=source_relative
+      - paths=source_relative
+      - require_unimplemented_servers=false
 
   - plugin: buf.build/grpc-ecosystem/gateway
     out: .
     opt:
       - paths=source_relative
+
+  - plugin: buf.build/bufbuild/validate-go
+    out: .
+    opt:
+      - paths=source_relative
+
+  - plugin: buf.build/bufbuild/connect-go
+    out: .
+    opt:
+      - paths=source_relative
+
+  - plugin: buf.build/grpc-ecosystem/openapiv2
+    out: doc
+    
+  - plugin: openapi
+    out: doc
+    opt:
+      - fq_schema_naming=true
+      - default_response=false
+    strategy: all

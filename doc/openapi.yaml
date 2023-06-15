@@ -1,0 +1,279 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: UserService API
+    version: 0.0.1
+paths:
+    /users:
+        get:
+            tags:
+                - UserService
+            operationId: UserService_GetUserList
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.UserListResponse'
+    /users/authenticate:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_Authenticate
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.AuthenticationResponse'
+    /users/authorize:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_Authorize
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/user.AuthorizationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /users/logActivity:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_LogActivity
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/user.LogEntry'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /users/login:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/user.LoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.AuthenticationResponse'
+    /users/logout:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_Logout
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/user.LogoutRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /users/managePermission:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_ManageUserPermission
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/user.ManageUserPermissionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.User'
+    /users/profile/{userId}:
+        patch:
+            tags:
+                - UserService
+            operationId: UserService_UpdateProfile
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/user.UpdateProfileRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.User'
+    /users/register:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_Register
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/user.RegistrationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.User'
+    /users/resetPassword:
+        post:
+            tags:
+                - UserService
+            operationId: UserService_ResetPassword
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/user.ResetPasswordRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+components:
+    schemas:
+        user.AuthenticationResponse:
+            type: object
+            properties:
+                userId:
+                    type: string
+                token:
+                    type: string
+        user.AuthorizationRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+                resource:
+                    type: string
+                actions:
+                    type: array
+                    items:
+                        type: string
+        user.LogEntry:
+            type: object
+            properties:
+                userId:
+                    type: string
+                action:
+                    type: string
+                timestamp:
+                    type: string
+        user.LoginRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+        user.LogoutRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+        user.ManageUserPermissionRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+                roles:
+                    type: array
+                    items:
+                        type: string
+                permissions:
+                    type: array
+                    items:
+                        type: string
+        user.RegistrationRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+                email:
+                    type: string
+                phone:
+                    type: string
+        user.ResetPasswordRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+                verificationCode:
+                    type: string
+                newPassword:
+                    type: string
+        user.UpdateProfileRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+                email:
+                    type: string
+                phone:
+                    type: string
+        user.User:
+            type: object
+            properties:
+                id:
+                    type: string
+                username:
+                    type: string
+                password:
+                    type: string
+                email:
+                    type: string
+                phone:
+                    type: string
+        user.UserListResponse:
+            type: object
+            properties:
+                users:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/user.User'
+tags:
+    - name: UserService

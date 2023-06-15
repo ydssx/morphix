@@ -3,6 +3,7 @@ module github.com/ydssx/morphix
 go 1.20
 
 require (
+	github.com/bufbuild/connect-go v1.8.0
 	github.com/go-kratos/kratos/v2 v2.6.2
 	github.com/golang/glog v1.1.0
 	github.com/google/wire v0.5.0
