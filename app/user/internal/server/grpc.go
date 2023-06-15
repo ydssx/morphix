@@ -3,26 +3,27 @@ package server
 import (
 
 	// "github.com/go-kratos/kratos/v2/middleware/logging"
+	"github.com/go-kratos/kratos/v2/log"
+	"go.uber.org/zap"
+
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
-	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	user "github.com/ydssx/morphix/app/user/api"
 	"github.com/ydssx/morphix/app/user/internal/conf"
-	"github.com/ydssx/morphix/app/user/internal/server/middleware"
+	"github.com/ydssx/morphix/app/user/internal/server/interceptors"
 	"github.com/ydssx/morphix/app/user/internal/service"
-	"go.uber.org/zap"
 )
 
-func NewGRPCServer(c *conf.Server, userSvc *service.UserService) *grpc.Server {
-	logopts := []logging.Option{
-		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
-		// Add any other option (check functions starting with logging.With).
-	}
+func NewGRPCServer(c *conf.Server, userSvc *service.UserService, logger log.Logger, zaplog *zap.Logger) *grpc.Server {
 
 	var opts = []grpc.ServerOption{
+		grpc.UnaryInterceptor(
+			interceptors.TraceInterceptor(),
+			interceptors.LoggingInterceptor(zaplog),
+		),
 		grpc.Middleware(recovery.Recovery()),
-		grpc.UnaryInterceptor(logging.UnaryServerInterceptor(middleware.InterceptorLogger(zap.NewExample()), logopts...)),
 	}
+
 	if c.Grpc.Network != "" {
 		opts = append(opts, grpc.Network(c.Grpc.Network))
 	}

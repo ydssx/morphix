@@ -11,6 +11,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/ydssx/morphix/app/user/internal/conf"
 	_ "go.uber.org/automaxprocs"
+	"go.uber.org/zap"
 )
 
 var flagconf string
@@ -33,7 +34,7 @@ func main() {
 		panic(err)
 	}
 
-	app, cleanup, err := wireApp(bc.Server, bc.Data, log.DefaultLogger)
+	app, cleanup, err := wireApp(bc.Server, bc.Data, log.DefaultLogger, zap.NewExample())
 	if err != nil {
 		panic(err)
 	}

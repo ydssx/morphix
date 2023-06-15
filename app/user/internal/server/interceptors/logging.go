@@ -1,14 +1,16 @@
-package middleware
+package interceptors
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
-func InterceptorLogger(l *zap.Logger) logging.Logger {
+func interceptorLogger(l *zap.Logger) logging.Logger {
 	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
 		f := make([]zap.Field, 0, len(fields)/2)
 
@@ -29,7 +31,7 @@ func InterceptorLogger(l *zap.Logger) logging.Logger {
 		}
 
 		logger := l.WithOptions(zap.AddCallerSkip(1)).With(f...)
-
+		
 		switch lvl {
 		case logging.LevelDebug:
 			logger.Debug(msg)
@@ -43,4 +45,20 @@ func InterceptorLogger(l *zap.Logger) logging.Logger {
 			panic(fmt.Sprintf("unknown level %v", lvl))
 		}
 	})
+}
+
+func LoggingInterceptor(l *zap.Logger) grpc.UnaryServerInterceptor {
+	logTraceID := func(ctx context.Context) logging.Fields {
+		if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
+			return logging.Fields{"traceID", span.TraceID().String()}
+		}
+		return nil
+	}
+	opts := []logging.Option{
+		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
+		logging.WithFieldsFromContext(logTraceID),
+		logging.WithTimestampFormat("2006-01-02 15:04:05"),
+		// Add any other option (check functions starting with logging.With).
+	}
+	return logging.UnaryServerInterceptor(interceptorLogger(l), opts...)
 }
