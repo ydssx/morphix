@@ -28,10 +28,12 @@ plugins:
       - paths=source_relative
 
   - plugin: buf.build/grpc-ecosystem/openapiv2
-    out: doc
+    out: docs
+    opt:
+      - allow_merge=true
     
   - plugin: openapi
-    out: doc
+    out: docs
     opt:
       - fq_schema_naming=true
       - default_response=false

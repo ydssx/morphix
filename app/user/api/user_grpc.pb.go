@@ -36,7 +36,9 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
+	// 用户注册
 	Register(ctx context.Context, in *RegistrationRequest, opts ...grpc.CallOption) (*User, error)
+	// 用户登录
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*AuthenticationResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*User, error)
@@ -150,7 +152,9 @@ func (c *userServiceClient) LogActivity(ctx context.Context, in *LogEntry, opts 
 // All implementations should embed UnimplementedUserServiceServer
 // for forward compatibility
 type UserServiceServer interface {
+	// 用户注册
 	Register(context.Context, *RegistrationRequest) (*User, error)
+	// 用户登录
 	Login(context.Context, *LoginRequest) (*AuthenticationResponse, error)
 	Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error)
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*User, error)

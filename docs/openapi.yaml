@@ -4,6 +4,7 @@
 openapi: 3.0.3
 info:
     title: UserService API
+    description: 用户服务
     version: 0.0.1
 paths:
     /users:
@@ -68,6 +69,7 @@ paths:
         post:
             tags:
                 - UserService
+            description: 用户登录
             operationId: UserService_Login
             requestBody:
                 content:
@@ -143,6 +145,7 @@ paths:
         post:
             tags:
                 - UserService
+            description: 用户注册
             operationId: UserService_Register
             requestBody:
                 content:
@@ -231,12 +234,16 @@ components:
             properties:
                 username:
                     type: string
+                    description: 用户名
                 password:
                     type: string
+                    description: 密码
                 email:
                     type: string
+                    description: 邮箱
                 phone:
                     type: string
+                    description: 手机号
         user.ResetPasswordRequest:
             type: object
             properties:

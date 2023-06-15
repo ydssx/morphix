@@ -139,6 +139,7 @@
     },
     "/users/login": {
       "post": {
+        "summary": "用户登录",
         "operationId": "UserService_Login",
         "responses": {
           "200": {
@@ -283,6 +284,7 @@
     },
     "/users/register": {
       "post": {
+        "summary": "用户注册",
         "operationId": "UserService_Register",
         "responses": {
           "200": {
@@ -462,17 +464,20 @@
       "type": "object",
       "properties": {
         "username": {
-          "type": "string"
+          "type": "string",
+          "title": "用户名"
         },
         "password": {
-          "type": "string"
+          "type": "string",
+          "title": "密码"
         },
         "email": {
-          "type": "string"
+          "type": "string",
+          "title": "邮箱"
         },
         "phone": {
           "type": "string",
-          "description": "其他注册信息字段..."
+          "title": "手机号"
         }
       }
     },

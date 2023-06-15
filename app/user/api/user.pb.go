@@ -106,10 +106,14 @@ type RegistrationRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// 用户名
 	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	// 密码
 	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	Email    string `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Phone    string `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"` // 其他注册信息字段...
+	// 邮箱
+	Email string `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	// 手机号
+	Phone string `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`
 }
 
 func (x *RegistrationRequest) Reset() {

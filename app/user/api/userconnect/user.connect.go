@@ -62,7 +62,9 @@ const (
 
 // UserServiceClient is a client for the user.UserService service.
 type UserServiceClient interface {
+	// 用户注册
 	Register(context.Context, *connect_go.Request[api.RegistrationRequest]) (*connect_go.Response[api.User], error)
+	// 用户登录
 	Login(context.Context, *connect_go.Request[api.LoginRequest]) (*connect_go.Response[api.AuthenticationResponse], error)
 	Logout(context.Context, *connect_go.Request[api.LogoutRequest]) (*connect_go.Response[emptypb.Empty], error)
 	UpdateProfile(context.Context, *connect_go.Request[api.UpdateProfileRequest]) (*connect_go.Response[api.User], error)
@@ -203,7 +205,9 @@ func (c *userServiceClient) LogActivity(ctx context.Context, req *connect_go.Req
 
 // UserServiceHandler is an implementation of the user.UserService service.
 type UserServiceHandler interface {
+	// 用户注册
 	Register(context.Context, *connect_go.Request[api.RegistrationRequest]) (*connect_go.Response[api.User], error)
+	// 用户登录
 	Login(context.Context, *connect_go.Request[api.LoginRequest]) (*connect_go.Response[api.AuthenticationResponse], error)
 	Logout(context.Context, *connect_go.Request[api.LogoutRequest]) (*connect_go.Response[emptypb.Empty], error)
 	UpdateProfile(context.Context, *connect_go.Request[api.UpdateProfileRequest]) (*connect_go.Response[api.User], error)
