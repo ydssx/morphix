@@ -12,8 +12,60 @@ services:
       - "16686:16686"
       - "14268:14268"
       # - "9411:9411"
-    # environment:
-    #   - SPAN_STORAGE_TYPE=elasticsearch
-    #   - ES_SERVER_URLS=http://elasticsearch:9200
-    #   - LOG_LEVEL=debug
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+      - ES_SERVER_URLS=http://elasticsearch:9200
+      - LOG_LEVEL=debug
+    networks:
+      - morphix_net
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./data/prometheus/data:/prometheus
+    networks:
+      - morphix_net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    hostname: grafana
+    user: root
+    environment:
+      # 时区上海 - Time zone Shanghai (Change if needed)
+      TZ: Asia/Shanghai
+    restart: always
+    volumes:
+        - ./data/grafana/data:/var/lib/grafana
+    ports:
+        - "3000:3000"
+    networks:
+      - morphix_net
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.4
+    container_name: elasticsearch
+    user: root
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./data/elasticsearch/data:/usr/share/elasticsearch/data
+    restart: always
+    ports:
+    - 9200:9200
+    - 9300:9300
+    networks:
+      - morphix_net
+
+networks:
+  morphix_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

@@ -57,7 +57,7 @@ func Run(ctx context.Context, c conf.Config) error {
 	server.GET("/hello", func(c *gin.Context) {
 		c.String(http.StatusOK, "Hello, World!")
 	})
-	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	server.Any("/metrics", gin.WrapH(promhttp.Handler()))
 	// mux.HandleFunc("/openapiv2/", openAPIServer(opts.OpenAPIDir))
 	// mux.HandleFunc("/healthz", healthzServer(conn))
 	opts := []gwruntime.ServeMuxOption{}
@@ -68,10 +68,6 @@ func Run(ctx context.Context, c conf.Config) error {
 	if err != nil {
 		return err
 	}
-
-	// server.GET("/test", func(c *gin.Context) {
-	// 	c.String(http.StatusOK, "Ok")
-	// })
 
 	server.Any("/api/*any", gin.WrapH(gw))
 

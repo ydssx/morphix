@@ -5,19 +5,22 @@ import (
 
 	grpcprom "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.opentelemetry.io/otel"
 	eptprom "go.opentelemetry.io/otel/exporters/prometheus"
-	"go.opentelemetry.io/otel/sdk/metric"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 )
 
-func InitMeter() error {
+func InitMeterProvider() error {
 	exporter, err := eptprom.New()
 	if err != nil {
 		return err
 	}
-	provider := metric.NewMeterProvider(metric.WithReader(exporter))
+	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(exporter))
 	_ = provider.Meter("github.com/open-telemetry/opentelemetry-go/example/prometheus")
+
+	otel.SetMeterProvider(provider)
 	return nil
 }
 
