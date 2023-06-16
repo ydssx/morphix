@@ -7,7 +7,7 @@ info:
     description: 用户服务
     version: 0.0.1
 paths:
-    /users:
+    /api/users:
         get:
             tags:
                 - UserService
@@ -19,7 +19,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/user.UserListResponse'
-    /users/authenticate:
+    /api/users/authenticate:
         post:
             tags:
                 - UserService
@@ -35,7 +35,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/user.AuthenticationResponse'
-    /users/authorize:
+    /api/users/authorize:
         post:
             tags:
                 - UserService
@@ -50,7 +50,7 @@ paths:
                 "200":
                     description: OK
                     content: {}
-    /users/logActivity:
+    /api/users/logActivity:
         post:
             tags:
                 - UserService
@@ -65,7 +65,7 @@ paths:
                 "200":
                     description: OK
                     content: {}
-    /users/login:
+    /api/users/login:
         post:
             tags:
                 - UserService
@@ -84,7 +84,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/user.AuthenticationResponse'
-    /users/logout:
+    /api/users/logout:
         post:
             tags:
                 - UserService
@@ -99,7 +99,7 @@ paths:
                 "200":
                     description: OK
                     content: {}
-    /users/managePermission:
+    /api/users/managePermission:
         post:
             tags:
                 - UserService
@@ -117,7 +117,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/user.User'
-    /users/profile/{userId}:
+    /api/users/profile/{userId}:
         patch:
             tags:
                 - UserService
@@ -141,7 +141,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/user.User'
-    /users/register:
+    /api/users/register:
         post:
             tags:
                 - UserService
@@ -160,7 +160,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/user.User'
-    /users/resetPassword:
+    /api/users/resetPassword:
         post:
             tags:
                 - UserService

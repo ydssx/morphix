@@ -30,8 +30,8 @@ func interceptorLogger(l *zap.Logger) logging.Logger {
 			}
 		}
 
-		logger := l.WithOptions(zap.AddCallerSkip(1)).With(f...)
-		
+		logger := l.WithOptions(zap.AddCallerSkip(2)).With(f...)
+
 		switch lvl {
 		case logging.LevelDebug:
 			logger.Debug(msg)
@@ -54,11 +54,13 @@ func LoggingInterceptor(l *zap.Logger) grpc.UnaryServerInterceptor {
 		}
 		return nil
 	}
+
 	opts := []logging.Option{
-		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
+		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall, logging.PayloadReceived, logging.PayloadSent),
 		logging.WithFieldsFromContext(logTraceID),
 		logging.WithTimestampFormat("2006-01-02 15:04:05"),
 		// Add any other option (check functions starting with logging.With).
 	}
+	
 	return logging.UnaryServerInterceptor(interceptorLogger(l), opts...)
 }

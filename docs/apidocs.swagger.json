@@ -16,7 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/users": {
+    "/api/users": {
       "get": {
         "operationId": "UserService_GetUserList",
         "responses": {
@@ -38,7 +38,7 @@
         ]
       }
     },
-    "/users/authenticate": {
+    "/api/users/authenticate": {
       "post": {
         "operationId": "UserService_Authenticate",
         "responses": {
@@ -71,7 +71,7 @@
         ]
       }
     },
-    "/users/authorize": {
+    "/api/users/authorize": {
       "post": {
         "operationId": "UserService_Authorize",
         "responses": {
@@ -104,7 +104,7 @@
         ]
       }
     },
-    "/users/logActivity": {
+    "/api/users/logActivity": {
       "post": {
         "operationId": "UserService_LogActivity",
         "responses": {
@@ -137,7 +137,7 @@
         ]
       }
     },
-    "/users/login": {
+    "/api/users/login": {
       "post": {
         "summary": "用户登录",
         "operationId": "UserService_Login",
@@ -170,7 +170,7 @@
         ]
       }
     },
-    "/users/logout": {
+    "/api/users/logout": {
       "post": {
         "operationId": "UserService_Logout",
         "responses": {
@@ -203,7 +203,7 @@
         ]
       }
     },
-    "/users/managePermission": {
+    "/api/users/managePermission": {
       "post": {
         "operationId": "UserService_ManageUserPermission",
         "responses": {
@@ -235,7 +235,7 @@
         ]
       }
     },
-    "/users/profile/{userId}": {
+    "/api/users/profile/{userId}": {
       "patch": {
         "operationId": "UserService_UpdateProfile",
         "responses": {
@@ -282,7 +282,7 @@
         ]
       }
     },
-    "/users/register": {
+    "/api/users/register": {
       "post": {
         "summary": "用户注册",
         "operationId": "UserService_Register",
@@ -315,7 +315,7 @@
         ]
       }
     },
-    "/users/resetPassword": {
+    "/api/users/resetPassword": {
       "post": {
         "operationId": "UserService_ResetPassword",
         "responses": {

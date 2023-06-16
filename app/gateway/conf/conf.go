@@ -14,7 +14,7 @@ type Config struct {
 type RpcConf struct {
 	Network string `yaml:"network,omitempty"`
 	Addr    string `yaml:"addr,omitempty"`
-	Timeout string	`yaml:"timeout"`
+	Timeout string `yaml:"timeout"`
 }
 
 func MustLoad(path string, v *Config) {

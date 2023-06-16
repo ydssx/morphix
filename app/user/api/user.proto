@@ -13,69 +13,69 @@ service UserService {
   // 用户注册
   rpc Register(RegistrationRequest) returns (User) {
     option (google.api.http) = {
-      post: "/users/register"
+      post: "/api/users/register"
       body: "*"
     };
   }
   // 用户登录
   rpc Login(LoginRequest) returns (AuthenticationResponse) {
     option (google.api.http) = {
-      post: "/users/login"
+      post: "/api/users/login"
       body: "*"
     };
   }
 
   rpc Logout(LogoutRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/users/logout"
+      post: "/api/users/logout"
       body: "*"
     };
   }
 
   rpc UpdateProfile(UpdateProfileRequest) returns (User) {
     option (google.api.http) = {
-      patch: "/users/profile/{user_id}"
+      patch: "/api/users/profile/{user_id}"
       body: "*"
     };
   }
 
   rpc ResetPassword(ResetPasswordRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/users/resetPassword"
+      post: "/api/users/resetPassword"
       body: "*"
     };
   }
 
   rpc Authenticate(google.protobuf.Empty) returns (AuthenticationResponse) {
     option (google.api.http) = {
-      post: "/users/authenticate"
+      post: "/api/users/authenticate"
       body: "*"
     };
   }
 
   rpc Authorize(AuthorizationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/users/authorize"
+      post: "/api/users/authorize"
       body: "*"
     };
   }
 
   rpc GetUserList(google.protobuf.Empty) returns (UserListResponse) {
     option (google.api.http) = {
-      get: "/users"
+      get: "/api/users"
     };
   }
 
   rpc ManageUserPermission(ManageUserPermissionRequest) returns (User) {
     option (google.api.http) = {
-      post: "/users/managePermission"
+      post: "/api/users/managePermission"
       body: "*"
     };
   }
 
   rpc LogActivity(LogEntry) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/users/logActivity"
+      post: "/api/users/logActivity"
       body: "*"
     };
   }

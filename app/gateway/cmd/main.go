@@ -11,7 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/ydssx/morphix/app/gateway/conf"
+	"github.com/ydssx/morphix/pkg/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 )
@@ -43,8 +45,19 @@ func Run(ctx context.Context, c conf.Config) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	err := trace.InitTracer("http://localhost:14268/api/traces", "gateway")
+	if err != nil {
+		panic(err)
+	}
+
 	server := gin.New()
+
 	server.Use(gin.Logger())
+
+	server.GET("/hello", func(c *gin.Context) {
+		c.String(http.StatusOK, "Hello, World!")
+	})
+	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	// mux.HandleFunc("/openapiv2/", openAPIServer(opts.OpenAPIDir))
 	// mux.HandleFunc("/healthz", healthzServer(conn))
 	opts := []gwruntime.ServeMuxOption{}
@@ -60,7 +73,7 @@ func Run(ctx context.Context, c conf.Config) error {
 	// 	c.String(http.StatusOK, "Ok")
 	// })
 
-	server.Any("*any", gin.WrapH(gw))
+	server.Any("/api/*any", gin.WrapH(gw))
 
 	err = server.Run(c.Addr)
 	if err != nil {
