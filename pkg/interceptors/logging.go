@@ -47,7 +47,7 @@ func interceptorLogger(l *zap.Logger) logging.Logger {
 	})
 }
 
-func LoggingInterceptor(l *zap.Logger) grpc.UnaryServerInterceptor {
+func LoggingServerInterceptor(l *zap.Logger) grpc.UnaryServerInterceptor {
 	logTraceID := func(ctx context.Context) logging.Fields {
 		if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
 			return logging.Fields{"traceID", span.TraceID().String()}
@@ -61,6 +61,6 @@ func LoggingInterceptor(l *zap.Logger) grpc.UnaryServerInterceptor {
 		logging.WithTimestampFormat("2006-01-02 15:04:05"),
 		// Add any other option (check functions starting with logging.With).
 	}
-	
+
 	return logging.UnaryServerInterceptor(interceptorLogger(l), opts...)
 }

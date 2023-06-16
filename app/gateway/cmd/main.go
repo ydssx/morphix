@@ -4,40 +4,22 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
-	"path"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-kratos/kratos/v2"
+	khttp "github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/go-kratos/swagger-api/openapiv2"
 	"github.com/golang/glog"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/ydssx/morphix/app/gateway/conf"
-	"github.com/ydssx/morphix/pkg/trace"
+	"github.com/ydssx/morphix/pkg/provider"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 )
-
-// Endpoint describes a gRPC endpoint
-type Endpoint struct {
-	Name, Network, Addr string
-}
-
-// Options is a set of options to be passed to Run
-type Options struct {
-	// Addr is the address to listen
-	Addr string
-
-	// GRPCServer defines an endpoint of a gRPC service
-	GRPCServer []Endpoint
-
-	// OpenAPIDir is a path to a directory from which the server
-	// serves OpenAPI specs.
-	OpenAPIDir string
-
-	// Mux is a list of options to be passed to the gRPC-Gateway multiplexer
-	Mux []gwruntime.ServeMuxOption
-}
 
 // Run starts a HTTP server and blocks while running if successful.
 // The server will be shutdown when "ctx" is canceled.
@@ -45,18 +27,20 @@ func Run(ctx context.Context, c conf.Config) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	err := trace.InitTracer("http://localhost:14268/api/traces", "gateway")
+	tp, err := provider.InitTraceProvider("http://localhost:14268/api/traces", "gateway")
 	if err != nil {
 		panic(err)
 	}
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			log.Printf("Error shutting down tracer provider: %v", err)
+		}
+	}()
 
 	server := gin.New()
 
-	server.Use(gin.Logger())
+	server.Use(gin.Logger(), gin.Recovery())
 
-	server.GET("/hello", func(c *gin.Context) {
-		c.String(http.StatusOK, "Hello, World!")
-	})
 	server.Any("/metrics", gin.WrapH(promhttp.Handler()))
 	// mux.HandleFunc("/openapiv2/", openAPIServer(opts.OpenAPIDir))
 	// mux.HandleFunc("/healthz", healthzServer(conn))
@@ -68,30 +52,24 @@ func Run(ctx context.Context, c conf.Config) error {
 	if err != nil {
 		return err
 	}
-
 	server.Any("/api/*any", gin.WrapH(gw))
 
-	err = server.Run(c.Addr)
-	if err != nil {
-		panic(err)
+	httpSrv := khttp.NewServer(khttp.Address(c.Addr))
+
+	openAPIhandler := openapiv2.NewHandler()
+	httpSrv.HandlePrefix("/q/", openAPIhandler)
+	
+	httpSrv.HandlePrefix("/", server)
+	app := kratos.New(
+		kratos.Name("gateway"),
+		kratos.Server(
+			httpSrv,
+		),
+	)
+	if err := app.Run(); err != nil {
+		log.Fatal(err)
 	}
 	return nil
-}
-
-// openAPIServer returns OpenAPI specification files located under "/openapiv2/"
-func openAPIServer(dir string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if !strings.HasSuffix(r.URL.Path, ".swagger.json") {
-			glog.Errorf("Not Found: %s", r.URL.Path)
-			http.NotFound(w, r)
-			return
-		}
-
-		glog.Infof("Serving %s", r.URL.Path)
-		p := strings.TrimPrefix(r.URL.Path, "docs/")
-		p = path.Join(dir, p)
-		http.ServeFile(w, r, p)
-	}
 }
 
 // allowCORS allows Cross Origin Resoruce Sharing from any origin.

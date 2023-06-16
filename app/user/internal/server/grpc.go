@@ -3,30 +3,25 @@ package server
 import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
-	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	user "github.com/ydssx/morphix/app/user/api"
 	"github.com/ydssx/morphix/app/user/internal/conf"
-	"github.com/ydssx/morphix/app/user/internal/server/interceptors"
 	"github.com/ydssx/morphix/app/user/internal/service"
-	"github.com/ydssx/morphix/pkg/trace"
+	"github.com/ydssx/morphix/pkg/interceptors"
+	"github.com/ydssx/morphix/pkg/middleware/kratos"
 	"go.uber.org/zap"
 )
 
 func NewGRPCServer(c *conf.Server, userSvc *service.UserService, logger log.Logger, zaplog *zap.Logger) *grpc.Server {
-	err := trace.InitTracer("http://localhost:14268/api/traces", "user-rpc")
-	if err != nil {
-		panic(err)
-	}
 
 	var opts = []grpc.ServerOption{
 		grpc.UnaryInterceptor(
-			// interceptors.TraceInterceptor(),
-			interceptors.LoggingInterceptor(zaplog),
+			interceptors.TraceServerInterceptor(),
+			interceptors.LoggingServerInterceptor(zaplog),
 		),
 		grpc.Middleware(
+			kratos.MetricServer(),
 			recovery.Recovery(),
-			tracing.Server(),
 		),
 	}
 

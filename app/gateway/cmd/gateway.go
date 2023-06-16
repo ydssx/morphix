@@ -9,8 +9,7 @@ import (
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/ydssx/morphix/app/gateway/conf"
 	user "github.com/ydssx/morphix/app/user/api"
-	"github.com/ydssx/morphix/pkg/metric"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"github.com/ydssx/morphix/pkg/interceptors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -28,7 +27,9 @@ func newGateway(ctx context.Context, opts []gwruntime.ServeMuxOption) (http.Hand
 
 	dialOpts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithChainUnaryInterceptor(otelgrpc.UnaryClientInterceptor(), metric.InitMetric()),
+		grpc.WithChainUnaryInterceptor(
+			interceptors.TraceClientInterceptor(),
+			interceptors.MetricClientInterceptor()),
 	}
 
 	for endpoint, f := range handlers {

@@ -10,6 +10,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/ydssx/morphix/app/user/internal/conf"
+	"github.com/ydssx/morphix/pkg/provider"
 	_ "go.uber.org/automaxprocs"
 	"go.uber.org/zap"
 )
@@ -34,6 +35,20 @@ func main() {
 		panic(err)
 	}
 
+	tp, _ := provider.InitTraceProvider("http://localhost:14268/api/traces", "user-rpc")
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			log.Errorf("Error shutting down tracer provider: %v", err)
+		}
+	}()
+
+	mp := provider.InitMeterProvider()
+	defer func() {
+		if err := mp.Shutdown(context.Background()); err != nil {
+			log.Errorf("Error shutting down meter provider: %v", err)
+		}
+	}()
+	
 	app, cleanup, err := wireApp(bc.Server, bc.Data, log.DefaultLogger, zap.NewExample())
 	if err != nil {
 		panic(err)
