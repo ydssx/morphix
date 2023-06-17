@@ -70,5 +70,5 @@ func InitMeterProvider() *sdkmetric.MeterProvider {
 	)
 
 	otel.SetMeterProvider(provider)
-	return nil
+	return provider
 }

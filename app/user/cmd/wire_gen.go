@@ -14,24 +14,26 @@ import (
 	"github.com/ydssx/morphix/app/user/internal/data"
 	"github.com/ydssx/morphix/app/user/internal/server"
 	"github.com/ydssx/morphix/app/user/internal/service"
-
-	_ "go.uber.org/automaxprocs"
 	"go.uber.org/zap"
+)
+
+import (
+	_ "go.uber.org/automaxprocs"
 )
 
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger,zaplog *zap.Logger) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger, zapLogger *zap.Logger, bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
 	dataData, cleanup, err := data.NewData(confData, logger)
 	if err != nil {
 		return nil, nil, err
 	}
 	userRepo := data.NewGreeterRepo(dataData)
 	userUsecase := biz.NewGreeterUsecase(userRepo)
-	userService := service.NewUserService(userUsecase,zaplog)
-	grpcServer := server.NewGRPCServer(confServer, userService, logger,zaplog)
-	app := newApp(grpcServer)
+	userService := service.NewUserService(userUsecase, zapLogger)
+	grpcServer := server.NewGRPCServer(confServer, userService, logger, zapLogger)
+	app := newApp(grpcServer, bootstrap)
 	return app, func() {
 		cleanup()
 	}, nil

@@ -8,4 +8,7 @@ scrape_configs:
       - targets: ["localhost:9090"]
   - job_name: gateway_server
     static_configs:
-      - targets: ["localhost:8000"]
+      - targets: ["host.docker.internal:8000"]
+  - job_name: etcd
+    static_configs:
+      - targets: ["host.docker.internal:2379"]

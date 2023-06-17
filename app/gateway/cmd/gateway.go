@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"net"
 	"net/http"
 
+	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
+	"github.com/go-kratos/kratos/v2/transport/grpc/resolver/discovery"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/ydssx/morphix/app/gateway/conf"
 	user "github.com/ydssx/morphix/app/user/api"
@@ -22,7 +22,8 @@ func registerRpcServer(c conf.Config) {
 	handlers[c.UserRpc.Addr] = user.RegisterUserServiceHandlerFromEndpoint
 }
 
-func newGateway(ctx context.Context, opts []gwruntime.ServeMuxOption) (http.Handler, error) {
+func newGateway(ctx context.Context, opts []gwruntime.ServeMuxOption, r *etcd.Registry) (http.Handler, error) {
+
 	mux := gwruntime.NewServeMux(opts...)
 
 	dialOpts := []grpc.DialOption{
@@ -30,6 +31,13 @@ func newGateway(ctx context.Context, opts []gwruntime.ServeMuxOption) (http.Hand
 		grpc.WithChainUnaryInterceptor(
 			interceptors.TraceClientInterceptor(),
 			interceptors.MetricClientInterceptor()),
+		grpc.WithResolvers(
+			discovery.NewBuilder(
+				r,
+				discovery.WithInsecure(true),
+				discovery.WithSubset(25),
+				discovery.PrintDebugLog(true),
+			)),
 	}
 
 	for endpoint, f := range handlers {
@@ -39,30 +47,4 @@ func newGateway(ctx context.Context, opts []gwruntime.ServeMuxOption) (http.Hand
 	}
 
 	return mux, nil
-}
-
-func dial(ctx context.Context, network, addr string) (*grpc.ClientConn, error) {
-	switch network {
-	case "tcp":
-		return dialTCP(ctx, addr)
-	case "unix":
-		return dialUnix(ctx, addr)
-	default:
-		return nil, fmt.Errorf("unsupported network type %q", network)
-	}
-}
-
-// dialTCP creates a client connection via TCP.
-// "addr" must be a valid TCP address with a port number.
-func dialTCP(ctx context.Context, addr string) (*grpc.ClientConn, error) {
-	return grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-}
-
-// dialUnix creates a client connection via a unix domain socket.
-// "addr" must be a valid path to the socket.
-func dialUnix(ctx context.Context, addr string) (*grpc.ClientConn, error) {
-	d := func(ctx context.Context, addr string) (net.Conn, error) {
-		return (&net.Dialer{}).DialContext(ctx, "unix", addr)
-	}
-	return grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithContextDialer(d))
 }
