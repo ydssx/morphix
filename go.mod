@@ -67,6 +67,7 @@ require (
 require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-kratos/aegis v0.2.0 // indirect
+	github.com/go-kratos/kratos/contrib/log/zap/v2 v2.0.0-20230616115456-fcd3b18e8344
 	github.com/go-kratos/kratos/contrib/metrics/prometheus/v2 v2.0.0-20230616115456-fcd3b18e8344
 	github.com/go-kratos/kratos/contrib/registry/etcd/v2 v2.0.0-20230616115456-fcd3b18e8344
 	github.com/go-kratos/swagger-api v1.0.1

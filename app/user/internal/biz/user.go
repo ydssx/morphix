@@ -2,6 +2,9 @@ package biz
 
 import (
 	"context"
+
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/ydssx/morphix/pkg/logger"
 )
 
 // Greeter is a Greeter model.
@@ -18,17 +21,18 @@ type UserRepo interface {
 	ListAll(context.Context) ([]*Greeter, error)
 }
 
-// UserUsecase is a Greeter usecase.
 type UserUsecase struct {
 	repo UserRepo
+	log  *log.Helper
 }
 
-// NewGreeterUsecase new a Greeter usecase.
-func NewGreeterUsecase(repo UserRepo) *UserUsecase {
-	return &UserUsecase{repo: repo}
+func NewUserUsecase(repo UserRepo, logger log.Logger) *UserUsecase {
+	return &UserUsecase{repo: repo, log: log.NewHelper(logger)}
 }
 
-// CreateGreeter creates a Greeter, and returns the new Greeter.
-func (uc *UserUsecase) CreateGreeter(ctx context.Context, g *Greeter) (*Greeter, error) {
-	return uc.repo.Save(ctx, g)
+func (uc *UserUsecase) ListUser(ctx context.Context, g *Greeter) (*Greeter, error) {
+	logger.Info(ctx, "用户列表")
+	logger.Infof(ctx, "用户列表:%v",123)
+	uc.repo.ListAll(ctx)
+	return nil, nil
 }

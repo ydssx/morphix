@@ -11,10 +11,10 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/ydssx/morphix/app/user/internal/conf"
+	"github.com/ydssx/morphix/pkg/logger"
 	"github.com/ydssx/morphix/pkg/provider"
 	etcdclient "go.etcd.io/etcd/client/v3"
 	_ "go.uber.org/automaxprocs"
-	"go.uber.org/zap"
 )
 
 var flagconf string
@@ -36,21 +36,11 @@ func main() {
 	if err := c.Scan(&bc); err != nil {
 		panic(err)
 	}
-	tp, _ := provider.InitTraceProvider("http://localhost:14268/api/traces", "user-rpc")
-	defer func() {
-		if err := tp.Shutdown(context.Background()); err != nil {
-			log.Errorf("Error shutting down tracer provider: %v", err)
-		}
-	}()
 
-	mp := provider.InitMeterProvider()
-	defer func() {
-		if err := mp.Shutdown(context.Background()); err != nil {
-			log.Errorf("Error shutting down meter provider: %v", err)
-		}
-	}()
-
-	app, cleanup, err := wireApp(bc.Server, bc.Data, log.DefaultLogger, zap.NewExample(),&bc)
+	x := log.With(logger.DefaultLogger, "caller", log.Caller(5), "ts", log.Timestamp("2006-01-02 15:04:05"))
+	log.SetLogger(x)
+	
+	app, cleanup, err := wireApp(bc.Server, bc.Data, logger.DefaultLogger, &bc)
 	if err != nil {
 		panic(err)
 	}
@@ -70,6 +60,11 @@ func newApp(gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
 		log.Fatal(err)
 	}
 	r := etcd.New(client)
+
+	tp, _ := provider.InitTraceProvider("http://localhost:14268/api/traces", "user-rpc")
+
+	mp := provider.InitMeterProvider()
+
 	return kratos.New(
 		kratos.Name(c.Name),
 		kratos.Metadata(map[string]string{}),
@@ -79,5 +74,7 @@ func newApp(gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
 			log.Infow("app.version", "1.0.0")
 			return nil
 		}),
+		kratos.AfterStop(tp.Shutdown),
+		kratos.AfterStop(mp.Shutdown),
 	)
 }

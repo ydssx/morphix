@@ -40,9 +40,9 @@ services:
       TZ: Asia/Shanghai
     restart: always
     volumes:
-        - ./data/grafana/data:/var/lib/grafana
+      - ./data/grafana/data:/var/lib/grafana
     ports:
-        - "3000:3000"
+      - "3000:3000"
     networks:
       - morphix_net
 
@@ -56,10 +56,10 @@ services:
       - TZ=Asia/Shanghai
     volumes:
       - ./data/elasticsearch/data:/usr/share/elasticsearch/data
-    restart: always
+    # restart: always
     ports:
-    - 9200:9200
-    - 9300:9300
+      - 9200:9200
+      - 9300:9300
     networks:
       - morphix_net
 
@@ -85,6 +85,26 @@ services:
       MYSQL_DATABASE: morphix
     volumes:
       - ./data/mysql/data:/var/lib/mysql
+    networks:
+      - morphix_net
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - 3100:3100
+    volumes:
+      - ./deploy/loki/loki-config.yml:/etc/loki/loki-config.yml
+    networks:
+      - morphix_net
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    # volumes:
+    #   - ./promtail-config:/etc/promtail
+    command: -config.file=/etc/promtail/config.yml
     networks:
       - morphix_net
 

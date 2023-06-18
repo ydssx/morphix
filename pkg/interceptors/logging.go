@@ -4,13 +4,16 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"github.com/ydssx/morphix/pkg/logger"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
-func interceptorLogger(l *zap.Logger) logging.Logger {
+func interceptorLogger(lg log.Logger) logging.Logger {
+	l := lg.(*logger.Logger)
 	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
 		f := make([]zap.Field, 0, len(fields)/2)
 
@@ -30,7 +33,7 @@ func interceptorLogger(l *zap.Logger) logging.Logger {
 			}
 		}
 
-		logger := l.WithOptions(zap.AddCallerSkip(2)).With(f...)
+		logger := l.Zlog.WithOptions(zap.AddCallerSkip(2)).With(f...)
 
 		switch lvl {
 		case logging.LevelDebug:
@@ -44,10 +47,11 @@ func interceptorLogger(l *zap.Logger) logging.Logger {
 		default:
 			panic(fmt.Sprintf("unknown level %v", lvl))
 		}
+
 	})
 }
 
-func LoggingServerInterceptor(l *zap.Logger) grpc.UnaryServerInterceptor {
+func LoggingServerInterceptor(l log.Logger) grpc.UnaryServerInterceptor {
 	logTraceID := func(ctx context.Context) logging.Fields {
 		if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
 			return logging.Fields{"traceID", span.TraceID().String()}

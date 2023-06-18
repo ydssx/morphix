@@ -5,7 +5,6 @@ import (
 
 	user "github.com/ydssx/morphix/app/user/api"
 	"github.com/ydssx/morphix/app/user/internal/biz"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -13,13 +12,12 @@ import (
 type UserService struct {
 	user.UnimplementedUserServiceServer
 
-	uc  *biz.UserUsecase
-	log *zap.Logger
+	uc *biz.UserUsecase
 }
 
 // NewUserService new a greeter service.
-func NewUserService(uc *biz.UserUsecase, log *zap.Logger) *UserService {
-	return &UserService{uc: uc, log: log}
+func NewUserService(uc *biz.UserUsecase) *UserService {
+	return &UserService{uc: uc}
 }
 
 // 用户注册
@@ -52,8 +50,8 @@ func (uc *UserService) Authorize(_ context.Context, _ *user.AuthorizationRequest
 	panic("not implemented") // TODO: Implement
 }
 
-func (uc *UserService) GetUserList(_ context.Context, _ *emptypb.Empty) (*user.UserListResponse, error) {
-	uc.log.Info("获取用户列表")
+func (uc *UserService) GetUserList(ctx context.Context, _ *emptypb.Empty) (*user.UserListResponse, error) {
+	uc.uc.ListUser(ctx, nil)
 	return &user.UserListResponse{Users: []*user.User{{
 		Id:       "1",
 		Username: "wangxin",
