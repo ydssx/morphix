@@ -16,9 +16,3 @@ data:
     read_timeout: 0.2s
     write_timeout: 0.2s
 
-
-smsRpc:
-  network: tcp
-  addr: 127.0.0.1:9001
-  timeout: 2s
-

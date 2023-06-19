@@ -1,0 +1,17 @@
+etcd:
+  endpoints:
+    - 127.0.0.1:2379
+  timeout: 5
+
+jeager:
+  addr: http://localhost:14268/api/traces
+
+userRpcClient:
+  network: tcp
+  addr: discovery:///user-rpc
+  timeout: 2
+
+smsRpcClient:
+  network: tcp
+  addr: 127.0.0.1:9001
+  timeout: 2

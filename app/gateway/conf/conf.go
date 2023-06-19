@@ -1,37 +1,19 @@
 package conf
 
 import (
-	"os"
+	"log"
 
-	"gopkg.in/yaml.v3"
+	"github.com/ydssx/morphix/common"
 )
 
 type Config struct {
-	Name    string   `yaml:"name,omitempty"`
-	Addr    string   `yaml:"addr,omitempty" json:"addr,omitempty"`
-	UserRpc RpcConf  `yaml:"userRpc,omitempty" json:"user_rpc,omitempty"`
-	Etcd    EtcdConf `yaml:"etcd,omitempty" json:"etcd,omitempty"`
-}
-
-type RpcConf struct {
-	Network string `yaml:"network,omitempty"`
-	Addr    string `yaml:"addr,omitempty"`
-	Timeout string `yaml:"timeout"`
-}
-
-type EtcdConf struct {
-	Endpoints []string `yaml:"endpoints,omitempty"`
-	Timeout   int      `yaml:"timeout,omitempty"`
+	common.CommonConfig
+	Name    string         `mapstructure:"name,omitempty"`
+	Addr    string         `mapstructure:"addr,omitempty" json:"addr,omitempty"`
+	UserRpc common.RpcConf `mapstructure:"userRpcClient,omitempty" json:"userRpcClient,omitempty"`
 }
 
 func MustLoad(path string, v *Config) {
-	content, err := os.ReadFile(path)
-	if err != nil {
-		panic(err)
-	}
-
-	err = yaml.Unmarshal(content, &v)
-	if err != nil {
-		panic(err)
-	}
+	common.MustLoad("../../../configs", &v, path)
+	log.Print(v)
 }
