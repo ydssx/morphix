@@ -1,3 +1,4 @@
+name: gateway
 addr: 0.0.0.0:8000
 
 userRpc:

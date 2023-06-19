@@ -7,9 +7,10 @@ import (
 )
 
 type Config struct {
+	Name    string   `yaml:"name,omitempty"`
 	Addr    string   `yaml:"addr,omitempty" json:"addr,omitempty"`
-	UserRpc RpcConf  `yaml:"userRpc,omitempty"`
-	Etcd    EtcdConf `yaml:"etcd,omitempty"`
+	UserRpc RpcConf  `yaml:"userRpc,omitempty" json:"user_rpc,omitempty"`
+	Etcd    EtcdConf `yaml:"etcd,omitempty" json:"etcd,omitempty"`
 }
 
 type RpcConf struct {

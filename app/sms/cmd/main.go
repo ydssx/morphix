@@ -10,7 +10,7 @@ import (
 	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
-	"github.com/ydssx/morphix/app/user/internal/conf"
+	"github.com/ydssx/morphix/app/sms/internal/conf"
 	"github.com/ydssx/morphix/pkg/logger"
 	"github.com/ydssx/morphix/pkg/provider"
 	etcdclient "go.etcd.io/etcd/client/v3"
@@ -37,7 +37,7 @@ func main() {
 		panic(err)
 	}
 
-	app, cleanup, err := wireApp(bc.Server, logger.DefaultLogger, &bc)
+	app, cleanup, err := wireApp(bc.Server, bc.Data, logger.DefaultLogger, &bc)
 	if err != nil {
 		panic(err)
 	}
@@ -47,6 +47,7 @@ func main() {
 	if err := app.Run(); err != nil {
 		panic(err)
 	}
+
 }
 
 func newApp(gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
@@ -67,7 +68,7 @@ func newApp(gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
 		kratos.Metadata(map[string]string{}),
 		kratos.Server(gs),
 		kratos.Registrar(r),
-		kratos.BeforeStart(func(ctx context.Context) error {
+		kratos.BeforeStart(func(_ context.Context) error {
 			log.Infow("app.version", "1.0.0")
 			return nil
 		}),

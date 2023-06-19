@@ -1,7 +1,7 @@
 syntax = "proto3";
-package kratos.api;
+package conf;
 
-option go_package = "morphix/app/user/internal/conf;conf";
+option go_package = "morphix/app/sms/internal/conf;conf";
 
 import "google/protobuf/duration.proto";
 
@@ -11,7 +11,6 @@ message Bootstrap {
   string name = 3;
   Etcd etcd = 4;
   Jeager jeager = 5;
-  SmsRpc smsRpc = 6;
 }
 
 message Server {
@@ -51,10 +50,4 @@ message Etcd {
 
 message Jeager {
   string addr = 1;
-}
-
-message SmsRpc {
-  string network = 1;
-  string addr = 2;
-  string timeout = 3;
 }

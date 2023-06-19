@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+package smsv1;
+
+option go_package="github.com/ydssx/morphix/api/sms/v1;smsv1";
+
+import "google/api/annotations.proto";
+
+// 短信服务接口
+service SMSService {
+    // 发送短信
+    rpc SendSMS(SendSMSRequest) returns (SendSMSResponse) {
+      option (google.api.http) = {
+        post: "/v1/sms/send"
+        body: "*"
+      };
+    }
+  
+    // 查询短信状态
+    rpc QuerySMSStatus(QuerySMSStatusRequest) returns (QuerySMSStatusResponse) {
+      option (google.api.http) = {
+        get: "/v1/sms/status/{sms_id}/{mobile_number}"
+      };
+    }
+  
+    // 管理短信模板
+    rpc ManageSMSTemplate(TemplateManagementRequest) returns (TemplateManagementResponse) {
+      option (google.api.http) = {
+        post: "/v1/sms/template"
+        body: "*"
+      };
+    }
+  
+    // 管理短信签名
+    rpc ManageSMSSignature(SignatureManagementRequest) returns (SignatureManagementResponse) {
+      option (google.api.http) = {
+        post: "/v1/sms/signature"
+        body: "*"
+      };
+    }
+  }
+  
+// 发送短信请求
+message SendSMSRequest {
+  string mobile_number = 1;
+  string message = 2;
+  string sender_id = 3;
+  // 可选参数
+  string template_id = 4;
+  string template_parameters = 5;
+}
+
+// 发送短信响应
+message SendSMSResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+// 查询短信状态请求
+message QuerySMSStatusRequest {
+  string sms_id = 1;
+  string mobile_number = 2;
+  // 可选参数
+  int64 start_time = 3;
+  int64 end_time = 4;
+}
+
+// 查询短信状态响应
+message QuerySMSStatusResponse {
+  repeated SMSStatus status = 1;
+}
+
+// 短信状态
+message SMSStatus {
+  string sms_id = 1;
+  string mobile_number = 2;
+  string status = 3;
+  int64 timestamp = 4;
+}
+
+// 短信模板
+message SMSTemplate {
+  string template_id = 1;
+  string template_content = 2;
+  // 可选参数
+  string template_name = 3;
+  string template_status = 4;
+}
+
+// 短信签名
+message SMSSignature {
+  string signature_id = 1;
+  string signature_content = 2;
+  // 可选参数
+  string signature_type = 3;
+  string signature_status = 4;
+}
+
+// 管理短信模板请求
+message TemplateManagementRequest {
+  // 可选参数，用于创建或编辑模板
+  SMSTemplate template = 1;
+  // 可选参数，用于删除模板
+  string template_id = 2;
+}
+
+// 管理短信模板响应
+message TemplateManagementResponse {
+  bool success = 1;
+  string error_message = 2;
+  // 可选参数，返回模板列表
+  repeated SMSTemplate templates = 3;
+}
+
+// 管理短信签名请求
+message SignatureManagementRequest {
+  // 可选参数，用于创建或编辑签名
+  SMSSignature signature = 1;
+  // 可选参数，用于删除签名
+  string signature_id = 2;
+}
+
+// 管理短信签名响应
+message SignatureManagementResponse {
+  bool success = 1;
+  string error_message = 2;
+  // 可选参数，返回签名列表
+  repeated SMSSignature signatures = 3;
+}

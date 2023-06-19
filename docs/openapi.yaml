@@ -3,8 +3,7 @@
 
 openapi: 3.0.3
 info:
-    title: UserService API
-    description: 用户服务
+    title: ""
     version: 0.0.1
 paths:
     /api/users:
@@ -175,8 +174,214 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /v1/sms/send:
+        post:
+            tags:
+                - SMSService
+            description: 发送短信
+            operationId: SMSService_SendSMS
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/smsv1.SendSMSRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/smsv1.SendSMSResponse'
+    /v1/sms/signature:
+        post:
+            tags:
+                - SMSService
+            description: 管理短信签名
+            operationId: SMSService_ManageSMSSignature
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/smsv1.SignatureManagementRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/smsv1.SignatureManagementResponse'
+    /v1/sms/status/{smsId}/{mobileNumber}:
+        get:
+            tags:
+                - SMSService
+            description: 查询短信状态
+            operationId: SMSService_QuerySMSStatus
+            parameters:
+                - name: smsId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: mobileNumber
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: startTime
+                  in: query
+                  description: 可选参数
+                  schema:
+                    type: integer
+                    format: int64
+                - name: endTime
+                  in: query
+                  schema:
+                    type: integer
+                    format: int64
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/smsv1.QuerySMSStatusResponse'
+    /v1/sms/template:
+        post:
+            tags:
+                - SMSService
+            description: 管理短信模板
+            operationId: SMSService_ManageSMSTemplate
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/smsv1.TemplateManagementRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/smsv1.TemplateManagementResponse'
 components:
     schemas:
+        smsv1.QuerySMSStatusResponse:
+            type: object
+            properties:
+                status:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/smsv1.SMSStatus'
+            description: 查询短信状态响应
+        smsv1.SMSSignature:
+            type: object
+            properties:
+                signatureId:
+                    type: string
+                signatureContent:
+                    type: string
+                signatureType:
+                    type: string
+                    description: 可选参数
+                signatureStatus:
+                    type: string
+            description: 短信签名
+        smsv1.SMSStatus:
+            type: object
+            properties:
+                smsId:
+                    type: string
+                mobileNumber:
+                    type: string
+                status:
+                    type: string
+                timestamp:
+                    type: integer
+                    format: int64
+            description: 短信状态
+        smsv1.SMSTemplate:
+            type: object
+            properties:
+                templateId:
+                    type: string
+                templateContent:
+                    type: string
+                templateName:
+                    type: string
+                    description: 可选参数
+                templateStatus:
+                    type: string
+            description: 短信模板
+        smsv1.SendSMSRequest:
+            type: object
+            properties:
+                mobileNumber:
+                    type: string
+                message:
+                    type: string
+                senderId:
+                    type: string
+                templateId:
+                    type: string
+                    description: 可选参数
+                templateParameters:
+                    type: string
+            description: 发送短信请求
+        smsv1.SendSMSResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                errorMessage:
+                    type: string
+            description: 发送短信响应
+        smsv1.SignatureManagementRequest:
+            type: object
+            properties:
+                signature:
+                    $ref: '#/components/schemas/smsv1.SMSSignature'
+                signatureId:
+                    type: string
+                    description: 可选参数，用于删除签名
+            description: 管理短信签名请求
+        smsv1.SignatureManagementResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                errorMessage:
+                    type: string
+                signatures:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/smsv1.SMSSignature'
+                    description: 可选参数，返回签名列表
+            description: 管理短信签名响应
+        smsv1.TemplateManagementRequest:
+            type: object
+            properties:
+                template:
+                    $ref: '#/components/schemas/smsv1.SMSTemplate'
+                templateId:
+                    type: string
+                    description: 可选参数，用于删除模板
+            description: 管理短信模板请求
+        smsv1.TemplateManagementResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                errorMessage:
+                    type: string
+                templates:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/smsv1.SMSTemplate'
+                    description: 可选参数，返回模板列表
+            description: 管理短信模板响应
         userv1.AuthenticationResponse:
             type: object
             properties:
@@ -283,4 +488,7 @@ components:
                     items:
                         $ref: '#/components/schemas/userv1.User'
 tags:
+    - name: SMSService
+      description: 短信服务接口
     - name: UserService
+      description: 用户服务

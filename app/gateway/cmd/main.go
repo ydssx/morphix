@@ -75,7 +75,7 @@ func Run(ctx context.Context, c conf.Config) error {
 	httpSrv.HandlePrefix("/", server)
 
 	app := kratos.New(
-		kratos.Name("gateway"),
+		kratos.Name(c.Name),
 		kratos.Server(
 			httpSrv,
 		),
