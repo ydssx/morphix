@@ -30,23 +30,13 @@ func main() {
 	}
 }
 
-// Run starts a HTTP server and blocks while running if successful.
-// The server will be shutdown when "ctx" is canceled.
 func Run(ctx context.Context, c conf.Config) error {
 	registerRpcServer(c)
 
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	tp, err := provider.InitTraceProvider("http://localhost:14268/api/traces", "gateway")
+	tp, err := provider.InitTraceProvider("http://localhost:14268/api/traces", c.Name)
 	if err != nil {
 		panic(err)
 	}
-	defer func() {
-		if err := tp.Shutdown(ctx); err != nil {
-			log.Printf("Error shutting down tracer provider: %v", err)
-		}
-	}()
 
 	server := gin.New()
 	server.Use(gin.Logger(), gin.Recovery())
@@ -72,13 +62,16 @@ func Run(ctx context.Context, c conf.Config) error {
 	httpSrv := khttp.NewServer(khttp.Address(c.Addr), khttp.Middleware(kmiddleware.MetricServer()))
 	openAPIhandler := openapiv2.NewHandler()
 	httpSrv.HandlePrefix("/q/", openAPIhandler)
+
 	httpSrv.HandlePrefix("/", server)
 
 	app := kratos.New(
 		kratos.Name(c.Name),
+		kratos.Context(ctx),
 		kratos.Server(
 			httpSrv,
 		),
+		kratos.AfterStop(tp.Shutdown),
 	)
 	if err := app.Run(); err != nil {
 		log.Fatal(err)

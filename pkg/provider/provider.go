@@ -41,17 +41,21 @@ func InitTraceProvider(url string, tracename string) (*sdktrace.TracerProvider, 
 	if err != nil {
 		return nil, err
 	}
+
+	sche := sdkresource.NewSchemaless(
+		semconv.ServiceNameKey.String(tracename),
+		attribute.String("exporter", "jaeger"),
+		attribute.Float64("float", 312.23),
+	)
+	source, _ := sdkresource.Merge(resource, sche)
+
 	tp := sdktrace.NewTracerProvider(
 		// 将基于父span的采样率设置为100%
 		sdktrace.WithSampler(sdktrace.ParentBased(sdktrace.TraceIDRatioBased(1.0))),
 		// 始终确保在生产中批量处理
 		sdktrace.WithBatcher(exp),
 		// 在资源中记录有关此应用程序的信息
-		sdktrace.WithResource(sdkresource.NewSchemaless(
-			semconv.ServiceNameKey.String(tracename),
-			attribute.String("exporter", "jaeger"),
-			attribute.Float64("float", 312.23),
-		)),
+		sdktrace.WithResource(source),
 	)
 
 	otel.SetTracerProvider(tp)
