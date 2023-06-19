@@ -19,11 +19,11 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
-var configFile = flag.String("f", "../configs/config.yaml", "the config file")
+var configFile = flag.String("f", "../../../../", "the config file")
 
 func main() {
 	var config conf.Config
-	conf.MustLoad(*configFile, &config)
+	conf.MustLoad(&config, *configFile,"./configs")
 
 	if err := Run(context.Background(), config); err != nil {
 		panic(err)
@@ -33,7 +33,7 @@ func main() {
 func Run(ctx context.Context, c conf.Config) error {
 	registerRpcServer(c)
 
-	tp, err := provider.InitTraceProvider("http://localhost:14268/api/traces", c.Name)
+	tp, err := provider.InitTraceProvider(c.CommonConfig.Jeager.Addr, c.Name)
 	if err != nil {
 		panic(err)
 	}

@@ -7,13 +7,12 @@ import (
 )
 
 type Config struct {
-	common.CommonConfig
-	Name    string         `mapstructure:"name,omitempty"`
-	Addr    string         `mapstructure:"addr,omitempty" json:"addr,omitempty"`
-	UserRpc common.RpcConf `mapstructure:"userRpcClient,omitempty" json:"userRpcClient,omitempty"`
+	common.CommonConfig `mapstructure:"common,omitempty" json:"common"`
+	Name                string `mapstructure:"name,omitempty" json:"name"`
+	Addr                string `mapstructure:"addr,omitempty" json:"addr,omitempty"`
 }
 
-func MustLoad(path string, v *Config) {
-	common.MustLoad("../../../configs", &v, path)
+func MustLoad(v *Config, path ...string) {
+	common.MustLoad(&v, path...)
 	log.Print(v)
 }

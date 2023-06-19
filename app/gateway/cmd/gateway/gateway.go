@@ -19,7 +19,7 @@ type registerFn func(ctx context.Context, mux *gwruntime.ServeMux, endpoint stri
 var handlers = make(map[string]registerFn)
 
 func registerRpcServer(c conf.Config) {
-	handlers[c.UserRpc.Addr] = userv1.RegisterUserServiceHandlerFromEndpoint
+	handlers[c.CommonConfig.UserRpcClient.Addr] = userv1.RegisterUserServiceHandlerFromEndpoint
 }
 
 func newGateway(ctx context.Context, opts []gwruntime.ServeMuxOption, r *etcd.Registry) (http.Handler, error) {
