@@ -18,7 +18,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/user.UserListResponse'
+                                $ref: '#/components/schemas/userv1.UserListResponse'
     /api/users/authenticate:
         post:
             tags:
@@ -34,7 +34,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/user.AuthenticationResponse'
+                                $ref: '#/components/schemas/userv1.AuthenticationResponse'
     /api/users/authorize:
         post:
             tags:
@@ -44,7 +44,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/user.AuthorizationRequest'
+                            $ref: '#/components/schemas/userv1.AuthorizationRequest'
                 required: true
             responses:
                 "200":
@@ -59,7 +59,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/user.LogEntry'
+                            $ref: '#/components/schemas/userv1.LogEntry'
                 required: true
             responses:
                 "200":
@@ -75,7 +75,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/user.LoginRequest'
+                            $ref: '#/components/schemas/userv1.LoginRequest'
                 required: true
             responses:
                 "200":
@@ -83,7 +83,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/user.AuthenticationResponse'
+                                $ref: '#/components/schemas/userv1.AuthenticationResponse'
     /api/users/logout:
         post:
             tags:
@@ -93,7 +93,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/user.LogoutRequest'
+                            $ref: '#/components/schemas/userv1.LogoutRequest'
                 required: true
             responses:
                 "200":
@@ -108,7 +108,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/user.ManageUserPermissionRequest'
+                            $ref: '#/components/schemas/userv1.ManageUserPermissionRequest'
                 required: true
             responses:
                 "200":
@@ -116,7 +116,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/user.User'
+                                $ref: '#/components/schemas/userv1.User'
     /api/users/profile/{userId}:
         patch:
             tags:
@@ -132,7 +132,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/user.UpdateProfileRequest'
+                            $ref: '#/components/schemas/userv1.UpdateProfileRequest'
                 required: true
             responses:
                 "200":
@@ -140,7 +140,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/user.User'
+                                $ref: '#/components/schemas/userv1.User'
     /api/users/register:
         post:
             tags:
@@ -151,7 +151,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/user.RegistrationRequest'
+                            $ref: '#/components/schemas/userv1.RegistrationRequest'
                 required: true
             responses:
                 "200":
@@ -159,7 +159,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/user.User'
+                                $ref: '#/components/schemas/userv1.User'
     /api/users/resetPassword:
         post:
             tags:
@@ -169,7 +169,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/user.ResetPasswordRequest'
+                            $ref: '#/components/schemas/userv1.ResetPasswordRequest'
                 required: true
             responses:
                 "200":
@@ -177,14 +177,14 @@ paths:
                     content: {}
 components:
     schemas:
-        user.AuthenticationResponse:
+        userv1.AuthenticationResponse:
             type: object
             properties:
                 userId:
                     type: string
                 token:
                     type: string
-        user.AuthorizationRequest:
+        userv1.AuthorizationRequest:
             type: object
             properties:
                 userId:
@@ -195,7 +195,7 @@ components:
                     type: array
                     items:
                         type: string
-        user.LogEntry:
+        userv1.LogEntry:
             type: object
             properties:
                 userId:
@@ -204,19 +204,19 @@ components:
                     type: string
                 timestamp:
                     type: string
-        user.LoginRequest:
+        userv1.LoginRequest:
             type: object
             properties:
                 username:
                     type: string
                 password:
                     type: string
-        user.LogoutRequest:
+        userv1.LogoutRequest:
             type: object
             properties:
                 userId:
                     type: string
-        user.ManageUserPermissionRequest:
+        userv1.ManageUserPermissionRequest:
             type: object
             properties:
                 userId:
@@ -229,7 +229,7 @@ components:
                     type: array
                     items:
                         type: string
-        user.RegistrationRequest:
+        userv1.RegistrationRequest:
             type: object
             properties:
                 username:
@@ -244,7 +244,7 @@ components:
                 phone:
                     type: string
                     description: 手机号
-        user.ResetPasswordRequest:
+        userv1.ResetPasswordRequest:
             type: object
             properties:
                 username:
@@ -253,7 +253,7 @@ components:
                     type: string
                 newPassword:
                     type: string
-        user.UpdateProfileRequest:
+        userv1.UpdateProfileRequest:
             type: object
             properties:
                 userId:
@@ -262,7 +262,7 @@ components:
                     type: string
                 phone:
                     type: string
-        user.User:
+        userv1.User:
             type: object
             properties:
                 id:
@@ -275,12 +275,12 @@ components:
                     type: string
                 phone:
                     type: string
-        user.UserListResponse:
+        userv1.UserListResponse:
             type: object
             properties:
                 users:
                     type: array
                     items:
-                        $ref: '#/components/schemas/user.User'
+                        $ref: '#/components/schemas/userv1.User'
 tags:
     - name: UserService

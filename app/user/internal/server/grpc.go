@@ -5,7 +5,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
-	user "github.com/ydssx/morphix/app/user/api"
+	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/user/internal/conf"
 	"github.com/ydssx/morphix/app/user/internal/service"
 	"github.com/ydssx/morphix/pkg/interceptors"
@@ -38,7 +38,7 @@ func NewGRPCServer(c *conf.Server, userSvc *service.UserService, logger log.Logg
 	}
 	srv := grpc.NewServer(opts...)
 
-	user.RegisterUserServiceServer(srv, userSvc)
+	userv1.RegisterUserServiceServer(srv, userSvc)
 
 	return srv
 }

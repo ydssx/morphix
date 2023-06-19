@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: app/user/api/user.proto
+// source: api/user/v1/user.proto
 
-package user
+package userv1
 
 import (
 	context "context"
@@ -20,16 +20,16 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UserService_Register_FullMethodName             = "/user.UserService/Register"
-	UserService_Login_FullMethodName                = "/user.UserService/Login"
-	UserService_Logout_FullMethodName               = "/user.UserService/Logout"
-	UserService_UpdateProfile_FullMethodName        = "/user.UserService/UpdateProfile"
-	UserService_ResetPassword_FullMethodName        = "/user.UserService/ResetPassword"
-	UserService_Authenticate_FullMethodName         = "/user.UserService/Authenticate"
-	UserService_Authorize_FullMethodName            = "/user.UserService/Authorize"
-	UserService_GetUserList_FullMethodName          = "/user.UserService/GetUserList"
-	UserService_ManageUserPermission_FullMethodName = "/user.UserService/ManageUserPermission"
-	UserService_LogActivity_FullMethodName          = "/user.UserService/LogActivity"
+	UserService_Register_FullMethodName             = "/userv1.UserService/Register"
+	UserService_Login_FullMethodName                = "/userv1.UserService/Login"
+	UserService_Logout_FullMethodName               = "/userv1.UserService/Logout"
+	UserService_UpdateProfile_FullMethodName        = "/userv1.UserService/UpdateProfile"
+	UserService_ResetPassword_FullMethodName        = "/userv1.UserService/ResetPassword"
+	UserService_Authenticate_FullMethodName         = "/userv1.UserService/Authenticate"
+	UserService_Authorize_FullMethodName            = "/userv1.UserService/Authorize"
+	UserService_GetUserList_FullMethodName          = "/userv1.UserService/GetUserList"
+	UserService_ManageUserPermission_FullMethodName = "/userv1.UserService/ManageUserPermission"
+	UserService_LogActivity_FullMethodName          = "/userv1.UserService/LogActivity"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -396,7 +396,7 @@ func _UserService_LogActivity_Handler(srv interface{}, ctx context.Context, dec 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UserService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "user.UserService",
+	ServiceName: "userv1.UserService",
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -441,5 +441,5 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "app/user/api/user.proto",
+	Metadata: "api/user/v1/user.proto",
 }

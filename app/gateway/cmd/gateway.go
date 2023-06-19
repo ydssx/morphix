@@ -7,8 +7,8 @@ import (
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2/transport/grpc/resolver/discovery"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/gateway/conf"
-	user "github.com/ydssx/morphix/app/user/api"
 	"github.com/ydssx/morphix/pkg/interceptors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -19,7 +19,7 @@ type registerFn func(ctx context.Context, mux *gwruntime.ServeMux, endpoint stri
 var handlers = make(map[string]registerFn)
 
 func registerRpcServer(c conf.Config) {
-	handlers[c.UserRpc.Addr] = user.RegisterUserServiceHandlerFromEndpoint
+	handlers[c.UserRpc.Addr] = userv1.RegisterUserServiceHandlerFromEndpoint
 }
 
 func newGateway(ctx context.Context, opts []gwruntime.ServeMuxOption, r *etcd.Registry) (http.Handler, error) {

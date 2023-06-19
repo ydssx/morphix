@@ -3,14 +3,14 @@ package service
 import (
 	"context"
 
-	user "github.com/ydssx/morphix/app/user/api"
+	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/user/internal/biz"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // GreeterService is a greeter service.
 type UserService struct {
-	user.UnimplementedUserServiceServer
+	userv1.UnimplementedUserServiceServer
 
 	uc *biz.UserUsecase
 }
@@ -21,38 +21,38 @@ func NewUserService(uc *biz.UserUsecase) *UserService {
 }
 
 // 用户注册
-func (uc *UserService) Register(_ context.Context, _ *user.RegistrationRequest) (*user.User, error) {
+func (uc *UserService) Register(_ context.Context, _ *userv1.RegistrationRequest) (*userv1.User, error) {
 	panic("not implemented") // TODO: Implement
 }
 
 // 用户登录
-func (uc *UserService) Login(_ context.Context, _ *user.LoginRequest) (*user.AuthenticationResponse, error) {
+func (uc *UserService) Login(_ context.Context, _ *userv1.LoginRequest) (*userv1.AuthenticationResponse, error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (uc *UserService) Logout(_ context.Context, _ *user.LogoutRequest) (*emptypb.Empty, error) {
+func (uc *UserService) Logout(_ context.Context, _ *userv1.LogoutRequest) (*emptypb.Empty, error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (uc *UserService) UpdateProfile(_ context.Context, _ *user.UpdateProfileRequest) (*user.User, error) {
+func (uc *UserService) UpdateProfile(_ context.Context, _ *userv1.UpdateProfileRequest) (*userv1.User, error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (uc *UserService) ResetPassword(_ context.Context, _ *user.ResetPasswordRequest) (*emptypb.Empty, error) {
+func (uc *UserService) ResetPassword(_ context.Context, _ *userv1.ResetPasswordRequest) (*emptypb.Empty, error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (uc *UserService) Authenticate(_ context.Context, _ *emptypb.Empty) (*user.AuthenticationResponse, error) {
+func (uc *UserService) Authenticate(_ context.Context, _ *emptypb.Empty) (*userv1.AuthenticationResponse, error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (uc *UserService) Authorize(_ context.Context, _ *user.AuthorizationRequest) (*emptypb.Empty, error) {
+func (uc *UserService) Authorize(_ context.Context, _ *userv1.AuthorizationRequest) (*emptypb.Empty, error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (uc *UserService) GetUserList(ctx context.Context, _ *emptypb.Empty) (*user.UserListResponse, error) {
+func (uc *UserService) GetUserList(ctx context.Context, _ *emptypb.Empty) (*userv1.UserListResponse, error) {
 	uc.uc.ListUser(ctx, nil)
-	return &user.UserListResponse{Users: []*user.User{{
+	return &userv1.UserListResponse{Users: []*userv1.User{{
 		Id:       "1",
 		Username: "wangxin",
 		Password: "123456",
@@ -61,10 +61,10 @@ func (uc *UserService) GetUserList(ctx context.Context, _ *emptypb.Empty) (*user
 	}}}, nil
 }
 
-func (uc *UserService) ManageUserPermission(_ context.Context, _ *user.ManageUserPermissionRequest) (*user.User, error) {
+func (uc *UserService) ManageUserPermission(_ context.Context, _ *userv1.ManageUserPermissionRequest) (*userv1.User, error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (uc *UserService) LogActivity(_ context.Context, _ *user.LogEntry) (*emptypb.Empty, error) {
+func (uc *UserService) LogActivity(_ context.Context, _ *userv1.LogEntry) (*emptypb.Empty, error) {
 	panic("not implemented") // TODO: Implement
 }

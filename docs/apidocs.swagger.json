@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "app/user/api/user.proto",
+    "title": "api/user/v1/user.proto",
     "version": "version not set"
   },
   "tags": [
@@ -23,7 +23,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/userUserListResponse"
+              "$ref": "#/definitions/userv1UserListResponse"
             }
           },
           "default": {
@@ -45,7 +45,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/userAuthenticationResponse"
+              "$ref": "#/definitions/userv1AuthenticationResponse"
             }
           },
           "default": {
@@ -95,7 +95,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/userAuthorizationRequest"
+              "$ref": "#/definitions/userv1AuthorizationRequest"
             }
           }
         ],
@@ -128,7 +128,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/userLogEntry"
+              "$ref": "#/definitions/userv1LogEntry"
             }
           }
         ],
@@ -145,7 +145,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/userAuthenticationResponse"
+              "$ref": "#/definitions/userv1AuthenticationResponse"
             }
           },
           "default": {
@@ -161,7 +161,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/userLoginRequest"
+              "$ref": "#/definitions/userv1LoginRequest"
             }
           }
         ],
@@ -194,7 +194,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/userLogoutRequest"
+              "$ref": "#/definitions/userv1LogoutRequest"
             }
           }
         ],
@@ -210,7 +210,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/userUser"
+              "$ref": "#/definitions/userv1User"
             }
           },
           "default": {
@@ -226,7 +226,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/userManageUserPermissionRequest"
+              "$ref": "#/definitions/userv1ManageUserPermissionRequest"
             }
           }
         ],
@@ -242,7 +242,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/userUser"
+              "$ref": "#/definitions/userv1User"
             }
           },
           "default": {
@@ -290,7 +290,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/userUser"
+              "$ref": "#/definitions/userv1User"
             }
           },
           "default": {
@@ -306,7 +306,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/userRegistrationRequest"
+              "$ref": "#/definitions/userv1RegistrationRequest"
             }
           }
         ],
@@ -339,7 +339,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/userResetPasswordRequest"
+              "$ref": "#/definitions/userv1ResetPasswordRequest"
             }
           }
         ],
@@ -378,7 +378,7 @@
         }
       }
     },
-    "userAuthenticationResponse": {
+    "userv1AuthenticationResponse": {
       "type": "object",
       "properties": {
         "userId": {
@@ -389,7 +389,7 @@
         }
       }
     },
-    "userAuthorizationRequest": {
+    "userv1AuthorizationRequest": {
       "type": "object",
       "properties": {
         "userId": {
@@ -406,7 +406,7 @@
         }
       }
     },
-    "userLogEntry": {
+    "userv1LogEntry": {
       "type": "object",
       "properties": {
         "userId": {
@@ -421,7 +421,7 @@
         }
       }
     },
-    "userLoginRequest": {
+    "userv1LoginRequest": {
       "type": "object",
       "properties": {
         "username": {
@@ -432,7 +432,7 @@
         }
       }
     },
-    "userLogoutRequest": {
+    "userv1LogoutRequest": {
       "type": "object",
       "properties": {
         "userId": {
@@ -440,7 +440,7 @@
         }
       }
     },
-    "userManageUserPermissionRequest": {
+    "userv1ManageUserPermissionRequest": {
       "type": "object",
       "properties": {
         "userId": {
@@ -460,7 +460,7 @@
         }
       }
     },
-    "userRegistrationRequest": {
+    "userv1RegistrationRequest": {
       "type": "object",
       "properties": {
         "username": {
@@ -481,7 +481,7 @@
         }
       }
     },
-    "userResetPasswordRequest": {
+    "userv1ResetPasswordRequest": {
       "type": "object",
       "properties": {
         "username": {
@@ -495,7 +495,7 @@
         }
       }
     },
-    "userUser": {
+    "userv1User": {
       "type": "object",
       "properties": {
         "id": {
@@ -516,14 +516,14 @@
         }
       }
     },
-    "userUserListResponse": {
+    "userv1UserListResponse": {
       "type": "object",
       "properties": {
         "users": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/userUser"
+            "$ref": "#/definitions/userv1User"
           }
         }
       }
