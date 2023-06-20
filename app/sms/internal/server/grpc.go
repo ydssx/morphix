@@ -18,6 +18,7 @@ func NewGRPCServer(c *conf.Server, smsSvc *service.SMSService, logger log.Logger
 		grpc.UnaryInterceptor(
 			// interceptors.TraceServerInterceptor(),
 			interceptors.LoggingServerInterceptor(logger),
+			interceptors.ValidatorServerInterceptor(),
 		),
 		grpc.Middleware(
 			kratos.MetricServer(),

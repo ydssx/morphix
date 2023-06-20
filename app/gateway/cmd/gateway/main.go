@@ -22,6 +22,8 @@ import (
 var configFile = flag.String("f", "../../../../configs/config.yaml", "the config file")
 
 func main() {
+	flag.Parse()
+	
 	var config common.Config
 	common.MustLoad(&config, *configFile)
 

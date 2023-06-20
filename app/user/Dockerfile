@@ -1,24 +1,23 @@
-FROM golang:1.18 AS builder
+FROM golang:1.19.2-alpine AS builder
 
-COPY . /src
+ENV GOPROXY=https://goproxy.cn
+
 WORKDIR /src
 
-RUN GOPROXY=https://goproxy.cn make build
+COPY go.mod go.sum ./
+RUN go mod download
 
-FROM debian:stable-slim
+COPY . .
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-		ca-certificates  \
-        netbase \
-        && rm -rf /var/lib/apt/lists/ \
-        && apt-get autoremove -y && apt-get autoclean -y
+RUN go build -o user ./app/user/cmd/user
 
-COPY --from=builder /src/bin /app
+FROM alpine
 
-WORKDIR /app
+WORKDIR /usr/src/app/
 
-EXPOSE 8000
+COPY --from=builder /src/user ./
+COPY --from=builder /src/configs ./
+
 EXPOSE 9000
-VOLUME /data/conf
 
-CMD ["./server", "-conf", "/data/conf"]
+CMD [ "./user","-f","./config.yaml" ]

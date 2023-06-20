@@ -6,7 +6,7 @@ WORKDIR /src
 
 COPY . .
 
-RUN go build -o /bin ./app/sms/cmd/sms
+RUN go build -o /bin ./app/gateway/cmd/gateway
 
 FROM alpine
 
@@ -15,4 +15,6 @@ WORKDIR /usr/src/app/
 COPY --from=builder /bin ./
 COPY --from=builder /src/configs ./
 
-CMD [ "./sms","-f","./config.yaml" ]
+EXPOSE 8000
+
+CMD [ "./gateway","-f","./config.yaml" ]

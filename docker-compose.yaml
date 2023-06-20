@@ -108,6 +108,32 @@ services:
     networks:
       - morphix_net
 
+  gateway:
+    image: gateway
+    container_name: gateway-service
+    build:
+      context: ./
+      dockerfile: ./app/gateway/Dockerfile
+    ports:
+      - 8000:8000
+    depends_on:
+      - etcd
+      - jeager
+    networks:
+      - morphix_net
+
+  user:
+    image: user
+    container_name: user-service
+    build:
+      context: ./
+      dockerfile: ./app/user/Dockerfile
+    depends_on:
+      - etcd
+      - jeager
+    networks:
+      - morphix_net
+
 networks:
   morphix_net:
     driver: bridge
