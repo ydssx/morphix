@@ -13,27 +13,27 @@ import (
 	"github.com/go-kratos/swagger-api/openapiv2"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/ydssx/morphix/app/gateway/conf"
+	"github.com/ydssx/morphix/common"
 	kmiddleware "github.com/ydssx/morphix/pkg/middleware/kratos"
 	"github.com/ydssx/morphix/pkg/provider"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
-var configFile = flag.String("f", "../../../../", "the config file")
+var configFile = flag.String("f", "../../../../configs/config.yaml", "the config file")
 
 func main() {
-	var config conf.Config
-	conf.MustLoad(&config, *configFile,"./configs")
+	var config common.Config
+	common.MustLoad(&config, *configFile)
 
 	if err := Run(context.Background(), config); err != nil {
 		panic(err)
 	}
 }
 
-func Run(ctx context.Context, c conf.Config) error {
+func Run(ctx context.Context, c common.Config) error {
 	registerRpcServer(c)
 
-	tp, err := provider.InitTraceProvider(c.CommonConfig.Jeager.Addr, c.Name)
+	tp, err := provider.InitTraceProvider(c.Jeager.Addr, c.Gateway.Name)
 	if err != nil {
 		panic(err)
 	}
@@ -59,14 +59,14 @@ func Run(ctx context.Context, c conf.Config) error {
 	}
 	server.Any("/api/*any", gin.WrapH(gw))
 
-	httpSrv := khttp.NewServer(khttp.Address(c.Addr), khttp.Middleware(kmiddleware.MetricServer()))
+	httpSrv := khttp.NewServer(khttp.Address(c.Gateway.Addr), khttp.Middleware(kmiddleware.MetricServer()))
 	openAPIhandler := openapiv2.NewHandler()
 	httpSrv.HandlePrefix("/q/", openAPIhandler)
 
 	httpSrv.HandlePrefix("/", server)
 
 	app := kratos.New(
-		kratos.Name(c.Name),
+		kratos.Name(c.Gateway.Name),
 		kratos.Context(ctx),
 		kratos.Server(
 			httpSrv,

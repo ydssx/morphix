@@ -1,62 +1,54 @@
-common:
-  etcd:
-    endpoints:
-      - 127.0.0.1:2379
-    timeout: 5
+etcd:
+  endpoints:
+    - 127.0.0.1:2379
+  timeout: 5
 
-  jeager:
-    addr: http://localhost:14268/api/traces
+jeager:
+  addr: http://localhost:14268/api/traces
 
-  userRpcClient:
-    network: tcp
-    addr: discovery:///user-rpc
-    timeout: 2
+userRpcClient:
+  network: tcp
+  addr: discovery:///user-rpc
+  timeout: 2
 
-  smsRpcClient:
-    network: tcp
-    addr: 127.0.0.1:9001
-    timeout: 2
----
+smsRpcClient:
+  network: tcp
+  addr: 127.0.0.1:9001
+  timeout: 2
+
 # gateway配置
-name: gateway
-addr: 0.0.0.0:8000
+gateway:
+  name: gateway
+  addr: 0.0.0.0:8000
 
----
 # user服务配置
-name: user-rpc
+user:
+  name: user-rpc
+  server:
+    grpc:
+      addr: 0.0.0.0:9000
+      timeout: 2
+  data:
+    database:
+      driver: mysql
+      source: root:root@tcp(127.0.0.1:3306)/test
+    redis:
+      addr: 127.0.0.1:6379
+      read_timeout: 2
+      write_timeout: 2
 
-server:
-  http:
-    addr: 0.0.0.0:8000
-    timeout: 1s
-  grpc:
-    addr: 0.0.0.0:9000
-    timeout: 1s
-data:
-  database:
-    driver: mysql
-    source: root:root@tcp(127.0.0.1:3306)/test
-  redis:
-    addr: 127.0.0.1:6379
-    read_timeout: 0.2s
-    write_timeout: 0.2s
-
----
 # sms服务配置
-name: sms-rpc
-
-server:
-  http:
-    addr: 0.0.0.0:8001
-    timeout: 1s
-  grpc:
-    addr: 0.0.0.0:9001
-    timeout: 1s
-data:
-  database:
-    driver: mysql
-    source: root:root@tcp(127.0.0.1:3306)/test
-  redis:
-    addr: 127.0.0.1:6379
-    read_timeout: 0.2s
-    write_timeout: 0.2s
+sms:
+  name: sms-rpc
+  server:
+    grpc:
+      addr: 0.0.0.0:9001
+      timeout: 2
+  data:
+    database:
+      driver: mysql
+      source: root:root@tcp(127.0.0.1:3306)/test
+    redis:
+      addr: 127.0.0.1:6379
+      read_timeout: 2
+      write_timeout: 2
