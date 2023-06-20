@@ -16,6 +16,8 @@ services:
       - SPAN_STORAGE_TYPE=elasticsearch
       - ES_SERVER_URLS=http://elasticsearch:9200
       - LOG_LEVEL=debug
+    depends_on:
+      - elasticsearch
     networks:
       - morphix_net
 
@@ -119,6 +121,7 @@ services:
     depends_on:
       - etcd
       - jeager
+      - user
     networks:
       - morphix_net
 
@@ -131,8 +134,11 @@ services:
     depends_on:
       - etcd
       - jeager
+      - sms
     networks:
       - morphix_net
+    logging:
+      driver: json-file
 
   sms:
     image: sms

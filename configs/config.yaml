@@ -13,7 +13,7 @@ userRpcClient:
 
 smsRpcClient:
   network: tcp
-  addr: 127.0.0.1:9001
+  addr: discovery:///sms-rpc
   timeout: 2
 
 # gateway配置

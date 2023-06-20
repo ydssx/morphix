@@ -10,9 +10,9 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/ydssx/morphix/app/user/internal/biz"
+	"github.com/ydssx/morphix/app/user/internal/data"
 	"github.com/ydssx/morphix/app/user/internal/server"
 	"github.com/ydssx/morphix/app/user/internal/service"
-	"github.com/ydssx/morphix/app/user/internal/data"
 	"github.com/ydssx/morphix/common"
 )
 
