@@ -6,11 +6,9 @@ import (
 
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/config"
-	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
-	"github.com/ydssx/morphix/app/sms/internal/conf"
+	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/pkg/logger"
 	"github.com/ydssx/morphix/pkg/provider"
 	etcdclient "go.etcd.io/etcd/client/v3"
@@ -20,24 +18,15 @@ import (
 var flagconf string
 
 func init() {
-	flag.StringVar(&flagconf, "-f", "../configs", "config path, eg: -conf config.yaml")
+	flag.StringVar(&flagconf, "f", "./../../../configs/config.yaml", "config path, eg: -conf config.yaml")
 }
 
 func main() {
 	flag.Parse()
-	c := config.New(config.WithSource(file.NewSource(flagconf)))
-	defer c.Close()
+	var bc common.Config
+	common.MustLoad(&bc, flagconf)
 
-	if err := c.Load(); err != nil {
-		panic(err)
-	}
-
-	var bc conf.Bootstrap
-	if err := c.Scan(&bc); err != nil {
-		panic(err)
-	}
-
-	app, cleanup, err := wireApp(bc.Server, bc.Data, logger.DefaultLogger, &bc)
+	app, cleanup, err := wireApp(&bc, logger.DefaultLogger)
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +39,7 @@ func main() {
 
 }
 
-func newApp(gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
+func newApp(gs *grpc.Server, c *common.Config) *kratos.App {
 	client, err := etcdclient.New(etcdclient.Config{
 		Endpoints: c.Etcd.Endpoints,
 	})
@@ -59,12 +48,12 @@ func newApp(gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
 	}
 	r := etcd.New(client)
 
-	tp, _ := provider.InitTraceProvider(c.Jeager.Addr, c.Name)
+	tp, _ := provider.InitTraceProvider(c.Jeager.Addr, c.Sms.Name)
 
 	mp := provider.InitMeterProvider()
 
 	return kratos.New(
-		kratos.Name(c.Name),
+		kratos.Name(c.Sms.Name),
 		kratos.Metadata(map[string]string{}),
 		kratos.Server(gs),
 		kratos.Registrar(r),

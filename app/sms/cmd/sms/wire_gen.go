@@ -9,9 +9,9 @@ package main
 import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/ydssx/morphix/app/sms/internal/conf"
 	"github.com/ydssx/morphix/app/sms/internal/server"
 	"github.com/ydssx/morphix/app/sms/internal/service"
+	"github.com/ydssx/morphix/common"
 )
 
 import (
@@ -20,10 +20,10 @@ import (
 
 // Injectors from wire.go:
 
-func wireApp(confServer *conf.Server, data *conf.Data, logger log.Logger, bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
+func wireApp(config *common.Config, logger log.Logger) (*kratos.App, func(), error) {
 	smsService := service.NewSMSService()
-	grpcServer := server.NewGRPCServer(confServer, smsService, logger)
-	app := newApp(grpcServer, bootstrap)
+	grpcServer := server.NewGRPCServer(config, smsService, logger)
+	app := newApp(grpcServer, config)
 	return app, func() {
 	}, nil
 }

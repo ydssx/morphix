@@ -7,11 +7,11 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
-	"github.com/ydssx/morphix/app/sms/internal/conf"
 	"github.com/ydssx/morphix/app/sms/internal/server"
 	"github.com/ydssx/morphix/app/sms/internal/service"
+	"github.com/ydssx/morphix/common"
 )
 
-func wireApp(*conf.Server, *conf.Data, log.Logger, *conf.Bootstrap) (*kratos.App, func(), error) {
+func wireApp(*common.Config, log.Logger) (*kratos.App, func(), error) {
 	panic(wire.Build(server.ProviderSet,service.ProviderSet,newApp))
 }

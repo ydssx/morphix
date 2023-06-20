@@ -134,6 +134,18 @@ services:
     networks:
       - morphix_net
 
+  sms:
+    image: sms
+    container_name: sms-service
+    build:
+      context: ./
+      dockerfile: ./app/sms/Dockerfile
+    depends_on:
+      - etcd
+      - jeager
+    networks:
+      - morphix_net
+
 networks:
   morphix_net:
     driver: bridge
