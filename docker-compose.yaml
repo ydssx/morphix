@@ -1,9 +1,20 @@
+version: '3.9'
+x-default-logging:
+  &logging
+  driver: "json-file"
+  options:
+    max-size: "5m"
+    max-file: "2"
+
 services:
 
   jeager:
     image: jaegertracing/all-in-one:latest
     container_name: jaeger
     restart: always
+    command: 
+      - "--prometheus.server-url"
+      - "http://prometheus:9090"
     ports:
       - "5775:5775/udp"
       - "6831:6831/udp"
@@ -16,6 +27,8 @@ services:
       - SPAN_STORAGE_TYPE=elasticsearch
       - ES_SERVER_URLS=http://elasticsearch:9200
       - LOG_LEVEL=debug
+      - METRICS_STORAGE_TYPE=prometheus
+    logging: *logging
     depends_on:
       - elasticsearch
     networks:
@@ -104,8 +117,9 @@ services:
   promtail:
     image: grafana/promtail:latest
     container_name: promtail
-    # volumes:
-    #   - ./promtail-config:/etc/promtail
+    volumes:
+      - ./deploy/loki/promtail-config.yaml:/etc/promtail/config.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers
     command: -config.file=/etc/promtail/config.yml
     networks:
       - morphix_net
