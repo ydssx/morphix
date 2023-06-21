@@ -24,19 +24,13 @@ init:
 	go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
 	go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
 	go install github.com/google/wire/cmd/wire@latest
+	go install github.com/bufbuild/buf/cmd/buf@latest
 
-.PHONY: config
-# generate internal proto
-config:
-	protoc --proto_path=./internal \
-	       --proto_path=./third_party \
- 	       --go_out=paths=source_relative:./internal \
-	       $(INTERNAL_PROTO_FILES)
 
 .PHONY: api
 # generate api proto
 api:
-	protoc --proto_path=./api --go_out=paths=source_relative:./api --go-http_out=paths=source_relative:./api --go-grpc_out=paths=source_relative:./api --openapi_out=fq_schema_naming=true,default_response=false:. ./api/user/v1/user.proto
+	buf generate
 
 .PHONY: build
 # build
