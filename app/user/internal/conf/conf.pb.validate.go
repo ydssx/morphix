@@ -147,11 +147,11 @@ func (m *Bootstrap) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetJeager()).(type) {
+		switch v := interface{}(m.GetJaeger()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, BootstrapValidationError{
-					field:  "Jeager",
+					field:  "Jaeger",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -159,16 +159,16 @@ func (m *Bootstrap) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, BootstrapValidationError{
-					field:  "Jeager",
+					field:  "Jaeger",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetJeager()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetJaeger()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
-				field:  "Jeager",
+				field:  "Jaeger",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -720,21 +720,21 @@ var _ interface {
 	ErrorName() string
 } = EtcdValidationError{}
 
-// Validate checks the field values on Jeager with the rules defined in the
+// Validate checks the field values on Jaeger with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *Jeager) Validate() error {
+func (m *Jaeger) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on Jeager with the rules defined in the
+// ValidateAll checks the field values on Jaeger with the rules defined in the
 // proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in JeagerMultiError, or nil if none found.
-func (m *Jeager) ValidateAll() error {
+// a list of violation errors wrapped in JaegerMultiError, or nil if none found.
+func (m *Jaeger) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *Jeager) validate(all bool) error {
+func (m *Jaeger) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -744,18 +744,18 @@ func (m *Jeager) validate(all bool) error {
 	// no validation rules for Addr
 
 	if len(errors) > 0 {
-		return JeagerMultiError(errors)
+		return JaegerMultiError(errors)
 	}
 
 	return nil
 }
 
-// JeagerMultiError is an error wrapping multiple validation errors returned by
-// Jeager.ValidateAll() if the designated constraints aren't met.
-type JeagerMultiError []error
+// JaegerMultiError is an error wrapping multiple validation errors returned by
+// Jaeger.ValidateAll() if the designated constraints aren't met.
+type JaegerMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m JeagerMultiError) Error() string {
+func (m JaegerMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -764,11 +764,11 @@ func (m JeagerMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m JeagerMultiError) AllErrors() []error { return m }
+func (m JaegerMultiError) AllErrors() []error { return m }
 
-// JeagerValidationError is the validation error returned by Jeager.Validate if
+// JaegerValidationError is the validation error returned by Jaeger.Validate if
 // the designated constraints aren't met.
-type JeagerValidationError struct {
+type JaegerValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -776,22 +776,22 @@ type JeagerValidationError struct {
 }
 
 // Field function returns field value.
-func (e JeagerValidationError) Field() string { return e.field }
+func (e JaegerValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e JeagerValidationError) Reason() string { return e.reason }
+func (e JaegerValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e JeagerValidationError) Cause() error { return e.cause }
+func (e JaegerValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e JeagerValidationError) Key() bool { return e.key }
+func (e JaegerValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e JeagerValidationError) ErrorName() string { return "JeagerValidationError" }
+func (e JaegerValidationError) ErrorName() string { return "JaegerValidationError" }
 
 // Error satisfies the builtin error interface
-func (e JeagerValidationError) Error() string {
+func (e JaegerValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -803,14 +803,14 @@ func (e JeagerValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sJeager.%s: %s%s",
+		"invalid %sJaeger.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = JeagerValidationError{}
+var _ error = JaegerValidationError{}
 
 var _ interface {
 	Field() string
@@ -818,7 +818,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = JeagerValidationError{}
+} = JaegerValidationError{}
 
 // Validate checks the field values on SmsRpc with the rules defined in the
 // proto definition for this message. If any rules are violated, the first

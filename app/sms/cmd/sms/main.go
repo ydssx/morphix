@@ -48,7 +48,7 @@ func newApp(gs *grpc.Server, c *common.Config) *kratos.App {
 	}
 	r := etcd.New(client)
 
-	tp, _ := provider.InitTraceProvider(c.Jeager.Addr, c.Sms.Name)
+	tp, _ := provider.InitTraceProvider(c.Jaeger.Addr, c.Sms.Name)
 
 	mp := provider.InitMeterProvider()
 

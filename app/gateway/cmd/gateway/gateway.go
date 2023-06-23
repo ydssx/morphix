@@ -10,6 +10,7 @@ import (
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/pkg/interceptors"
+	"github.com/ydssx/morphix/pkg/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -30,7 +31,9 @@ func newGateway(ctx context.Context, opts []gwruntime.ServeMuxOption, r *etcd.Re
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithChainUnaryInterceptor(
 			interceptors.TraceClientInterceptor(),
-			interceptors.MetricClientInterceptor()),
+			interceptors.LoggingClientInterceptor(logger.DefaultLogger),
+			interceptors.MetricClientInterceptor(),
+		),
 		grpc.WithResolvers(
 			discovery.NewBuilder(
 				r,

@@ -10,7 +10,7 @@ message Bootstrap {
   Data data = 2;
   string name = 3;
   Etcd etcd = 4;
-  Jeager jeager = 5;
+  Jaeger jaeger = 5;
   SmsRpc smsRpc = 6;
 }
 
@@ -49,7 +49,7 @@ message Etcd {
   google.protobuf.Duration timeout = 2;
 }
 
-message Jeager {
+message Jaeger {
   string addr = 1;
 }
 

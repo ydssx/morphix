@@ -22,22 +22,18 @@ func NewGreeterRepo(data *Data, logger log.Logger) biz.UserRepo {
 	}
 }
 
-func (r *userRepo) Save(ctx context.Context, g *biz.Greeter) (*biz.Greeter, error) {
-	return g, nil
+// CreateUser implements biz.UserRepo.
+func (*userRepo) CreateUser(context.Context, *biz.User) error {
+	panic("unimplemented")
 }
 
-func (r *userRepo) Update(ctx context.Context, g *biz.Greeter) (*biz.Greeter, error) {
-	return g, nil
-}
-
-func (r *userRepo) FindByID(context.Context, int64) (*biz.Greeter, error) {
-	return nil, nil
-}
-
-func (r *userRepo) ListByHello(context.Context, string) ([]*biz.Greeter, error) {
-	return nil, nil
-}
-
-func (r *userRepo) ListAll(context.Context) ([]*biz.Greeter, error) {
-	return nil, nil
+// ListUser implements biz.UserRepo.
+func (*userRepo) ListUser(context.Context) ([]biz.User, error) {
+	return []biz.User{{
+		ID:       1,
+		Username: "ydssx",
+		Password: "1234556",
+		Email:    "456@qq.com",
+		Phone:    "1562659746",
+	}}, nil
 }

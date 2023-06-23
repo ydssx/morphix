@@ -3,8 +3,8 @@ etcd:
     - etcd:2379
   timeout: 5
 
-jeager:
-  addr: http://jeager:14268/api/traces
+jaeger:
+  addr: http://jaeger:14268/api/traces
 
 userRpcClient:
   network: tcp

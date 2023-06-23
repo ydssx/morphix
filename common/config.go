@@ -12,7 +12,7 @@ type Config struct {
 	User          User          `yaml:"user"`
 	Sms           Sms           `yaml:"sms"`
 	Etcd          Etcd          `yaml:"etcd"`
-	Jeager        Jeager        `yaml:"jeager"`
+	Jaeger        Jaeger        `yaml:"jaeger"`
 	UserRpcClient UserRpcClient `yaml:"userRpcClient"`
 	SmsRpcClient  SmsRpcClient  `yaml:"smsRpcClient"`
 }
@@ -98,8 +98,8 @@ type Etcd struct {
 	Timeout   int      `yaml:"timeout"`
 }
 
-// Jeager
-type Jeager struct {
+// Jaeger
+type Jaeger struct {
 	Addr string `yaml:"addr"`
 }
 

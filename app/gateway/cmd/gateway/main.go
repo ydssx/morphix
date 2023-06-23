@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/chenjiandongx/ginprom"
 	"github.com/gin-gonic/gin"
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2"
@@ -23,7 +24,7 @@ var configFile = flag.String("f", "../../../../configs/config.yaml", "the config
 
 func main() {
 	flag.Parse()
-	
+
 	var config common.Config
 	common.MustLoad(&config, *configFile)
 
@@ -35,14 +36,14 @@ func main() {
 func Run(ctx context.Context, c common.Config) error {
 	registerRpcServer(c)
 
-	tp, err := provider.InitTraceProvider(c.Jeager.Addr, c.Gateway.Name)
+	tp, err := provider.InitTraceProvider(c.Jaeger.Addr, c.Gateway.Name)
 	if err != nil {
 		panic(err)
 	}
 
 	server := gin.New()
-	server.Use(gin.Logger(), gin.Recovery())
-	server.Any("/metrics", gin.WrapH(promhttp.Handler()))
+	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), gin.Recovery())
+	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	opts := []gwruntime.ServeMuxOption{}
 

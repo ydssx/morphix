@@ -30,7 +30,7 @@ type Bootstrap struct {
 	Data   *Data   `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 	Name   string  `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	Etcd   *Etcd   `protobuf:"bytes,4,opt,name=etcd,proto3" json:"etcd,omitempty"`
-	Jeager *Jeager `protobuf:"bytes,5,opt,name=jeager,proto3" json:"jeager,omitempty"`
+	Jaeger *Jaeger `protobuf:"bytes,5,opt,name=jaeger,proto3" json:"jaeger,omitempty"`
 	SmsRpc *SmsRpc `protobuf:"bytes,6,opt,name=smsRpc,proto3" json:"smsRpc,omitempty"`
 }
 
@@ -94,9 +94,9 @@ func (x *Bootstrap) GetEtcd() *Etcd {
 	return nil
 }
 
-func (x *Bootstrap) GetJeager() *Jeager {
+func (x *Bootstrap) GetJaeger() *Jaeger {
 	if x != nil {
-		return x.Jeager
+		return x.Jaeger
 	}
 	return nil
 }
@@ -273,7 +273,7 @@ func (x *Etcd) GetTimeout() *durationpb.Duration {
 	return nil
 }
 
-type Jeager struct {
+type Jaeger struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -281,8 +281,8 @@ type Jeager struct {
 	Addr string `protobuf:"bytes,1,opt,name=addr,proto3" json:"addr,omitempty"`
 }
 
-func (x *Jeager) Reset() {
-	*x = Jeager{}
+func (x *Jaeger) Reset() {
+	*x = Jaeger{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_app_user_internal_conf_conf_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -290,13 +290,13 @@ func (x *Jeager) Reset() {
 	}
 }
 
-func (x *Jeager) String() string {
+func (x *Jaeger) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Jeager) ProtoMessage() {}
+func (*Jaeger) ProtoMessage() {}
 
-func (x *Jeager) ProtoReflect() protoreflect.Message {
+func (x *Jaeger) ProtoReflect() protoreflect.Message {
 	mi := &file_app_user_internal_conf_conf_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -308,12 +308,12 @@ func (x *Jeager) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Jeager.ProtoReflect.Descriptor instead.
-func (*Jeager) Descriptor() ([]byte, []int) {
+// Deprecated: Use Jaeger.ProtoReflect.Descriptor instead.
+func (*Jaeger) Descriptor() ([]byte, []int) {
 	return file_app_user_internal_conf_conf_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *Jeager) GetAddr() string {
+func (x *Jaeger) GetAddr() string {
 	if x != nil {
 		return x.Addr
 	}
@@ -736,7 +736,7 @@ var file_app_user_internal_conf_conf_proto_goTypes = []interface{}{
 	(*Server)(nil),              // 1: kratos.api.Server
 	(*Data)(nil),                // 2: kratos.api.Data
 	(*Etcd)(nil),                // 3: kratos.api.Etcd
-	(*Jeager)(nil),              // 4: kratos.api.Jeager
+	(*Jaeger)(nil),              // 4: kratos.api.Jaeger
 	(*SmsRpc)(nil),              // 5: kratos.api.SmsRpc
 	(*Server_HTTP)(nil),         // 6: kratos.api.Server.HTTP
 	(*Server_GRPC)(nil),         // 7: kratos.api.Server.GRPC
@@ -748,7 +748,7 @@ var file_app_user_internal_conf_conf_proto_depIdxs = []int32{
 	1,  // 0: kratos.api.Bootstrap.server:type_name -> kratos.api.Server
 	2,  // 1: kratos.api.Bootstrap.data:type_name -> kratos.api.Data
 	3,  // 2: kratos.api.Bootstrap.etcd:type_name -> kratos.api.Etcd
-	4,  // 3: kratos.api.Bootstrap.jeager:type_name -> kratos.api.Jeager
+	4,  // 3: kratos.api.Bootstrap.jaeger:type_name -> kratos.api.Jaeger
 	5,  // 4: kratos.api.Bootstrap.smsRpc:type_name -> kratos.api.SmsRpc
 	6,  // 5: kratos.api.Server.http:type_name -> kratos.api.Server.HTTP
 	7,  // 6: kratos.api.Server.grpc:type_name -> kratos.api.Server.GRPC
@@ -821,7 +821,7 @@ func file_app_user_internal_conf_conf_proto_init() {
 			}
 		}
 		file_app_user_internal_conf_conf_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Jeager); i {
+			switch v := v.(*Jaeger); i {
 			case 0:
 				return &v.state
 			case 1:
