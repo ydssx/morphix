@@ -37,6 +37,11 @@ api:
 build:
 	mkdir -p bin/ && go build -ldflags "-X main.Version=$(VERSION)" -o ./bin/ ./...
 
+.PHONY: up
+# up
+up:
+	docker compose up -d
+
 .PHONY: generate
 # generate
 generate:
