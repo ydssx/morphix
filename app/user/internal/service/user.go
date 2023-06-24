@@ -3,9 +3,12 @@ package service
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/errors"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/user/internal/biz"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -30,7 +33,19 @@ func (s *UserService) Register(ctx context.Context, req *userv1.RegistrationRequ
 		// 注册失败，返回错误信息
 		return nil, err
 	}
-
+	result, err := s.sms.SendSMS(ctx, &smsv1.SendSMSRequest{
+		MobileNumber:       "15623562713",
+		Message:            "测试短信",
+		SenderId:           "",
+		TemplateId:         "",
+		TemplateParameters: "",
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !result.Success {
+		return nil, errors.New(401, "发送短信失败", "失败")
+	}
 	// 将业务层返回的用户对象转换为接口定义的 User 对象，并返回
 	response := &userv1.User{
 		Id:       "123",
@@ -87,8 +102,21 @@ func (s *UserService) Authorize(ctx context.Context, req *userv1.AuthorizationRe
 
 // GetUserList 实现获取用户列表接口
 func (s *UserService) GetUserList(ctx context.Context, req *emptypb.Empty) (*userv1.UserListResponse, error) {
-	
-	return s.uc.GetUserList(ctx, req) 
+	result, err := s.sms.SendSMS(ctx, &smsv1.SendSMSRequest{
+		MobileNumber:       "15623562713",
+		Message:            "测试短信",
+		SenderId:           "",
+		TemplateId:         "",
+		TemplateParameters: "",
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !result.Success {
+		return nil, status.Error(codes.Unavailable, "短信发送失败")
+	}
+
+	return s.uc.GetUserList(ctx, req)
 }
 
 // ManageUserPermission 实现管理用户权限接口

@@ -68,6 +68,7 @@ func (uc *UserUsecase) GetUserList(ctx context.Context, req *emptypb.Empty) (*us
 	if err != nil {
 		return nil, err
 	}
+	
 	resp := new(userv1.UserListResponse)
 	for _, v := range users {
 		resp.Users = append(resp.Users, &userv1.User{

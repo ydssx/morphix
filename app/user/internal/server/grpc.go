@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
-	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/user/internal/service"
@@ -18,12 +17,12 @@ func NewGRPCServer(c *common.Config, userSvc *service.UserService, logger log.Lo
 
 	var opts = []grpc.ServerOption{
 		grpc.UnaryInterceptor(
-			// interceptors.TraceServerInterceptor(),
+			interceptors.TraceServerInterceptor(),
 			interceptors.LoggingServerInterceptor(logger),
 		),
 		grpc.Middleware(
 			kratos.MetricServer(),
-			tracing.Server(),
+			// tracing.Server(),
 			// logging.Server(logger),
 			recovery.Recovery(),
 		),

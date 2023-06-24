@@ -1,5 +1,5 @@
 version: '3.9'
-x-default-logging: 
+x-default-logging:
   &logging
   driver: loki
   options:
@@ -9,20 +9,26 @@ x-default-logging:
 
 services:
 
-  jeager:
+  jaeger:
     image: jaegertracing/all-in-one:latest
     container_name: jaeger
     restart: always
-    command: 
+    command:
       - "--prometheus.server-url"
       - "http://prometheus:9090"
+      - --prometheus.query.support-spanmetrics-connector=true
     ports:
-      - "5775:5775/udp"
-      - "6831:6831/udp"
-      - "6832:6832/udp"
-      - "5778:5778"
+      # - "5775:5775/udp"
+      # - "6831:6831/udp"
+      # - "6832:6832/udp"
+      # - "5778:5778"
       - "16686:16686"
-      - "14268:14268"
+      - "16685:16685"
+      # - "14268:14268"
+      # - "4318:4318"
+      - "4317"
+      - "14250"
+      - "14268"
       # - "9411:9411"
     environment:
       # - SPAN_STORAGE_TYPE=elasticsearch
@@ -30,16 +36,45 @@ services:
       - LOG_LEVEL=debug
       - METRICS_STORAGE_TYPE=prometheus
       - PROMETHEUS_QUERY_SUPPORT_SPANMETRICS_CONNECTOR=true
-    logging: *logging
+      - COLLECTOR_OTLP_ENABLED=true
+    # logging: *logging
     depends_on:
-      - elasticsearch
       - prometheus
     networks:
       - morphix_net
     deploy:
       resources:
-       limits:
-         memory: 200M
+        limits:
+          memory: 200M
+
+  # OpenTelemetry Collector
+  otelcol:
+    image: otel/opentelemetry-collector-contrib:0.76.1
+    container_name: otel-col
+    deploy:
+      resources:
+        limits:
+          memory: 125M
+    restart: unless-stopped
+    command:
+      [
+        "--config=/etc/otelcol-config.yml",
+        "--config=/etc/otelcol-config-extras.yml"
+      ]
+    volumes:
+      - ./deploy/otelcollector/otelcol-config.yml:/etc/otelcol-config.yml
+      - ./deploy/otelcollector/otelcol-config-extras.yml:/etc/otelcol-config-extras.yml
+    ports:
+      - "4317:4317" # OTLP over gRPC receiver
+      - "4318:4318" # OTLP over HTTP receiver
+      - "9464:9464" # Prometheus exporter
+      - "8888:8888" # metrics endpoint
+      - "8889:8889"
+    depends_on:
+      - jaeger
+    networks:
+      - morphix_net
+    # logging: *logging
 
   prometheus:
     image: prom/prometheus:latest
@@ -101,8 +136,8 @@ services:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
     ports:
-      - 2379:2379
-      - 2380:2380
+      - 2377:2379
+      - 2378:2380
     networks:
       - morphix_net
 
@@ -150,11 +185,11 @@ services:
     #   - 8000:8000
     depends_on:
       - etcd
-      - jeager
+      - jaeger
       - user
     networks:
       - morphix_net
-    logging: *logging
+    # logging: *logging
 
   user:
     image: user
@@ -164,7 +199,7 @@ services:
       dockerfile: ./app/user/Dockerfile
     depends_on:
       - etcd
-      - jeager
+      - jaeger
       - sms
     networks:
       - morphix_net
@@ -177,7 +212,7 @@ services:
       dockerfile: ./app/sms/Dockerfile
     depends_on:
       - etcd
-      - jeager
+      - jaeger
     networks:
       - morphix_net
 

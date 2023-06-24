@@ -3,11 +3,13 @@ package provider
 import (
 	"context"
 	"sync"
+	"time"
 
+	"github.com/go-logr/logr"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/jaeger"
-	eptprom "go.opentelemetry.io/otel/exporters/prometheus"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	sdkresource "go.opentelemetry.io/otel/sdk/resource"
@@ -37,7 +39,9 @@ func initResource() *sdkresource.Resource {
 
 func InitTraceProvider(url string, tracename string) (*sdktrace.TracerProvider, error) {
 	// 创建 Jaeger exporter
-	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
+	// exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
+	ctx := context.Background()
+	exp, err := otlptracegrpc.New(ctx, otlptracegrpc.WithEndpoint("otelcol:4317"), otlptracegrpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +51,7 @@ func InitTraceProvider(url string, tracename string) (*sdktrace.TracerProvider, 
 		attribute.String("exporter", "jaeger"),
 		attribute.Float64("float", 312.23),
 	)
-	source, _ := sdkresource.Merge(resource, sche)
+	source, _ := sdkresource.Merge(initResource(), sche)
 
 	tp := sdktrace.NewTracerProvider(
 		// 将基于父span的采样率设置为100%
@@ -64,15 +68,19 @@ func InitTraceProvider(url string, tracename string) (*sdktrace.TracerProvider, 
 }
 
 func InitMeterProvider() *sdkmetric.MeterProvider {
-	exporter, err := eptprom.New()
+	exporter, err := otlpmetricgrpc.New(context.Background(), otlpmetricgrpc.WithEndpoint("otelcol:4317"), otlpmetricgrpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
 	provider := sdkmetric.NewMeterProvider(
-		sdkmetric.WithReader(exporter),
+		sdkmetric.WithReader(sdkmetric.NewPeriodicReader(exporter, sdkmetric.WithInterval(time.Second*10))),
 		sdkmetric.WithResource(initResource()),
 	)
 
 	otel.SetMeterProvider(provider)
 	return provider
+}
+
+func InitLoggerProvider() {
+	otel.SetLogger(logr.FromContextOrDiscard(context.Background()))
 }

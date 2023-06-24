@@ -40,6 +40,7 @@ func Run(ctx context.Context, c common.Config) error {
 	if err != nil {
 		panic(err)
 	}
+	mp := provider.InitMeterProvider()
 
 	server := gin.New()
 	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), gin.Recovery())
@@ -75,6 +76,7 @@ func Run(ctx context.Context, c common.Config) error {
 			httpSrv,
 		),
 		kratos.AfterStop(tp.Shutdown),
+		kratos.AfterStop(mp.Shutdown),
 	)
 	if err := app.Run(); err != nil {
 		log.Fatal(err)
