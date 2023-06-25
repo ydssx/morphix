@@ -32,9 +32,9 @@ spec:
           ports:
             - containerPort: 2379
           env:
-            - name:  ALLOW_NONE_AUTHENTICATION
+            - name: ALLOW_NONE_AUTHENTICATION
               value: "yes"
-            - name:  ETCD_ADVERTISE_CLIENT_URLS
+            - name: ETCD_ADVERTISE_CLIENT_URLS
               value: http://etcd:2379
 
 ---
@@ -55,58 +55,111 @@ spec:
         app: grafana
     spec:
       containers:
-      - name: grafana
-        image: grafana/grafana:latest
-        imagePullPolicy: IfNotPresent
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
-        ports:
-        - containerPort: 3000
-        volumeMounts:
-          - name: storage
-            mountPath: /var/lib/grafana
+        - name: grafana
+          image: grafana/grafana:latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: storage
+              mountPath: /var/lib/grafana
       volumes:
         - name: storage
           emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger
+  namespace: morphix
+  labels:
+    app: jaeger
+spec:
+  selector:
+    matchLabels:
+      app: jaeger
+  template:
+    metadata:
+      labels:
+        app: jaeger
+    spec:
+      containers:
+        - name: jaeger
+          image: jaegertracing/all-in-one:latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 16686
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name:  grafana
+  name: grafana
   namespace: morphix
 spec:
   selector:
     app: grafana
-  type:  NodePort
+  type: LoadBalancer
   ports:
-  - name:  service
-    port:  3000
-    targetPort:  3000
-    protocol: TCP
+    - name: service
+      port: 3000
+      targetPort: 3000
+      protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger
+  namespace: morphix
+spec:
+  selector:
+    app: jaeger
+  type: LoadBalancer
+  ports:
+    - name: service
+      port: 16686
+      targetPort: 16686
+      protocol: TCP
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: grafana-ingress
+  name: morphix-ingress
   namespace: morphix
   labels:
-    name: grafana-ingress
+    name: morphix-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
-  - host: morphix.grafana.com
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: grafana
-            port: 
-              number: 3000
+    - host: morphix.grafana.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 3000
+    - host: morphix.jaeger.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: jaeger
+                port:
+                  number: 16686
