@@ -9,6 +9,8 @@ kind: Deployment
 metadata:
   name: etcd
   namespace: morphix
+  labels:
+    app: etcd
 spec:
   replicas: 2
   selector:
@@ -34,3 +36,77 @@ spec:
               value: "yes"
             - name:  ETCD_ADVERTISE_CLIENT_URLS
               value: http://etcd:2379
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: morphix
+  labels:
+    app: grafana
+spec:
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+          - name: storage
+            mountPath: /var/lib/grafana
+      volumes:
+        - name: storage
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name:  grafana
+  namespace: morphix
+spec:
+  selector:
+    app: grafana
+  type:  NodePort
+  ports:
+  - name:  service
+    port:  3000
+    targetPort:  3000
+    protocol: TCP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+  namespace: morphix
+  labels:
+    name: grafana-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: morphix.grafana.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: grafana
+            port: 
+              number: 3000
