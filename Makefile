@@ -42,6 +42,11 @@ build:
 up:
 	docker compose up -d
 
+.PHONY: gentoken
+# up
+gentoken:
+	kubectl -n kubernetes-dashboard create token admin-user
+
 .PHONY: generate
 # generate
 generate:

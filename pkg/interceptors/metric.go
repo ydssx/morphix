@@ -8,6 +8,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func MetricClientInterceptor() grpc.UnaryClientInterceptor {
@@ -18,16 +20,19 @@ func MetricClientInterceptor() grpc.UnaryClientInterceptor {
 		),
 	)
 	reg.MustRegister(clMetrics)
-
 	exemplarFromContext := func(ctx context.Context) prometheus.Labels {
 		if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
 			return prometheus.Labels{"traceID": span.TraceID().String()}
 		}
 		return nil
 	}
-	promauto.With(reg).NewCounter(prometheus.CounterOpts{
+	panicsTotal := promauto.With(reg).NewCounter(prometheus.CounterOpts{
 		Name: "grpc_req_panics_recovered_total",
 		Help: "Total number of gRPC requests recovered from internal panic.",
 	})
+	_ = func(p any) (err error) {
+		panicsTotal.Inc()
+		return status.Errorf(codes.Internal, "%s", p)
+	}
 	return clMetrics.UnaryClientInterceptor(grpcprom.WithExemplarFromContext(exemplarFromContext))
 }

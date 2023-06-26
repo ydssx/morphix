@@ -218,6 +218,8 @@ spec:
       serviceAccountName: prometheus
       containers:
         - name: prometheus
+          securityContext:
+            runAsUser: 0 # 指定以 root 用户身份运行容器
           image: prom/prometheus:latest
           imagePullPolicy: IfNotPresent
           resources:
@@ -274,17 +276,23 @@ data:
     - /etc/config/rules
     - /etc/config/alerts
     scrape_configs:
-    - honor_labels: true
-      job_name: morphix
-      kubernetes_sd_configs:
-      - namespaces:
-          own_namespace: true
-        role: pod
-      relabel_configs:
-      - action: keep
-        regex: true
-        source_labels:
-        - __meta_kubernetes_pod_annotation_morphix
+      - job_name: prometheus
+        static_configs:
+          - targets: ["prometheus:9090"]
+      - job_name: etcd
+        static_configs:
+          - targets: ["etcd:2379"]
+      - honor_labels: true
+        job_name: morphix
+        kubernetes_sd_configs:
+        - namespaces:
+            own_namespace: true
+          role: pod
+        relabel_configs:
+        - action: keep
+          regex: true
+          source_labels:
+          - __meta_kubernetes_pod_annotation_morphix
 
 ---
 apiVersion: v1
@@ -300,6 +308,22 @@ spec:
     - name: service
       port: 3000
       targetPort: 3000
+      protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etcd
+  namespace: morphix
+spec:
+  selector:
+    app: etcd
+  type: ClusterIP
+  ports:
+    - name: service
+      port: 2379
+      targetPort: 2379
       protocol: TCP
 
 ---
