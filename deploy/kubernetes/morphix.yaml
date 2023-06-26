@@ -27,8 +27,8 @@ spec:
           imagePullPolicy: IfNotPresent
           resources:
             limits:
-              memory: "128Mi"
-              cpu: "500m"
+              memory: "50Mi"
+              cpu: "100m"
           ports:
             - containerPort: 2379
           env:
@@ -61,7 +61,7 @@ spec:
           resources:
             limits:
               memory: "128Mi"
-              cpu: "500m"
+              cpu: "100m"
           ports:
             - containerPort: 3000
           volumeMounts:
@@ -70,6 +70,7 @@ spec:
       volumes:
         - name: storage
           emptyDir: {}
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -93,10 +94,197 @@ spec:
           imagePullPolicy: IfNotPresent
           resources:
             limits:
-              memory: "128Mi"
-              cpu: "500m"
+              memory: "50Mi"
+              cpu: "100m"
           ports:
+            - containerPort: 5775
+              protocol: UDP
+            - containerPort: 6831
+              protocol: UDP
+            - containerPort: 6832
+              protocol: UDP
+            - containerPort: 5778
+              protocol: TCP
             - containerPort: 16686
+              protocol: TCP
+            - containerPort: 16685
+              protocol: TCP
+            - containerPort: 9411
+              protocol: TCP
+            - containerPort: 4317
+              protocol: TCP
+            - containerPort: 4318
+              protocol: TCP
+          env:
+            - name: PROMETHEUS_QUERY_SUPPORT_SPANMETRICS_CONNECTOR
+              value: "true"
+            - name: METRICS_STORAGE_TYPE
+              value: prometheus
+            - name: SPAN_STORAGE_TYPE
+              value: memory
+            - name: JAEGER_DISABLED
+              value: "false"
+            - name: COLLECTOR_OTLP_ENABLED
+              value: "true"
+          args:
+            - "--memory.max-traces"
+            - "10000"
+            - "--query.base-path"
+            - "/jaeger/ui"
+            - "--prometheus.server-url"
+            - "http://prometheus.morphix:9090"
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: prometheus
+  name: prometheus
+  namespace: morphix
+  annotations: {}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: prometheus
+  name: prometheus
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+      - nodes/proxy
+      - nodes/metrics
+      - services
+      - endpoints
+      - pods
+      - ingresses
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - "extensions"
+      - "networking.k8s.io"
+    resources:
+      - ingresses/status
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+  - nonResourceURLs:
+      - "/metrics"
+    verbs:
+      - get
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: prometheus
+  name: prometheus
+subjects:
+  - kind: ServiceAccount
+    name: prometheus
+    namespace: morphix
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: morphix
+  labels:
+    app: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      serviceAccountName: prometheus
+      containers:
+        - name: prometheus
+          image: prom/prometheus:latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: "100Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 9090
+          args:
+            - --storage.tsdb.retention.time=3d
+            - --config.file=/etc/config/prometheus.yml
+            - --storage.tsdb.path=/data
+            - --web.console.libraries=/etc/prometheus/console_libraries
+            - --web.console.templates=/etc/prometheus/consoles
+            - --enable-feature=exemplar-storage
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+            - name: storage-volume
+              mountPath: /data
+              subPath: ""
+      volumes:
+        - name: config-volume
+          configMap:
+            name: prometheus
+        - name: storage-volume
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus
+  namespace: morphix
+  labels:
+    app: prometheus
+data:
+  alerting_rules.yml: |
+    {}
+  alerts: |
+    {}
+  recording_rules.yml: |
+    {}
+  rules: |
+    {}
+  prometheus.yml: |
+    global:
+      evaluation_interval: 30s
+      scrape_interval: 5s
+      scrape_timeout: 3s
+    rule_files:
+    - /etc/config/recording_rules.yml
+    - /etc/config/alerting_rules.yml
+    - /etc/config/rules
+    - /etc/config/alerts
+    scrape_configs:
+    - honor_labels: true
+      job_name: morphix
+      kubernetes_sd_configs:
+      - namespaces:
+          own_namespace: true
+        role: pod
+      relabel_configs:
+      - action: keep
+        regex: true
+        source_labels:
+        - __meta_kubernetes_pod_annotation_morphix
 
 ---
 apiVersion: v1
@@ -107,7 +295,7 @@ metadata:
 spec:
   selector:
     app: grafana
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - name: service
       port: 3000
@@ -123,12 +311,31 @@ metadata:
 spec:
   selector:
     app: jaeger
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - name: service
       port: 16686
       targetPort: 16686
       protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: prometheus
+  name: prometheus
+  namespace: morphix
+spec:
+  ports:
+    - name: http
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
+  selector:
+    app: prometheus
+  sessionAffinity: None
+  type: ClusterIP
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -142,8 +349,13 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - grafana.morphix.com
+        - jaeger.morphix.com
+      secretName: tls-secret
   rules:
-    - host: morphix.grafana.com
+    - host: grafana.morphix.com
       http:
         paths:
           - pathType: Prefix
@@ -153,7 +365,7 @@ spec:
                 name: grafana
                 port:
                   number: 3000
-    - host: morphix.jaeger.com
+    - host: jaeger.morphix.com
       http:
         paths:
           - pathType: Prefix
