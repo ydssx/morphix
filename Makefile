@@ -42,11 +42,20 @@ build:
 up:
 	docker compose up -d
 
-.PHONY: gentoken
+.PHONY: dashboard
 # up
-gentoken:
+dashboard:
+	kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+	kubectl apply -f deploy/kubernetes/dashboard-adminuser.yaml
 	kubectl -n kubernetes-dashboard create token admin-user
 
+.PHONY: ingress
+# up
+ingress:
+	helm upgrade --install ingress-nginx ingress-nginx \
+	--repo https://kubernetes.github.io/ingress-nginx \
+	--namespace ingress-nginx --create-namespace
+	
 .PHONY: generate
 # generate
 generate:
