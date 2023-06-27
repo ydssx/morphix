@@ -4,11 +4,9 @@ import (
 	"context"
 	"flag"
 	"log"
-	"time"
 
 	"github.com/chenjiandongx/ginprom"
 	"github.com/gin-gonic/gin"
-	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	"github.com/go-kratos/kratos/v2"
 	khttp "github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/go-kratos/swagger-api/openapiv2"
@@ -17,7 +15,6 @@ import (
 	"github.com/ydssx/morphix/common"
 	kmiddleware "github.com/ydssx/morphix/pkg/middleware/kratos"
 	"github.com/ydssx/morphix/pkg/provider"
-	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 var configFile = flag.String("f", "../../../../configs/config.yaml", "the config file")
@@ -48,14 +45,7 @@ func Run(ctx context.Context, c common.Config) error {
 
 	opts := []gwruntime.ServeMuxOption{}
 
-	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   c.Etcd.Endpoints,
-		DialTimeout: time.Second * time.Duration(c.Etcd.Timeout),
-	})
-	if err != nil {
-		panic(err)
-	}
-	r := etcd.New(cli)
+	r := common.NewEtcdRegistry(c.Etcd)
 
 	gw, err := newGateway(ctx, opts, r)
 	if err != nil {
