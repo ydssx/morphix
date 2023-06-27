@@ -8,13 +8,13 @@ import (
 
 // Config
 type Config struct {
-	Gateway       Gateway       `yaml:"gateway"`
-	User          User          `yaml:"user"`
-	Sms           Sms           `yaml:"sms"`
-	Etcd          Etcd          `yaml:"etcd"`
-	Jaeger        Jaeger        `yaml:"jaeger"`
-	UserRpcClient UserRpcClient `yaml:"userRpcClient"`
-	SmsRpcClient  SmsRpcClient  `yaml:"smsRpcClient"`
+	Gateway       Gateway   `yaml:"gateway"`
+	User          User      `yaml:"user"`
+	Sms           Sms       `yaml:"sms"`
+	Etcd          Etcd      `yaml:"etcd"`
+	Jaeger        Jaeger    `yaml:"jaeger"`
+	UserRpcClient RpcClient `yaml:"userRpcClient"`
+	SmsRpcClient  RpcClient `yaml:"smsRpcClient"`
 }
 
 // Server
@@ -34,8 +34,8 @@ type SmsData struct {
 	Redis    SmsDataRedis    `yaml:"redis"`
 }
 
-// UserRpcClient
-type UserRpcClient struct {
+// RpcClient
+type RpcClient struct {
 	Network string `yaml:"network"`
 	Addr    string `yaml:"addr"`
 	Timeout int    `yaml:"timeout"`
@@ -83,13 +83,6 @@ type SmsDataRedis struct {
 	Addr         string `yaml:"addr"`
 	ReadTimeout  int    `yaml:"read_timeout"`
 	WriteTimeout int    `yaml:"write_timeout"`
-}
-
-// SmsRpcClient
-type SmsRpcClient struct {
-	Addr    string `yaml:"addr"`
-	Timeout int    `yaml:"timeout"`
-	Network string `yaml:"network"`
 }
 
 // Etcd

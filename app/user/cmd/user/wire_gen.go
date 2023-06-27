@@ -30,7 +30,7 @@ func wireApp(config *common.Config, logger log.Logger) (*kratos.App, func(), err
 	}
 	userRepo := data.NewGreeterRepo(dataData, logger)
 	userUsecase := biz.NewUserUsecase(userRepo, logger)
-	smsServiceClient := service.NewSMSClient(config)
+	smsServiceClient := common.NewSMSClient(config)
 	userService := service.NewUserService(userUsecase, smsServiceClient)
 	grpcServer := server.NewGRPCServer(config, userService, logger)
 	app := newApp(grpcServer, config)
