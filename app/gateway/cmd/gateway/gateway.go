@@ -19,13 +19,14 @@ type registerFn func(ctx context.Context, mux *gwruntime.ServeMux, endpoint stri
 
 var handlers = make(map[string]registerFn)
 
-func registerRpcServer(c common.Config) {
+func registerRpcHandler(c common.Config) {
 	handlers[c.UserRpcClient.Addr] = userv1.RegisterUserServiceHandlerFromEndpoint
 }
 
-func newGateway(ctx context.Context, opts []gwruntime.ServeMuxOption, r *etcd.Registry) (http.Handler, error) {
-
+func newGateway(ctx context.Context, r *etcd.Registry, opts ...gwruntime.ServeMuxOption) (http.Handler, error) {
 	mux := gwruntime.NewServeMux(opts...)
+
+	builder := discovery.NewBuilder(r, discovery.WithSubset(25), discovery.PrintDebugLog(true))
 
 	dialOpts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -34,13 +35,7 @@ func newGateway(ctx context.Context, opts []gwruntime.ServeMuxOption, r *etcd.Re
 			interceptors.LoggingClientInterceptor(logger.DefaultLogger),
 			interceptors.MetricClientInterceptor(),
 		),
-		grpc.WithResolvers(
-			discovery.NewBuilder(
-				r,
-				discovery.WithInsecure(true),
-				discovery.WithSubset(25),
-				discovery.PrintDebugLog(true),
-			)),
+		grpc.WithResolvers(builder),
 	}
 
 	for endpoint, f := range handlers {

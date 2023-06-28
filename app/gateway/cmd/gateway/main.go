@@ -31,7 +31,7 @@ func main() {
 }
 
 func Run(ctx context.Context, c common.Config) error {
-	registerRpcServer(c)
+	registerRpcHandler(c)
 
 	tp, err := provider.InitTraceProvider(c.Jaeger.Addr, c.Gateway.Name)
 	if err != nil {
@@ -39,25 +39,11 @@ func Run(ctx context.Context, c common.Config) error {
 	}
 	mp := provider.InitMeterProvider()
 
-	server := gin.New()
-	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), gin.Recovery())
-	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
-
-	opts := []gwruntime.ServeMuxOption{}
-
-	r := common.NewEtcdRegistry(c.Etcd)
-
-	gw, err := newGateway(ctx, opts, r)
-	if err != nil {
-		return err
-	}
-	server.Any("/api/*any", gin.WrapH(gw))
-
 	httpSrv := khttp.NewServer(khttp.Address(c.Gateway.Addr), khttp.Middleware(kmiddleware.MetricServer()))
 	openAPIhandler := openapiv2.NewHandler()
 	httpSrv.HandlePrefix("/q/", openAPIhandler)
 
-	httpSrv.HandlePrefix("/", server)
+	httpSrv.HandlePrefix("/", newGinHandler(ctx, c))
 
 	app := kratos.New(
 		kratos.Name(c.Gateway.Name),
@@ -73,4 +59,21 @@ func Run(ctx context.Context, c common.Config) error {
 	}
 
 	return nil
+}
+
+func newGinHandler(ctx context.Context, c common.Config) *gin.Engine {
+	server := gin.New()
+	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), gin.Recovery())
+	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
+	opts := []gwruntime.ServeMuxOption{}
+
+	r := common.NewEtcdRegistry(c.Etcd)
+
+	gw, err := newGateway(ctx, r, opts...)
+	if err != nil {
+		panic(err)
+	}
+	server.Any("/api/*any", gin.WrapH(gw))
+	return server
 }
