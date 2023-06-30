@@ -32,8 +32,7 @@ jobs:
       - run:
           name: deploy
           command: |
-            git clone https://github.com/ydssx/morphix.git
-            cd morphix
+            git clone https://github.com/ydssx/morphix.git && cd morphix
             chmod +x ./build.sh
             ./build.sh
 workflows:
