@@ -37,6 +37,6 @@ workflows:
   build-and-test:
     jobs:
       - test-go
-    # - deploy:
-    #     requires:
-    #       - test-go
+      - deploy:
+          requires:
+            - test-go
