@@ -34,6 +34,7 @@ jobs:
           command: |
             ls -al
             pwd
+            find $CIRCLE_WORKING_DIRECTORY -name "build.sh"
             chmod +x ./morphix/build.sh
             ./morphix/build.sh
 workflows:
