@@ -96,6 +96,7 @@ require (
 
 require (
 	github.com/bsm/redislock v0.9.3
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-kratos/aegis v0.2.0 // indirect
 	github.com/go-kratos/kratos/contrib/log/zap/v2 v2.0.0-20230616115456-fcd3b18e8344

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eo pipefail
+
 # 阿里云容器镜像服务相关信息
 REGISTRY_URL="registry.cn-shenzhen.aliyuncs.com"
 REGISTRY_NAMESPACE="ydssx"
