@@ -26,7 +26,7 @@ jobs:
     # This is an example deploy job, not actually used by the workflow
     docker:
       - image: cimg/base:stable          
-    working_directory: /morphix/github.com/ydssx/morphix
+    # working_directory: /morphix/github.com/ydssx/morphix
     steps:
       # Replace this with steps to deploy to users
       - run:
@@ -34,8 +34,8 @@ jobs:
           command: |
             ls -al
             pwd
-            chmod +x ./build.sh
-            ./build.sh
+            chmod +x ./morphix/build.sh
+            ./morphix/build.sh
 workflows:
   build-and-test:
     jobs:
