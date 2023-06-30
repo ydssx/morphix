@@ -13,6 +13,7 @@ type Config struct {
 	Sms           Sms       `yaml:"sms"`
 	Etcd          Etcd      `yaml:"etcd"`
 	Jaeger        Jaeger    `yaml:"jaeger"`
+	Otelcol       Otelcol   `yaml:"otelcol"`
 	UserRpcClient RpcClient `yaml:"userRpcClient"`
 	SmsRpcClient  RpcClient `yaml:"smsRpcClient"`
 }
@@ -93,6 +94,9 @@ type Etcd struct {
 
 // Jaeger
 type Jaeger struct {
+	Addr string `yaml:"addr"`
+}
+type Otelcol struct {
 	Addr string `yaml:"addr"`
 }
 

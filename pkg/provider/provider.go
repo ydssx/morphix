@@ -41,7 +41,7 @@ func InitTraceProvider(url string, tracename string) (*sdktrace.TracerProvider, 
 	// 创建 Jaeger exporter
 	// exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
 	ctx := context.Background()
-	exp, err := otlptracegrpc.New(ctx, otlptracegrpc.WithEndpoint("otelcol:4317"), otlptracegrpc.WithInsecure())
+	exp, err := otlptracegrpc.New(ctx, otlptracegrpc.WithEndpoint(url), otlptracegrpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
@@ -67,8 +67,8 @@ func InitTraceProvider(url string, tracename string) (*sdktrace.TracerProvider, 
 	return tp, nil
 }
 
-func InitMeterProvider() *sdkmetric.MeterProvider {
-	exporter, err := otlpmetricgrpc.New(context.Background(), otlpmetricgrpc.WithEndpoint("otelcol:4317"), otlpmetricgrpc.WithInsecure())
+func InitMeterProvider(endpoint string) *sdkmetric.MeterProvider {
+	exporter, err := otlpmetricgrpc.New(context.Background(), otlpmetricgrpc.WithEndpoint(endpoint), otlpmetricgrpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}

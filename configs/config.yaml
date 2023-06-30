@@ -6,6 +6,9 @@ etcd:
 jaeger:
   addr: http://jaeger:14268/api/traces
 
+otelcol:
+  addr: otelcol:4317
+
 userRpcClient:
   network: tcp
   addr: discovery:///user-rpc

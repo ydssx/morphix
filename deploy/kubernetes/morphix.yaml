@@ -7,12 +7,74 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: user-service
+  namespace: morphix
+  labels:
+    app: user-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+        - name: user-service
+          image: registry.cn-shenzhen.aliyuncs.com/ydssx/user:1.0.0
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "50Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 9000
+      imagePullSecrets:
+        - name: aliyun-registry-secret
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-service
+  namespace: morphix
+  labels:
+    app: gateway-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway-service
+  template:
+    metadata:
+      labels:
+        app: gateway-service
+    spec:
+      containers:
+        - name: gateway-service
+          image: registry.cn-shenzhen.aliyuncs.com/ydssx/gateway:1.0.0
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "50Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 8000
+      imagePullSecrets:
+        - name: aliyun-registry-secret
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: etcd
   namespace: morphix
   labels:
     app: etcd
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: etcd
@@ -295,6 +357,192 @@ data:
           - __meta_kubernetes_pod_annotation_morphix
 
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otelcol
+  namespace: morphix
+  labels:
+    app: otelcol
+spec:
+  selector:
+    matchLabels:
+      app: otelcol
+  template:
+    metadata:
+      labels:
+        app: otelcol
+      annotations:
+        # checksum/config: 43d3318bb84ce994167ce160b46e0e06eb17a17b8de61b578bf4a3e97f4dcdd1
+        morphix: "true"
+        prometheus.io/port: "9464"
+        prometheus.io/scrape: "true"
+    spec:
+      # serviceAccountName: prometheus
+      containers:
+        - name: otelcol
+          # securityContext:
+          #   runAsUser: 0 # 指定以 root 用户身份运行容器
+          image: otel/opentelemetry-collector-contrib:0.76.1
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: "50Mi"
+              cpu: "100m"
+          ports:
+            - name: jaeger-compact
+              containerPort: 6831
+              protocol: UDP
+            - name: jaeger-grpc
+              containerPort: 14250
+              protocol: TCP
+            - name: jaeger-thrift
+              containerPort: 14268
+              protocol: TCP
+            - name: metrics
+              containerPort: 8888
+              protocol: TCP
+            - name: otlp
+              containerPort: 4317
+              protocol: TCP
+            - name: otlp-http
+              containerPort: 4318
+              protocol: TCP
+            - name: prometheus
+              containerPort: 9464
+              protocol: TCP
+            - name: zipkin
+              containerPort: 9411
+              protocol: TCP
+          args:
+            - --config=/etc/config/otelcol-config.yml
+            - --config=/etc/config/otelcol-config-extras.yml
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+          # env:
+          #   - name: MY_POD_IP
+          #     valueFrom:
+          #       fieldRef:
+          #         apiVersion: v1
+          #         fieldPath: status.podIP
+      volumes:
+        - name: config-volume
+          configMap:
+            name: otelcol
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otelcol
+  namespace: morphix
+  labels:
+    app: otelcol
+data:
+  otelcol-config-extras.yml: |
+    {}
+  otelcol-config.yml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+
+    exporters:
+      otlp:
+        endpoint: "jaeger.morphix:4317"
+        tls:
+          insecure: true
+      logging:
+      prometheus:
+        endpoint: "0.0.0.0:9464"
+        resource_to_telemetry_conversion:
+          enabled: true
+        enable_open_metrics: true
+
+    processors:
+      batch:
+      filter:
+        metrics:
+          exclude:
+            match_type: strict
+            metric_names:
+              - queueSize
+
+    connectors:
+      spanmetrics:
+        histogram:
+          explicit:
+            buckets: [100us, 1ms, 2ms, 6ms, 10ms, 100ms, 250ms]
+        dimensions:
+          - name: http.method
+            default: GET
+          - name: http.status_code
+        dimensions_cache_size: 1000
+        aggregation_temporality: "AGGREGATION_TEMPORALITY_CUMULATIVE"    
+        metrics_flush_interval: 15s
+    
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [otlp, logging, spanmetrics]
+        metrics:
+          receivers: [otlp, spanmetrics]
+          processors: [filter, batch]
+          exporters: [prometheus, logging]
+        logs:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [logging]
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otelcol
+  namespace: morphix
+spec:
+  selector:
+    app: otelcol
+  type: ClusterIP
+  ports:
+    - name: jaeger-compact
+      port: 6831
+      targetPort: 6831
+      protocol: UDP
+    - name: jaeger-grpc
+      port: 14250
+      targetPort: 14250
+      protocol: TCP
+    - name: jaeger-thrift
+      port: 14268
+      targetPort: 14268
+      protocol: TCP
+    - name: metrics
+      port: 8888
+      targetPort: 8888
+      protocol: TCP
+    - name: otlp
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+      appProtocol: grpc
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      protocol: TCP
+    - name: prometheus
+      port: 9464
+      targetPort: 9464
+      protocol: TCP
+    - name: zipkin
+      port: 9411
+      targetPort: 9411
+      protocol: TCP
+
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -308,6 +556,38 @@ spec:
     - name: service
       port: 3000
       targetPort: 3000
+      protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: morphix
+spec:
+  selector:
+    app: user-service
+  type: ClusterIP
+  ports:
+    - name: user-service
+      port: 9000
+      targetPort: 9000
+      protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+  namespace: morphix
+spec:
+  selector:
+    app: gateway-service
+  type: LoadBalancer
+  ports:
+    - name: gateway-service
+      port: 8000
+      targetPort: 8000
       protocol: TCP
 
 ---
@@ -340,6 +620,10 @@ spec:
     - name: service
       port: 16686
       targetPort: 16686
+      protocol: TCP
+    - name: jaeger-grpc
+      port: 4317
+      targetPort: 4317
       protocol: TCP
 
 ---

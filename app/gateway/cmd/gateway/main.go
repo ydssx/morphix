@@ -33,11 +33,11 @@ func main() {
 func Run(ctx context.Context, c common.Config) error {
 	registerRpcHandler(c)
 
-	tp, err := provider.InitTraceProvider(c.Jaeger.Addr, c.Gateway.Name)
+	tp, err := provider.InitTraceProvider(c.Otelcol.Addr, c.Gateway.Name)
 	if err != nil {
 		panic(err)
 	}
-	mp := provider.InitMeterProvider()
+	mp := provider.InitMeterProvider(c.Otelcol.Addr)
 
 	httpSrv := khttp.NewServer(khttp.Address(c.Gateway.Addr), khttp.Middleware(kmiddleware.MetricServer()))
 	openAPIhandler := openapiv2.NewHandler()
