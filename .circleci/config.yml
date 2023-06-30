@@ -32,11 +32,10 @@ jobs:
       - run:
           name: deploy
           command: |
-            ls -al
-            pwd
-            find /home/circleci/project -name "build.sh"
-            chmod +x /home/circleci/project/morphix/build.sh
-            /home/circleci/project/morphix/build.sh
+            git clone https://github.com/ydssx/morphix.git
+            cd morphix
+            chmod +x ./build.sh
+            ./build.sh
 workflows:
   build-and-test:
     jobs:
