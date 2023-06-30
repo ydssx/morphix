@@ -7,68 +7,6 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service
-  namespace: morphix
-  labels:
-    app: user-service
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: user-service
-  template:
-    metadata:
-      labels:
-        app: user-service
-    spec:
-      containers:
-        - name: user-service
-          image: registry.cn-shenzhen.aliyuncs.com/ydssx/user:1.0.0
-          imagePullPolicy: Always
-          resources:
-            limits:
-              memory: "50Mi"
-              cpu: "100m"
-          ports:
-            - containerPort: 9000
-      imagePullSecrets:
-        - name: aliyun-registry-secret
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: gateway-service
-  namespace: morphix
-  labels:
-    app: gateway-service
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: gateway-service
-  template:
-    metadata:
-      labels:
-        app: gateway-service
-    spec:
-      containers:
-        - name: gateway-service
-          image: registry.cn-shenzhen.aliyuncs.com/ydssx/gateway:1.0.0
-          imagePullPolicy: Always
-          resources:
-            limits:
-              memory: "50Mi"
-              cpu: "100m"
-          ports:
-            - containerPort: 8000
-      imagePullSecrets:
-        - name: aliyun-registry-secret
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
   name: etcd
   namespace: morphix
   labels:
@@ -188,6 +126,8 @@ spec:
               value: "false"
             - name: COLLECTOR_OTLP_ENABLED
               value: "true"
+            - name: LOG_LEVEL
+              value: "debug"
           args:
             - "--memory.max-traces"
             - "10000"
@@ -344,6 +284,9 @@ data:
       - job_name: etcd
         static_configs:
           - targets: ["etcd:2379"]
+      - job_name: gateway-service
+        static_configs:
+          - targets: ["gateway-service:8000"]
       - honor_labels: true
         job_name: morphix
         kubernetes_sd_configs:
@@ -387,7 +330,7 @@ spec:
           imagePullPolicy: IfNotPresent
           resources:
             limits:
-              memory: "50Mi"
+              memory: "100Mi"
               cpu: "100m"
           ports:
             - name: jaeger-compact
@@ -481,7 +424,7 @@ data:
         dimensions_cache_size: 1000
         aggregation_temporality: "AGGREGATION_TEMPORALITY_CUMULATIVE"    
         metrics_flush_interval: 15s
-    
+
     service:
       pipelines:
         traces:
@@ -528,7 +471,6 @@ spec:
       port: 4317
       targetPort: 4317
       protocol: TCP
-      appProtocol: grpc
     - name: otlp-http
       port: 4318
       targetPort: 4318
@@ -556,38 +498,6 @@ spec:
     - name: service
       port: 3000
       targetPort: 3000
-      protocol: TCP
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: user-service
-  namespace: morphix
-spec:
-  selector:
-    app: user-service
-  type: ClusterIP
-  ports:
-    - name: user-service
-      port: 9000
-      targetPort: 9000
-      protocol: TCP
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: gateway-service
-  namespace: morphix
-spec:
-  selector:
-    app: gateway-service
-  type: LoadBalancer
-  ports:
-    - name: gateway-service
-      port: 8000
-      targetPort: 8000
       protocol: TCP
 
 ---
@@ -643,7 +553,7 @@ spec:
   selector:
     app: prometheus
   sessionAffinity: None
-  type: ClusterIP
+  type: LoadBalancer
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -683,3 +593,13 @@ spec:
                 name: jaeger
                 port:
                   number: 16686
+    - host: www.morphix.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: gateway-service
+                port:
+                  number: 8000

@@ -42,8 +42,8 @@ func Run(ctx context.Context, c common.Config) error {
 	httpSrv := khttp.NewServer(khttp.Address(c.Gateway.Addr), khttp.Middleware(kmiddleware.MetricServer()))
 	openAPIhandler := openapiv2.NewHandler()
 	httpSrv.HandlePrefix("/q/", openAPIhandler)
-
-	httpSrv.HandlePrefix("/", newGinHandler(ctx, c))
+	ginHandler := newGinHandler(ctx, c)
+	httpSrv.HandlePrefix("/", ginHandler)
 
 	app := kratos.New(
 		kratos.Name(c.Gateway.Name),

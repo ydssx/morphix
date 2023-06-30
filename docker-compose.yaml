@@ -176,11 +176,13 @@ services:
       - morphix_net
 
   gateway:
-    image: gateway
+    image: registry.cn-shenzhen.aliyuncs.com/ydssx/gateway:${TAG:-latest}
     container_name: gateway-service
     build:
       context: ./
       dockerfile: ./app/gateway/Dockerfile
+      args:
+        - TAG=${TAG:-latest}
     # ports:
     #   - 8000:8000
     depends_on:
@@ -192,11 +194,13 @@ services:
     # logging: *logging
 
   user:
-    image: user
+    image: registry.cn-shenzhen.aliyuncs.com/ydssx/user:${TAG:-latest}
     container_name: user-service
     build:
       context: ./
       dockerfile: ./app/user/Dockerfile
+      args:
+        - TAG=${TAG:-latest}
     depends_on:
       - etcd
       - jaeger
@@ -205,11 +209,13 @@ services:
       - morphix_net
 
   sms:
-    image: sms
+    image: registry.cn-shenzhen.aliyuncs.com/ydssx/sms:${TAG:-latest}
     container_name: sms-service
     build:
       context: ./
       dockerfile: ./app/sms/Dockerfile
+      args:
+        - TAG=${TAG:-latest}
     depends_on:
       - etcd
       - jaeger
@@ -222,7 +228,7 @@ services:
     volumes:
       - ./deploy/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
-      - 80:80
+      - 8080:80
     networks:
       - morphix_net
 
