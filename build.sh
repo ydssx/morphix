@@ -12,7 +12,8 @@ registry_password="$REGISTRY_PASSWORD"
 version="1.0.1"
 
 # 登录镜像仓库
-docker login --username "$registry_username" --password "$registry_password" $REGISTRY_URL
+echo "$registry_password" | docker login --username "$registry_username" --password-stdin $REGISTRY_URL
+
 
 # 查找微服务目录下的 Dockerfile 文件，并迭代构建和推送镜像
 services=("gateway" "user" "sms")
