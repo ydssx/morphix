@@ -29,10 +29,10 @@ jobs:
     # working_directory: /morphix/github.com/ydssx/morphix
     steps:
       # Replace this with steps to deploy to users
+      - checkout
       - run:
           name: deploy
           command: |
-            git clone https://github.com/ydssx/morphix.git && cd morphix
             chmod +x ./build.sh
             ./build.sh
 workflows:
