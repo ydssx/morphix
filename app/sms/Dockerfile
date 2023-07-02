@@ -17,4 +17,4 @@ COPY --from=builder /src/configs ./
 
 EXPOSE 9001
 
-CMD [ "./sms","-f","./config.yaml" ]
+CMD [ "./sms","-f","/etc/morphix/config.yaml" ]

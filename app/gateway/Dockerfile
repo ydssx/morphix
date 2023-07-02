@@ -17,4 +17,4 @@ COPY --from=builder /src/configs ./
 
 EXPOSE 8000
 
-CMD [ "./gateway","-f","./config.yaml" ]
+CMD [ "./gateway","-f","/etc/morphix/config.yaml" ]

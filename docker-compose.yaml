@@ -181,6 +181,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.gateway.rule=Host(`www.example.com`)"
     container_name: gateway-service
+    volumes:
+      - ./configs:/etc/morphix
     build:
       context: ./
       dockerfile: ./app/gateway/Dockerfile
@@ -199,6 +201,8 @@ services:
   user:
     image: registry.cn-shenzhen.aliyuncs.com/ydssx/user:${TAG:-latest}
     container_name: user-service
+    volumes:
+      - ./configs:/etc/morphix
     build:
       context: ./
       dockerfile: ./app/user/Dockerfile
@@ -214,6 +218,8 @@ services:
   sms:
     image: registry.cn-shenzhen.aliyuncs.com/ydssx/sms:${TAG:-latest}
     container_name: sms-service
+    volumes:
+      - ./configs/:/etc/morphix/:ro
     build:
       context: ./
       dockerfile: ./app/sms/Dockerfile
