@@ -251,6 +251,16 @@ services:
     networks:
       - morphix_net
 
+  nats:
+    container_name: nats
+    image: nats:latest
+    ports:
+      - "4222:4222"
+      - "8223:8222"
+      - "6222:6222"
+    networks:
+      - morphix_net
+
 networks:
   morphix_net:
     driver: bridge
