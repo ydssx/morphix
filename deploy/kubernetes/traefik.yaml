@@ -30,14 +30,12 @@ rules:
       - ingresses/status
     verbs:
       - update
-
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: traefik-account
   namespace: morphix
-
 
 ---
 kind: ClusterRoleBinding
