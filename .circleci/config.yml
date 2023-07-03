@@ -35,7 +35,6 @@ jobs:
       - run:
           name: deploy
           command: |
-            ls -al
             chmod +x ./build.sh
             ./build.sh
 workflows:
