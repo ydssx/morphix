@@ -12,7 +12,7 @@ metadata:
   labels:
     app: gateway-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: gateway-service
@@ -31,8 +31,15 @@ spec:
               cpu: "100m"
           ports:
             - containerPort: 8000
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/morphix
       imagePullSecrets:
         - name: aliyun-registry-secret
+      volumes:
+        - name: config-volume
+          configMap:
+            name: morphix-config
 
 ---
 apiVersion: v1
@@ -43,10 +50,9 @@ metadata:
 spec:
   selector:
     app: gateway-service
-  type: ClusterIP
+  type: LoadBalancer
   ports:
-    - name: gateway-service
+    - name: http
       port: 8000
       targetPort: 8000
       protocol: TCP
-

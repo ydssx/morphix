@@ -7,45 +7,52 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sms-service
+  name: user-service
   namespace: morphix
   labels:
-    app: sms-service
+    app: user-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: sms-service
+      app: user-service
   template:
     metadata:
       labels:
-        app: sms-service
+        app: user-service
     spec:
       containers:
-        - name: sms-service
-          image: registry.cn-shenzhen.aliyuncs.com/ydssx/sms:1.0.1
+        - name: user-service
+          image: registry.cn-shenzhen.aliyuncs.com/ydssx/user:1.0.1
           imagePullPolicy: Always
           resources:
             limits:
               memory: "50Mi"
               cpu: "100m"
           ports:
-            - containerPort: 9001
+            - containerPort: 9000
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/morphix
       imagePullSecrets:
         - name: aliyun-registry-secret
+      volumes:
+        - name: config-volume
+          configMap:
+            name: morphix-config
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: sms-service
+  name: user-service
   namespace: morphix
 spec:
   selector:
-    app: sms-service
+    app: user-service
   type: ClusterIP
   ports:
-    - name: sms-service
-      port: 9001
-      targetPort: 9001
+    - name: user-service
+      port: 9000
+      targetPort: 9000
       protocol: TCP

@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sample-ingress
+
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: sample-gateway
+  namespace: sample-ingress
+spec:
+  gatewayClassName: istio
+  listeners:
+    - name: http
+      hostname: "*.morphix.com"
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: All
+
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: morphix-gateway
+  namespace: morphix
+spec:
+  parentRefs:
+    - name: sample-gateway
+      namespace: sample-ingress
+  hostnames: ["www.morphix.com"]
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      backendRefs:
+        - name: gateway-service
+          port: 8000
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: grafana
+  namespace: morphix
+spec:
+  parentRefs:
+    - name: sample-gateway
+      namespace: sample-ingress
+  hostnames: ["grafana.morphix.com"]
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: grafana
+          port: 3000
+
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: jaeger
+  namespace: morphix
+spec:
+  parentRefs:
+    - name: sample-gateway
+      namespace: sample-ingress
+  hostnames: ["jaeger.morphix.com"]
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: jaeger
+          port: 16686

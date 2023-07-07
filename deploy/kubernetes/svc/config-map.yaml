@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: morphix-config
+  namespace: morphix
+  labels:
+    app: morphix-config
+data:
+  config.yaml: |
+    etcd:
+      endpoints:
+        - etcd:2379
+      timeout: 5
+
+    jaeger:
+      addr: http://jaeger:14268/api/traces
+
+    otelcol:
+      addr: otelcol:4317
+
+    userRpcClient:
+      network: tcp
+      addr: discovery:///user-rpc
+      timeout: 2
+
+    smsRpcClient:
+      network: tcp
+      addr: discovery:///sms-rpc
+      timeout: 2
+
+    # gateway配置
+    gateway:
+      name: gateway
+      addr: 0.0.0.0:8000
+
+    # user服务配置
+    user:
+      name: user-rpc
+      server:
+        grpc:
+          addr: 0.0.0.0:9000
+          timeout: 2
+      data:
+        database:
+          driver: mysql
+          source: root:root@tcp(127.0.0.1:3306)/test
+        redis:
+          addr: 127.0.0.1:6379
+          read_timeout: 2
+          write_timeout: 2
+
+    # sms服务配置
+    sms:
+      name: sms-rpc
+      server:
+        grpc:
+          addr: 0.0.0.0:9001
+          timeout: 2
+      data:
+        database:
+          driver: mysql
+          source: root:root@tcp(127.0.0.1:3306)/test
+        redis:
+          addr: 127.0.0.1:6379
+          read_timeout: 2
+          write_timeout: 2
