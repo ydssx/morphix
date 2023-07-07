@@ -33,5 +33,5 @@ func (*SMSService) QuerySMSStatus(context.Context, *smsv1.QuerySMSStatusRequest)
 
 // SendSMS implements smsv1.SMSServiceServer.
 func (*SMSService) SendSMS(ctx context.Context, req *smsv1.SendSMSRequest) (resp *smsv1.SendSMSResponse, err error) {
-	return &smsv1.SendSMSResponse{Success: false}, nil
+	return &smsv1.SendSMSResponse{Success: true}, nil
 }

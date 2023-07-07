@@ -9,6 +9,7 @@ import (
 	"github.com/ydssx/morphix/pkg/interceptors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/grpclog"
 )
 
 func NewSMSClient(c *Config) smsv1.SMSServiceClient {
@@ -37,9 +38,25 @@ func createConn(etcdConf Etcd, rpcCliConf RpcClient) *grpc.ClientConn {
 				discovery.PrintDebugLog(true),
 			)),
 	}
-	conn, err := grpc.DialContext(context.Background(), rpcCliConf.Addr, opts...)
+	ctx := context.Background()
+	conn, err := grpc.DialContext(ctx, rpcCliConf.Addr, opts...)
 	if err != nil {
 		panic(err)
 	}
+	defer func() {
+		if err != nil {
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Infof("Failed to close conn to %s: %v", rpcCliConf.Addr, cerr)
+			}
+			return
+		}
+		go func() {
+			<-ctx.Done()
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Infof("Failed to close conn to %s: %v", rpcCliConf.Addr, cerr)
+			}
+		}()
+	}()
+
 	return conn
 }
