@@ -16,7 +16,7 @@ data:
       addr: http://jaeger:14268/api/traces
 
     otelcol:
-      addr: otelcol:4317
+      addr: otelcol.morphix:4317
 
     userRpcClient:
       network: tcp
