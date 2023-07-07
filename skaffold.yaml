@@ -1,0 +1,43 @@
+apiVersion: skaffold/v4beta5
+kind: Config
+metadata:
+  name: morphix
+build:
+  tagPolicy:
+    gitCommit:
+      ignoreChanges: false
+  artifacts:
+    - image: registry.cn-shenzhen.aliyuncs.com/ydssx/gateway
+      context: .
+      docker:
+        dockerfile: app/gateway/Dockerfile
+    - image: registry.cn-shenzhen.aliyuncs.com/ydssx/sms
+      context: .
+      docker:
+        dockerfile: app/sms/Dockerfile
+    - image: registry.cn-shenzhen.aliyuncs.com/ydssx/user
+      context: .
+      docker:
+        dockerfile: app/user/Dockerfile
+manifests:
+  rawYaml:
+    - deploy/kubernetes/dashboard-adminuser.yaml
+    - deploy/kubernetes/etcd.yaml
+    - deploy/kubernetes/gateway.yaml
+    - deploy/kubernetes/grafana.yaml
+    - deploy/kubernetes/jaeger.yaml
+    - deploy/kubernetes/nats.yaml
+    - deploy/kubernetes/otelcol.yaml
+    - deploy/kubernetes/prometheus.yaml
+    - deploy/kubernetes/traefik.yaml
+    - deploy/kubernetes/svc/config-map.yaml
+    - deploy/kubernetes/svc/gateway-svc.yaml
+    - deploy/kubernetes/svc/sms-svc.yaml
+    - deploy/kubernetes/svc/user-svc.yaml
+deploy:
+  kubectl:
+    hooks:
+      before:
+        - host:
+            command: ["cmd.exe", "/C", "kubectl create ns morphix && kubectl label namespace morphix istio-injection=enabled --overwrite && make secret"]
+            os: [windows]
