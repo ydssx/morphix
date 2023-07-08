@@ -1,0 +1,16 @@
+configMapGenerator:
+  - name: morphix-config
+    files:
+      - config.yaml
+    namespace: morphix
+resources:
+  - gateway-svc.yaml
+  - sms-svc.yaml
+  - user-svc.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+namespace: morphix
+commonLabels:
+  project: morphix
+# images:
+#   - newTag: 1.0.2
