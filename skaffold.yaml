@@ -3,9 +3,14 @@ kind: Config
 metadata:
   name: morphix
 build:
+  local:
+    concurrency: 0
+    tryImportMissing: false
+    useDockerCLI: false
+    push: true
   tagPolicy:
-    gitCommit:
-      ignoreChanges: false
+    envTemplate:
+      template: "{{.IMAGE_TAG}}"
   artifacts:
     - image: registry.cn-shenzhen.aliyuncs.com/ydssx/gateway
       context: .
@@ -20,24 +25,13 @@ build:
       docker:
         dockerfile: app/user/Dockerfile
 manifests:
-  rawYaml:
-    - deploy/kubernetes/dashboard-adminuser.yaml
-    - deploy/kubernetes/etcd.yaml
-    - deploy/kubernetes/gateway.yaml
-    - deploy/kubernetes/grafana.yaml
-    - deploy/kubernetes/jaeger.yaml
-    - deploy/kubernetes/nats.yaml
-    - deploy/kubernetes/otelcol.yaml
-    - deploy/kubernetes/prometheus.yaml
-    - deploy/kubernetes/traefik.yaml
-    - deploy/kubernetes/svc/config-map.yaml
-    - deploy/kubernetes/svc/gateway-svc.yaml
-    - deploy/kubernetes/svc/sms-svc.yaml
-    - deploy/kubernetes/svc/user-svc.yaml
-deploy:
-  kubectl:
-    hooks:
-      before:
-        - host:
-            command: ["cmd.exe", "/C", "kubectl create ns morphix && kubectl label namespace morphix istio-injection=enabled --overwrite && make secret"]
-            os: [windows]
+  kustomize:
+    paths:
+      - deploy\kubernetes\svc
+# deploy:
+#   kubectl:
+#     hooks:
+#       before:
+#         - host:
+#             command: ["cmd.exe", "/C", "kubectl label namespace morphix istio-injection=enabled --overwrite"]
+#             os: [windows]

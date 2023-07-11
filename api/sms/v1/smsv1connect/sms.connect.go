@@ -137,28 +137,40 @@ type SMSServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewSMSServiceHandler(svc SMSServiceHandler, opts ...connect_go.HandlerOption) (string, http.Handler) {
-	mux := http.NewServeMux()
-	mux.Handle(SMSServiceSendSMSProcedure, connect_go.NewUnaryHandler(
+	sMSServiceSendSMSHandler := connect_go.NewUnaryHandler(
 		SMSServiceSendSMSProcedure,
 		svc.SendSMS,
 		opts...,
-	))
-	mux.Handle(SMSServiceQuerySMSStatusProcedure, connect_go.NewUnaryHandler(
+	)
+	sMSServiceQuerySMSStatusHandler := connect_go.NewUnaryHandler(
 		SMSServiceQuerySMSStatusProcedure,
 		svc.QuerySMSStatus,
 		opts...,
-	))
-	mux.Handle(SMSServiceManageSMSTemplateProcedure, connect_go.NewUnaryHandler(
+	)
+	sMSServiceManageSMSTemplateHandler := connect_go.NewUnaryHandler(
 		SMSServiceManageSMSTemplateProcedure,
 		svc.ManageSMSTemplate,
 		opts...,
-	))
-	mux.Handle(SMSServiceManageSMSSignatureProcedure, connect_go.NewUnaryHandler(
+	)
+	sMSServiceManageSMSSignatureHandler := connect_go.NewUnaryHandler(
 		SMSServiceManageSMSSignatureProcedure,
 		svc.ManageSMSSignature,
 		opts...,
-	))
-	return "/smsv1.SMSService/", mux
+	)
+	return "/smsv1.SMSService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case SMSServiceSendSMSProcedure:
+			sMSServiceSendSMSHandler.ServeHTTP(w, r)
+		case SMSServiceQuerySMSStatusProcedure:
+			sMSServiceQuerySMSStatusHandler.ServeHTTP(w, r)
+		case SMSServiceManageSMSTemplateProcedure:
+			sMSServiceManageSMSTemplateHandler.ServeHTTP(w, r)
+		case SMSServiceManageSMSSignatureProcedure:
+			sMSServiceManageSMSSignatureHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
 }
 
 // UnimplementedSMSServiceHandler returns CodeUnimplemented from all methods.

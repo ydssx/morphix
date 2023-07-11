@@ -9,9 +9,10 @@ import (
 	"github.com/google/wire"
 	"github.com/ydssx/morphix/app/sms/internal/server"
 	"github.com/ydssx/morphix/app/sms/internal/service"
+	"github.com/ydssx/morphix/app/sms/internal/biz"
 	"github.com/ydssx/morphix/common"
 )
 
 func wireApp(*common.Config, log.Logger) (*kratos.App, func(), error) {
-	panic(wire.Build(server.ProviderSet,service.ProviderSet,newApp))
+	panic(wire.Build(server.ProviderSet,service.ProviderSet,biz.ProviderSet,newApp))
 }

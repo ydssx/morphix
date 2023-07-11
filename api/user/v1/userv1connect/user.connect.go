@@ -225,58 +225,82 @@ type UserServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewUserServiceHandler(svc UserServiceHandler, opts ...connect_go.HandlerOption) (string, http.Handler) {
-	mux := http.NewServeMux()
-	mux.Handle(UserServiceRegisterProcedure, connect_go.NewUnaryHandler(
+	userServiceRegisterHandler := connect_go.NewUnaryHandler(
 		UserServiceRegisterProcedure,
 		svc.Register,
 		opts...,
-	))
-	mux.Handle(UserServiceLoginProcedure, connect_go.NewUnaryHandler(
+	)
+	userServiceLoginHandler := connect_go.NewUnaryHandler(
 		UserServiceLoginProcedure,
 		svc.Login,
 		opts...,
-	))
-	mux.Handle(UserServiceLogoutProcedure, connect_go.NewUnaryHandler(
+	)
+	userServiceLogoutHandler := connect_go.NewUnaryHandler(
 		UserServiceLogoutProcedure,
 		svc.Logout,
 		opts...,
-	))
-	mux.Handle(UserServiceUpdateProfileProcedure, connect_go.NewUnaryHandler(
+	)
+	userServiceUpdateProfileHandler := connect_go.NewUnaryHandler(
 		UserServiceUpdateProfileProcedure,
 		svc.UpdateProfile,
 		opts...,
-	))
-	mux.Handle(UserServiceResetPasswordProcedure, connect_go.NewUnaryHandler(
+	)
+	userServiceResetPasswordHandler := connect_go.NewUnaryHandler(
 		UserServiceResetPasswordProcedure,
 		svc.ResetPassword,
 		opts...,
-	))
-	mux.Handle(UserServiceAuthenticateProcedure, connect_go.NewUnaryHandler(
+	)
+	userServiceAuthenticateHandler := connect_go.NewUnaryHandler(
 		UserServiceAuthenticateProcedure,
 		svc.Authenticate,
 		opts...,
-	))
-	mux.Handle(UserServiceAuthorizeProcedure, connect_go.NewUnaryHandler(
+	)
+	userServiceAuthorizeHandler := connect_go.NewUnaryHandler(
 		UserServiceAuthorizeProcedure,
 		svc.Authorize,
 		opts...,
-	))
-	mux.Handle(UserServiceGetUserListProcedure, connect_go.NewUnaryHandler(
+	)
+	userServiceGetUserListHandler := connect_go.NewUnaryHandler(
 		UserServiceGetUserListProcedure,
 		svc.GetUserList,
 		opts...,
-	))
-	mux.Handle(UserServiceManageUserPermissionProcedure, connect_go.NewUnaryHandler(
+	)
+	userServiceManageUserPermissionHandler := connect_go.NewUnaryHandler(
 		UserServiceManageUserPermissionProcedure,
 		svc.ManageUserPermission,
 		opts...,
-	))
-	mux.Handle(UserServiceLogActivityProcedure, connect_go.NewUnaryHandler(
+	)
+	userServiceLogActivityHandler := connect_go.NewUnaryHandler(
 		UserServiceLogActivityProcedure,
 		svc.LogActivity,
 		opts...,
-	))
-	return "/userv1.UserService/", mux
+	)
+	return "/userv1.UserService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case UserServiceRegisterProcedure:
+			userServiceRegisterHandler.ServeHTTP(w, r)
+		case UserServiceLoginProcedure:
+			userServiceLoginHandler.ServeHTTP(w, r)
+		case UserServiceLogoutProcedure:
+			userServiceLogoutHandler.ServeHTTP(w, r)
+		case UserServiceUpdateProfileProcedure:
+			userServiceUpdateProfileHandler.ServeHTTP(w, r)
+		case UserServiceResetPasswordProcedure:
+			userServiceResetPasswordHandler.ServeHTTP(w, r)
+		case UserServiceAuthenticateProcedure:
+			userServiceAuthenticateHandler.ServeHTTP(w, r)
+		case UserServiceAuthorizeProcedure:
+			userServiceAuthorizeHandler.ServeHTTP(w, r)
+		case UserServiceGetUserListProcedure:
+			userServiceGetUserListHandler.ServeHTTP(w, r)
+		case UserServiceManageUserPermissionProcedure:
+			userServiceManageUserPermissionHandler.ServeHTTP(w, r)
+		case UserServiceLogActivityProcedure:
+			userServiceLogActivityHandler.ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
 }
 
 // UnimplementedUserServiceHandler returns CodeUnimplemented from all methods.

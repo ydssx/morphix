@@ -329,6 +329,8 @@ components:
                     description: 可选参数
                 templateParameters:
                     type: string
+                scene:
+                    type: string
             description: 发送短信请求
         smsv1.SendSMSResponse:
             type: object

@@ -620,6 +620,9 @@
         },
         "templateParameters": {
           "type": "string"
+        },
+        "scene": {
+          "type": "string"
         }
       },
       "title": "发送短信请求"

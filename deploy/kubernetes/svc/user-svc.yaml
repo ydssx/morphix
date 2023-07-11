@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: registry.cn-shenzhen.aliyuncs.com/ydssx/user:1.0.1
+          image: registry.cn-shenzhen.aliyuncs.com/ydssx/user:1.0.2
           imagePullPolicy: Always
           resources:
             limits:

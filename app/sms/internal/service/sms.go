@@ -4,16 +4,19 @@ import (
 	"context"
 
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
+	"github.com/ydssx/morphix/app/sms/internal/biz"
 )
 
 var _ smsv1.SMSServiceServer = (*SMSService)(nil)
 
 type SMSService struct {
 	smsv1.UnimplementedSMSServiceServer
+
+	uc *biz.SmsUseCase
 }
 
-func NewSMSService() *SMSService {
-	return &SMSService{}
+func NewSMSService(uc *biz.SmsUseCase) *SMSService {
+	return &SMSService{uc: uc}
 }
 
 // ManageSMSSignature implements smsv1.SMSServiceServer.
@@ -32,6 +35,6 @@ func (*SMSService) QuerySMSStatus(context.Context, *smsv1.QuerySMSStatusRequest)
 }
 
 // SendSMS implements smsv1.SMSServiceServer.
-func (*SMSService) SendSMS(ctx context.Context, req *smsv1.SendSMSRequest) (resp *smsv1.SendSMSResponse, err error) {
-	return &smsv1.SendSMSResponse{Success: true}, nil
+func (s *SMSService) SendSMS(ctx context.Context, req *smsv1.SendSMSRequest) (resp *smsv1.SendSMSResponse, err error) {
+	return s.uc.SendSMS(ctx, req)
 }

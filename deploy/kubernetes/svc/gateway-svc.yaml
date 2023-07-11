@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: gateway-service
-          image: registry.cn-shenzhen.aliyuncs.com/ydssx/gateway:1.0.1
+          image: registry.cn-shenzhen.aliyuncs.com/ydssx/gateway:1.0.2
           imagePullPolicy: Always
           resources:
             limits:

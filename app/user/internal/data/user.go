@@ -31,8 +31,8 @@ func (*userRepo) CreateUser(context.Context, *biz.User) error {
 func (*userRepo) ListUser(context.Context) ([]biz.User, error) {
 	return []biz.User{{
 		ID:       1,
-		Username: "ydssx",
-		Password: "1234556",
+		Username: "ydssx1",
+		Password: "12345567",
 		Email:    "456@qq.com",
 		Phone:    "1562659746",
 	}}, nil

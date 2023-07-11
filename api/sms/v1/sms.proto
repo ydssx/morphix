@@ -48,6 +48,7 @@ message SendSMSRequest {
   // 可选参数
   string template_id = 4;
   string template_parameters = 5;
+  string scene = 6;
 }
 
 // 发送短信响应

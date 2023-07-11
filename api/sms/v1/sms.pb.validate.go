@@ -67,6 +67,8 @@ func (m *SendSMSRequest) validate(all bool) error {
 
 	// no validation rules for TemplateParameters
 
+	// no validation rules for Scene
+
 	if len(errors) > 0 {
 		return SendSMSRequestMultiError(errors)
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/bsm/redislock"
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -11,7 +12,7 @@ func NewRedis(opt *redis.Options) *redis.Client {
 	cli := redis.NewClient(opt)
 	_, err := cli.Ping(context.Background()).Result()
 	if err != nil {
-		panic(err)
+		log.Error(err)
 	}
 	return cli
 }
