@@ -52,6 +52,9 @@ sms:
       driver: mysql
       source: root:root@tcp(127.0.0.1:3306)/test
     redis:
-      addr: redis.morphix.svc.cluster.local:6379
+      addr: redis.morphix:6379
+      username:
+      password:
       read_timeout: 2
       write_timeout: 2
+      dial_timeout: 5

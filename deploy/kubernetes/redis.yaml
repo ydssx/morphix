@@ -20,8 +20,8 @@ spec:
         tier: backend
     spec:
       containers:
-      - name: leader
-        image: "docker.io/redis:6.0.5"
+      - name: redis
+        image: "redis:6.0.20-alpine"
         resources:
           requests:
             cpu: 100m
@@ -49,4 +49,5 @@ spec:
     app: redis
     role: leader
     tier: backend
-  type: NodePort
+  type: ClusterIP
+  # clusterIP: None

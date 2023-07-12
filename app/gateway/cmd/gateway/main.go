@@ -40,8 +40,10 @@ func Run(ctx context.Context, c common.Config) error {
 	mp := provider.InitMeterProvider(c.Otelcol.Addr)
 
 	httpSrv := khttp.NewServer(khttp.Address(c.Gateway.Addr), khttp.Middleware(kmiddleware.MetricServer()))
+
 	openAPIhandler := openapiv2.NewHandler()
 	httpSrv.HandlePrefix("/q/", openAPIhandler)
+	
 	ginHandler := newGinHandler(ctx, c)
 	httpSrv.HandlePrefix("/", ginHandler)
 

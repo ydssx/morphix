@@ -14,16 +14,13 @@ import (
 var ProviderSet = wire.NewSet(NewSmsUseCase, NewSmsRedisClient)
 
 func NewSmsRedisClient(c *common.Config) *goredis.Client {
-	// redisConf, err := goredis.ParseURL(c.Sms.Data.Redis.Addr)
-	// if err != nil {
-	// 	log.Fatalf("redis address invalid: %v", err)
-	// }
-
+	redisConf := c.Sms.Data.Redis
 	return redis.NewRedis(&goredis.Options{
-		Addr: c.Sms.Data.Redis.Addr,
-		// Password:     redisConf.Password,
-		// Username:     redisConf.Username,
-		ReadTimeout:  time.Duration(c.Sms.Data.Redis.ReadTimeout),
-		WriteTimeout: time.Duration(c.Sms.Data.Redis.WriteTimeout),
+		Addr: redisConf.Addr,
+		Password:     redisConf.Password,
+		Username:     redisConf.Username,
+		ReadTimeout:  time.Duration(redisConf.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(redisConf.WriteTimeout) * time.Second,
+		DialTimeout:  time.Duration(redisConf.WriteTimeout) * time.Second,
 	})
 }

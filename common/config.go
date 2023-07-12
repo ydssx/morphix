@@ -32,7 +32,7 @@ type Database struct {
 // SmsData
 type SmsData struct {
 	Database SmsDataDatabase `yaml:"database"`
-	Redis    SmsDataRedis    `yaml:"redis"`
+	Redis    Redis           `yaml:"redis"`
 }
 
 // RpcClient
@@ -54,13 +54,6 @@ type Gateway struct {
 	Addr string `yaml:"addr"`
 }
 
-// Redis
-type Redis struct {
-	Addr         string `yaml:"addr"`
-	ReadTimeout  int    `yaml:"read_timeout"`
-	WriteTimeout int    `yaml:"write_timeout"`
-}
-
 // Sms
 type Sms struct {
 	Name   string    `yaml:"name"`
@@ -80,10 +73,13 @@ type Grpc struct {
 }
 
 // SmsDataRedis
-type SmsDataRedis struct {
+type Redis struct {
 	Addr         string `yaml:"addr"`
+	Username     string `yaml:"username"`
+	Password     string `yaml:"password"`
 	ReadTimeout  int    `yaml:"read_timeout"`
 	WriteTimeout int    `yaml:"write_timeout"`
+	DialTimeout  int    `yaml:"dial_timeout"`
 }
 
 // Etcd
