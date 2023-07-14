@@ -33,35 +33,38 @@ api:
 	buf generate
 
 .PHONY: build
-# build
 build:
 	mkdir -p bin/ && go build -ldflags "-X main.Version=$(VERSION)" -o ./bin/ ./...
 
 .PHONY: up
-# up
 up:
 	docker compose up -d
 
 .PHONY: dashboard
-# up
 dashboard:
 	kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
 	kubectl apply -f deploy/kubernetes/dashboard-adminuser.yaml
 	kubectl -n kubernetes-dashboard create token admin-user
 
 .PHONY: ingress
-# up
 ingress:
 	helm upgrade --install ingress-nginx ingress-nginx \
 	--repo https://kubernetes.github.io/ingress-nginx \
 	--namespace ingress-nginx --create-namespace
 	
 .PHONY: generate
-# generate
 generate:
-	go mod tidy
 	go get github.com/google/wire/cmd/wire@latest
 	go generate ./...
+
+.PHONY: dev
+dev:
+	skaffold dev --no-prune=false --cache-artifacts=false
+
+.PHONY: secret
+secret:
+	kubectl -n morphix create secret docker-registry aliyun-registry-secret --docker-server=registry.cn-shenzhen.aliyuncs.com \
+			--docker-username=$(registry_username) --docker-password=$(registry_password)
 
 .PHONY: all
 # generate all

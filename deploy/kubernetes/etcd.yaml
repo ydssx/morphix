@@ -20,6 +20,7 @@ spec:
     metadata:
       labels:
         app: etcd
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
         - name: etcd

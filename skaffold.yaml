@@ -28,10 +28,13 @@ manifests:
   kustomize:
     paths:
       - deploy\kubernetes\svc
-# deploy:
-#   kubectl:
-#     hooks:
-#       before:
-#         - host:
-#             command: ["cmd.exe", "/C", "kubectl label namespace morphix istio-injection=enabled --overwrite"]
-#             os: [windows]
+deploy:
+  kubectl:
+    hooks:
+      before:
+        - host:
+            command: ["cmd.exe", "/C", "kubectl label namespace morphix istio-injection=enabled --overwrite"]
+            os: [windows]
+        - host:
+            command: ["sh", "-c", "kubectl label namespace morphix istio-injection=enabled --overwrite"]
+            os: [darwin, linux]

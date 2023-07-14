@@ -19,6 +19,7 @@ spec:
     metadata:
       labels:
         app: otelcol
+        sidecar.istio.io/inject: "false"
       annotations:
         # checksum/config: 43d3318bb84ce994167ce160b46e0e06eb17a17b8de61b578bf4a3e97f4dcdd1
         morphix: "true"

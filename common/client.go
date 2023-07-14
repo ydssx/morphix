@@ -3,12 +3,12 @@ package common
 import (
 	"context"
 
-	"github.com/go-kratos/kratos/v2/transport/grpc/resolver/discovery"
+	kgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/pkg/interceptors"
+	"github.com/ydssx/morphix/pkg/logger"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
 )
 
@@ -27,19 +27,16 @@ func NewUserClient(c *Config) userv1.UserServiceClient {
 func createConn(etcdConf Etcd, rpcCliConf RpcClient) *grpc.ClientConn {
 	r := NewEtcdRegistry(etcdConf)
 
-	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(interceptors.TraceClientInterceptor()),
-		grpc.WithResolvers(
-			discovery.NewBuilder(
-				r,
-				discovery.WithInsecure(true),
-				discovery.WithSubset(25),
-				discovery.PrintDebugLog(true),
-			)),
-	}
 	ctx := context.Background()
-	conn, err := grpc.DialContext(ctx, rpcCliConf.Addr, opts...)
+	conn, err := kgrpc.DialInsecure(ctx,
+		kgrpc.WithEndpoint(rpcCliConf.Addr),
+		kgrpc.WithDiscovery(r),
+		kgrpc.WithUnaryInterceptor(
+			interceptors.TraceClientInterceptor(),
+			interceptors.LoggingClientInterceptor(logger.DefaultLogger),
+			interceptors.MetricClientInterceptor(),
+		),
+	)
 	if err != nil {
 		panic(err)
 	}
