@@ -11,32 +11,21 @@ service SMSService {
     // 发送短信
     rpc SendSMS(SendSMSRequest) returns (SendSMSResponse) {
       option (google.api.http) = {
-        post: "/v1/sms/send"
+        post: "/api/v1/sms/send"
         body: "*"
       };
     }
   
     // 查询短信状态
-    rpc QuerySMSStatus(QuerySMSStatusRequest) returns (QuerySMSStatusResponse) {
-      option (google.api.http) = {
-        get: "/v1/sms/status/{sms_id}/{mobile_number}"
-      };
+    rpc CheckSMSStatus(QuerySMSStatusRequest) returns (QuerySMSStatusResponse) {
     }
   
     // 管理短信模板
     rpc ManageSMSTemplate(TemplateManagementRequest) returns (TemplateManagementResponse) {
-      option (google.api.http) = {
-        post: "/v1/sms/template"
-        body: "*"
-      };
     }
   
     // 管理短信签名
     rpc ManageSMSSignature(SignatureManagementRequest) returns (SignatureManagementResponse) {
-      option (google.api.http) = {
-        post: "/v1/sms/signature"
-        body: "*"
-      };
     }
   }
   
@@ -64,11 +53,13 @@ message QuerySMSStatusRequest {
   // 可选参数
   int64 start_time = 3;
   int64 end_time = 4;
+  string sms_code = 5;
+  string scene = 6;
 }
 
 // 查询短信状态响应
 message QuerySMSStatusResponse {
-  repeated SMSStatus status = 1;
+  bool status = 1;
 }
 
 // 短信状态

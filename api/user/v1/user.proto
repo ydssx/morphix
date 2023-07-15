@@ -82,7 +82,7 @@ service UserService {
 }
 
 message User {
-  string id = 1;
+  int64 id = 1;
   string username = 2;
   string password = 3;
   string email = 4;
@@ -99,6 +99,8 @@ message RegistrationRequest {
   string email = 3;
   // 手机号
   string phone = 4;
+  // 短信验证码
+  string sms_code = 5;
 }
 
 message LoginRequest {

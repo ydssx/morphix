@@ -173,6 +173,8 @@ func (m *RegistrationRequest) validate(all bool) error {
 
 	// no validation rules for Phone
 
+	// no validation rules for SmsCode
+
 	if len(errors) > 0 {
 		return RegistrationRequestMultiError(errors)
 	}

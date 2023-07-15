@@ -35,9 +35,9 @@ const (
 const (
 	// SMSServiceSendSMSProcedure is the fully-qualified name of the SMSService's SendSMS RPC.
 	SMSServiceSendSMSProcedure = "/smsv1.SMSService/SendSMS"
-	// SMSServiceQuerySMSStatusProcedure is the fully-qualified name of the SMSService's QuerySMSStatus
+	// SMSServiceCheckSMSStatusProcedure is the fully-qualified name of the SMSService's CheckSMSStatus
 	// RPC.
-	SMSServiceQuerySMSStatusProcedure = "/smsv1.SMSService/QuerySMSStatus"
+	SMSServiceCheckSMSStatusProcedure = "/smsv1.SMSService/CheckSMSStatus"
 	// SMSServiceManageSMSTemplateProcedure is the fully-qualified name of the SMSService's
 	// ManageSMSTemplate RPC.
 	SMSServiceManageSMSTemplateProcedure = "/smsv1.SMSService/ManageSMSTemplate"
@@ -51,7 +51,7 @@ type SMSServiceClient interface {
 	// 发送短信
 	SendSMS(context.Context, *connect_go.Request[v1.SendSMSRequest]) (*connect_go.Response[v1.SendSMSResponse], error)
 	// 查询短信状态
-	QuerySMSStatus(context.Context, *connect_go.Request[v1.QuerySMSStatusRequest]) (*connect_go.Response[v1.QuerySMSStatusResponse], error)
+	CheckSMSStatus(context.Context, *connect_go.Request[v1.QuerySMSStatusRequest]) (*connect_go.Response[v1.QuerySMSStatusResponse], error)
 	// 管理短信模板
 	ManageSMSTemplate(context.Context, *connect_go.Request[v1.TemplateManagementRequest]) (*connect_go.Response[v1.TemplateManagementResponse], error)
 	// 管理短信签名
@@ -73,9 +73,9 @@ func NewSMSServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts 
 			baseURL+SMSServiceSendSMSProcedure,
 			opts...,
 		),
-		querySMSStatus: connect_go.NewClient[v1.QuerySMSStatusRequest, v1.QuerySMSStatusResponse](
+		checkSMSStatus: connect_go.NewClient[v1.QuerySMSStatusRequest, v1.QuerySMSStatusResponse](
 			httpClient,
-			baseURL+SMSServiceQuerySMSStatusProcedure,
+			baseURL+SMSServiceCheckSMSStatusProcedure,
 			opts...,
 		),
 		manageSMSTemplate: connect_go.NewClient[v1.TemplateManagementRequest, v1.TemplateManagementResponse](
@@ -94,7 +94,7 @@ func NewSMSServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts 
 // sMSServiceClient implements SMSServiceClient.
 type sMSServiceClient struct {
 	sendSMS            *connect_go.Client[v1.SendSMSRequest, v1.SendSMSResponse]
-	querySMSStatus     *connect_go.Client[v1.QuerySMSStatusRequest, v1.QuerySMSStatusResponse]
+	checkSMSStatus     *connect_go.Client[v1.QuerySMSStatusRequest, v1.QuerySMSStatusResponse]
 	manageSMSTemplate  *connect_go.Client[v1.TemplateManagementRequest, v1.TemplateManagementResponse]
 	manageSMSSignature *connect_go.Client[v1.SignatureManagementRequest, v1.SignatureManagementResponse]
 }
@@ -104,9 +104,9 @@ func (c *sMSServiceClient) SendSMS(ctx context.Context, req *connect_go.Request[
 	return c.sendSMS.CallUnary(ctx, req)
 }
 
-// QuerySMSStatus calls smsv1.SMSService.QuerySMSStatus.
-func (c *sMSServiceClient) QuerySMSStatus(ctx context.Context, req *connect_go.Request[v1.QuerySMSStatusRequest]) (*connect_go.Response[v1.QuerySMSStatusResponse], error) {
-	return c.querySMSStatus.CallUnary(ctx, req)
+// CheckSMSStatus calls smsv1.SMSService.CheckSMSStatus.
+func (c *sMSServiceClient) CheckSMSStatus(ctx context.Context, req *connect_go.Request[v1.QuerySMSStatusRequest]) (*connect_go.Response[v1.QuerySMSStatusResponse], error) {
+	return c.checkSMSStatus.CallUnary(ctx, req)
 }
 
 // ManageSMSTemplate calls smsv1.SMSService.ManageSMSTemplate.
@@ -124,7 +124,7 @@ type SMSServiceHandler interface {
 	// 发送短信
 	SendSMS(context.Context, *connect_go.Request[v1.SendSMSRequest]) (*connect_go.Response[v1.SendSMSResponse], error)
 	// 查询短信状态
-	QuerySMSStatus(context.Context, *connect_go.Request[v1.QuerySMSStatusRequest]) (*connect_go.Response[v1.QuerySMSStatusResponse], error)
+	CheckSMSStatus(context.Context, *connect_go.Request[v1.QuerySMSStatusRequest]) (*connect_go.Response[v1.QuerySMSStatusResponse], error)
 	// 管理短信模板
 	ManageSMSTemplate(context.Context, *connect_go.Request[v1.TemplateManagementRequest]) (*connect_go.Response[v1.TemplateManagementResponse], error)
 	// 管理短信签名
@@ -142,9 +142,9 @@ func NewSMSServiceHandler(svc SMSServiceHandler, opts ...connect_go.HandlerOptio
 		svc.SendSMS,
 		opts...,
 	)
-	sMSServiceQuerySMSStatusHandler := connect_go.NewUnaryHandler(
-		SMSServiceQuerySMSStatusProcedure,
-		svc.QuerySMSStatus,
+	sMSServiceCheckSMSStatusHandler := connect_go.NewUnaryHandler(
+		SMSServiceCheckSMSStatusProcedure,
+		svc.CheckSMSStatus,
 		opts...,
 	)
 	sMSServiceManageSMSTemplateHandler := connect_go.NewUnaryHandler(
@@ -161,8 +161,8 @@ func NewSMSServiceHandler(svc SMSServiceHandler, opts ...connect_go.HandlerOptio
 		switch r.URL.Path {
 		case SMSServiceSendSMSProcedure:
 			sMSServiceSendSMSHandler.ServeHTTP(w, r)
-		case SMSServiceQuerySMSStatusProcedure:
-			sMSServiceQuerySMSStatusHandler.ServeHTTP(w, r)
+		case SMSServiceCheckSMSStatusProcedure:
+			sMSServiceCheckSMSStatusHandler.ServeHTTP(w, r)
 		case SMSServiceManageSMSTemplateProcedure:
 			sMSServiceManageSMSTemplateHandler.ServeHTTP(w, r)
 		case SMSServiceManageSMSSignatureProcedure:
@@ -180,8 +180,8 @@ func (UnimplementedSMSServiceHandler) SendSMS(context.Context, *connect_go.Reque
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("smsv1.SMSService.SendSMS is not implemented"))
 }
 
-func (UnimplementedSMSServiceHandler) QuerySMSStatus(context.Context, *connect_go.Request[v1.QuerySMSStatusRequest]) (*connect_go.Response[v1.QuerySMSStatusResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("smsv1.SMSService.QuerySMSStatus is not implemented"))
+func (UnimplementedSMSServiceHandler) CheckSMSStatus(context.Context, *connect_go.Request[v1.QuerySMSStatusRequest]) (*connect_go.Response[v1.QuerySMSStatusResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("smsv1.SMSService.CheckSMSStatus is not implemented"))
 }
 
 func (UnimplementedSMSServiceHandler) ManageSMSTemplate(context.Context, *connect_go.Request[v1.TemplateManagementRequest]) (*connect_go.Response[v1.TemplateManagementResponse], error) {

@@ -28,7 +28,7 @@ func wireApp(config *common.Config, logger log.Logger) (*kratos.App, func(), err
 	if err != nil {
 		return nil, nil, err
 	}
-	userRepo := data.NewGreeterRepo(dataData, logger)
+	userRepo := data.NewUserRepo(dataData, logger)
 	userUsecase := biz.NewUserUsecase(userRepo, logger)
 	smsServiceClient := common.NewSMSClient(config)
 	userService := service.NewUserService(userUsecase, smsServiceClient)

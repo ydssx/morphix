@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -27,6 +28,18 @@ func (s *SmsUseCase) SendSMS(ctx context.Context, req *smsv1.SendSMSRequest) (re
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &smsv1.SendSMSResponse{Success: true}, nil
+}
+
+func (s *SmsUseCase) CheckSMSStatus(ctx context.Context, req *smsv1.QuerySMSStatusRequest) (*smsv1.QuerySMSStatusResponse, error) {
+	key := fmt.Sprintf("%s-%s", req.MobileNumber, req.Scene)
+	code, err := s.rdb.Get(ctx, key).Result()
+	if err != nil {
+		return nil, err
+	}
+	if code != req.SmsCode {
+		return nil, errors.New("验证码错误")
+	}
+	return &smsv1.QuerySMSStatusResponse{Status: true}, nil
 }

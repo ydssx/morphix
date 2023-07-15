@@ -7,6 +7,7 @@ import (
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	kgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/pkg/interceptors"
@@ -20,6 +21,7 @@ var handlers = make(map[string]registerFn)
 
 func registerRpcHandler(c common.Config) {
 	handlers[c.UserRpcClient.Addr] = userv1.RegisterUserServiceHandler
+	handlers[c.SmsRpcClient.Addr] = smsv1.RegisterSMSServiceHandler
 }
 
 func newGateway(ctx context.Context, r *etcd.Registry, opts ...gwruntime.ServeMuxOption) (http.Handler, error) {
@@ -43,6 +45,6 @@ func newGateway(ctx context.Context, r *etcd.Registry, opts ...gwruntime.ServeMu
 			return nil, err
 		}
 	}
-	
+
 	return mux, nil
 }

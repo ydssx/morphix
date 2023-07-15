@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/axiaoxin-com/logging"
@@ -8,6 +9,8 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
+
+var DB *gorm.DB
 
 func NewDB(dsn string) *gorm.DB {
 	var err error
@@ -19,7 +22,12 @@ func NewDB(dsn string) *gorm.DB {
 	if err != nil {
 		panic(err)
 	}
-	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxIdleConns(100)
 	sqlDB.SetMaxOpenConns(100)
+	DB = db
 	return db
+}
+
+func Transaction(fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error {
+	return DB.Transaction(fc, opts...)
 }

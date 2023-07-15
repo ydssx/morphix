@@ -38,3 +38,8 @@ func (*SMSService) QuerySMSStatus(context.Context, *smsv1.QuerySMSStatusRequest)
 func (s *SMSService) SendSMS(ctx context.Context, req *smsv1.SendSMSRequest) (resp *smsv1.SendSMSResponse, err error) {
 	return s.uc.SendSMS(ctx, req)
 }
+
+// CheckSMSStatus implements smsv1.SMSServiceServer.
+func (s *SMSService) CheckSMSStatus(ctx context.Context, req *smsv1.QuerySMSStatusRequest) (*smsv1.QuerySMSStatusResponse, error) {
+	return s.uc.CheckSMSStatus(ctx, req)
+}

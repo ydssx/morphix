@@ -34,7 +34,7 @@ user:
   data:
     database:
       driver: mysql
-      source: root:root@tcp(127.0.0.1:3306)/test
+      source: root:root@tcp(mysql.morphix:3306)/user
     redis:
       addr: 127.0.0.1:6379
       read_timeout: 2

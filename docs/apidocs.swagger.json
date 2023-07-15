@@ -351,7 +351,7 @@
         ]
       }
     },
-    "/v1/sms/send": {
+    "/api/v1/sms/send": {
       "post": {
         "summary": "发送短信",
         "operationId": "SMSService_SendSMS",
@@ -376,124 +376,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/smsv1SendSMSRequest"
-            }
-          }
-        ],
-        "tags": [
-          "SMSService"
-        ]
-      }
-    },
-    "/v1/sms/signature": {
-      "post": {
-        "summary": "管理短信签名",
-        "operationId": "SMSService_ManageSMSSignature",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/smsv1SignatureManagementResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/smsv1SignatureManagementRequest"
-            }
-          }
-        ],
-        "tags": [
-          "SMSService"
-        ]
-      }
-    },
-    "/v1/sms/status/{smsId}/{mobileNumber}": {
-      "get": {
-        "summary": "查询短信状态",
-        "operationId": "SMSService_QuerySMSStatus",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/smsv1QuerySMSStatusResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "smsId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "mobileNumber",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "startTime",
-            "description": "可选参数",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "endTime",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "int64"
-          }
-        ],
-        "tags": [
-          "SMSService"
-        ]
-      }
-    },
-    "/v1/sms/template": {
-      "post": {
-        "summary": "管理短信模板",
-        "operationId": "SMSService_ManageSMSTemplate",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/smsv1TemplateManagementResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/smsv1TemplateManagementRequest"
             }
           }
         ],
@@ -536,11 +418,7 @@
       "type": "object",
       "properties": {
         "status": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/smsv1SMSStatus"
-          }
+          "type": "boolean"
         }
       },
       "title": "查询短信状态响应"
@@ -563,25 +441,6 @@
         }
       },
       "title": "短信签名"
-    },
-    "smsv1SMSStatus": {
-      "type": "object",
-      "properties": {
-        "smsId": {
-          "type": "string"
-        },
-        "mobileNumber": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "timestamp": {
-          "type": "string",
-          "format": "int64"
-        }
-      },
-      "title": "短信状态"
     },
     "smsv1SMSTemplate": {
       "type": "object",
@@ -639,20 +498,6 @@
       },
       "title": "发送短信响应"
     },
-    "smsv1SignatureManagementRequest": {
-      "type": "object",
-      "properties": {
-        "signature": {
-          "$ref": "#/definitions/smsv1SMSSignature",
-          "title": "可选参数，用于创建或编辑签名"
-        },
-        "signatureId": {
-          "type": "string",
-          "title": "可选参数，用于删除签名"
-        }
-      },
-      "title": "管理短信签名请求"
-    },
     "smsv1SignatureManagementResponse": {
       "type": "object",
       "properties": {
@@ -672,20 +517,6 @@
         }
       },
       "title": "管理短信签名响应"
-    },
-    "smsv1TemplateManagementRequest": {
-      "type": "object",
-      "properties": {
-        "template": {
-          "$ref": "#/definitions/smsv1SMSTemplate",
-          "title": "可选参数，用于创建或编辑模板"
-        },
-        "templateId": {
-          "type": "string",
-          "title": "可选参数，用于删除模板"
-        }
-      },
-      "title": "管理短信模板请求"
     },
     "smsv1TemplateManagementResponse": {
       "type": "object",
@@ -807,6 +638,10 @@
         "phone": {
           "type": "string",
           "title": "手机号"
+        },
+        "smsCode": {
+          "type": "string",
+          "title": "短信验证码"
         }
       }
     },
@@ -828,7 +663,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "username": {
           "type": "string"

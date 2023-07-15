@@ -2,13 +2,12 @@ package service
 
 import (
 	"context"
+	"errors"
 
-	"github.com/go-kratos/kratos/v2/errors"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/user/internal/biz"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/ydssx/morphix/constants"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -27,32 +26,24 @@ func NewUserService(uc *biz.UserUsecase, sms smsv1.SMSServiceClient) *UserServic
 
 // Register 实现用户注册接口
 func (s *UserService) Register(ctx context.Context, req *userv1.RegistrationRequest) (*userv1.User, error) {
-	// 调用业务逻辑层的方法进行用户注册处理
+	checkResult, err := s.sms.CheckSMSStatus(ctx, &smsv1.QuerySMSStatusRequest{MobileNumber: req.Phone, SmsCode: req.SmsCode, Scene: string(constants.SmsSceneUserRegister)})
+	if err != nil {
+		return nil, err
+	}
+	if !checkResult.Status {
+		return nil, errors.New("校验短信验证码失败")
+	}
+
 	user, err := s.uc.RegisterUser(ctx, req.Username, req.Password, req.Email, req.Phone)
 	if err != nil {
-		// 注册失败，返回错误信息
 		return nil, err
 	}
-	result, err := s.sms.SendSMS(ctx, &smsv1.SendSMSRequest{
-		MobileNumber:       "15623562713",
-		Message:            "测试短信",
-		SenderId:           "",
-		TemplateId:         "",
-		TemplateParameters: "",
-	})
-	if err != nil {
-		return nil, err
-	}
-	if !result.Success {
-		return nil, errors.New(401, "发送短信失败", "失败")
-	}
-	// 将业务层返回的用户对象转换为接口定义的 User 对象，并返回
+
 	response := &userv1.User{
-		Id:       "123",
+		Id:       int64(user.ID),
 		Username: user.Username,
 		Email:    user.Email,
 		Phone:    user.Phone,
-		// 其他个人信息字段...
 	}
 
 	return response, nil
@@ -102,21 +93,7 @@ func (s *UserService) Authorize(ctx context.Context, req *userv1.AuthorizationRe
 
 // GetUserList 实现获取用户列表接口
 func (s *UserService) GetUserList(ctx context.Context, req *emptypb.Empty) (*userv1.UserListResponse, error) {
-	result, err := s.sms.SendSMS(ctx, &smsv1.SendSMSRequest{
-		MobileNumber:       "15623562713",
-		Message:            "测试短信",
-		SenderId:           "",
-		TemplateId:         "",
-		TemplateParameters: "",
-	})
-	if err != nil {
-		return nil, err
-	}
-	if !result.Success {
-		return nil, status.Error(codes.Unavailable, "短信发送失败")
-	}
-
-	return s.uc.GetUserList(ctx, req)
+	return s.uc.ListUser(ctx)
 }
 
 // ManageUserPermission 实现管理用户权限接口

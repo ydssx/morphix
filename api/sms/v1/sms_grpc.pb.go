@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	SMSService_SendSMS_FullMethodName            = "/smsv1.SMSService/SendSMS"
-	SMSService_QuerySMSStatus_FullMethodName     = "/smsv1.SMSService/QuerySMSStatus"
+	SMSService_CheckSMSStatus_FullMethodName     = "/smsv1.SMSService/CheckSMSStatus"
 	SMSService_ManageSMSTemplate_FullMethodName  = "/smsv1.SMSService/ManageSMSTemplate"
 	SMSService_ManageSMSSignature_FullMethodName = "/smsv1.SMSService/ManageSMSSignature"
 )
@@ -32,7 +32,7 @@ type SMSServiceClient interface {
 	// 发送短信
 	SendSMS(ctx context.Context, in *SendSMSRequest, opts ...grpc.CallOption) (*SendSMSResponse, error)
 	// 查询短信状态
-	QuerySMSStatus(ctx context.Context, in *QuerySMSStatusRequest, opts ...grpc.CallOption) (*QuerySMSStatusResponse, error)
+	CheckSMSStatus(ctx context.Context, in *QuerySMSStatusRequest, opts ...grpc.CallOption) (*QuerySMSStatusResponse, error)
 	// 管理短信模板
 	ManageSMSTemplate(ctx context.Context, in *TemplateManagementRequest, opts ...grpc.CallOption) (*TemplateManagementResponse, error)
 	// 管理短信签名
@@ -56,9 +56,9 @@ func (c *sMSServiceClient) SendSMS(ctx context.Context, in *SendSMSRequest, opts
 	return out, nil
 }
 
-func (c *sMSServiceClient) QuerySMSStatus(ctx context.Context, in *QuerySMSStatusRequest, opts ...grpc.CallOption) (*QuerySMSStatusResponse, error) {
+func (c *sMSServiceClient) CheckSMSStatus(ctx context.Context, in *QuerySMSStatusRequest, opts ...grpc.CallOption) (*QuerySMSStatusResponse, error) {
 	out := new(QuerySMSStatusResponse)
-	err := c.cc.Invoke(ctx, SMSService_QuerySMSStatus_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, SMSService_CheckSMSStatus_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ type SMSServiceServer interface {
 	// 发送短信
 	SendSMS(context.Context, *SendSMSRequest) (*SendSMSResponse, error)
 	// 查询短信状态
-	QuerySMSStatus(context.Context, *QuerySMSStatusRequest) (*QuerySMSStatusResponse, error)
+	CheckSMSStatus(context.Context, *QuerySMSStatusRequest) (*QuerySMSStatusResponse, error)
 	// 管理短信模板
 	ManageSMSTemplate(context.Context, *TemplateManagementRequest) (*TemplateManagementResponse, error)
 	// 管理短信签名
@@ -104,8 +104,8 @@ type UnimplementedSMSServiceServer struct {
 func (UnimplementedSMSServiceServer) SendSMS(context.Context, *SendSMSRequest) (*SendSMSResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendSMS not implemented")
 }
-func (UnimplementedSMSServiceServer) QuerySMSStatus(context.Context, *QuerySMSStatusRequest) (*QuerySMSStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method QuerySMSStatus not implemented")
+func (UnimplementedSMSServiceServer) CheckSMSStatus(context.Context, *QuerySMSStatusRequest) (*QuerySMSStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckSMSStatus not implemented")
 }
 func (UnimplementedSMSServiceServer) ManageSMSTemplate(context.Context, *TemplateManagementRequest) (*TemplateManagementResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ManageSMSTemplate not implemented")
@@ -143,20 +143,20 @@ func _SMSService_SendSMS_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SMSService_QuerySMSStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SMSService_CheckSMSStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QuerySMSStatusRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SMSServiceServer).QuerySMSStatus(ctx, in)
+		return srv.(SMSServiceServer).CheckSMSStatus(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: SMSService_QuerySMSStatus_FullMethodName,
+		FullMethod: SMSService_CheckSMSStatus_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SMSServiceServer).QuerySMSStatus(ctx, req.(*QuerySMSStatusRequest))
+		return srv.(SMSServiceServer).CheckSMSStatus(ctx, req.(*QuerySMSStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -209,8 +209,8 @@ var SMSService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _SMSService_SendSMS_Handler,
 		},
 		{
-			MethodName: "QuerySMSStatus",
-			Handler:    _SMSService_QuerySMSStatus_Handler,
+			MethodName: "CheckSMSStatus",
+			Handler:    _SMSService_CheckSMSStatus_Handler,
 		},
 		{
 			MethodName: "ManageSMSTemplate",

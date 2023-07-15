@@ -2,23 +2,21 @@ package biz
 
 import (
 	"context"
+	"errors"
 
 	"github.com/go-kratos/kratos/v2/log"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
-	"google.golang.org/protobuf/types/known/emptypb"
+	"github.com/ydssx/morphix/app/user/internal/models"
+	"gorm.io/gorm"
 )
 
-type User struct {
-	ID       int64
-	Username string
-	Password string
-	Email    string
-	Phone    string
-}
-
 type UserRepo interface {
-	CreateUser(context.Context, *User) error
-	ListUser(context.Context) ([]User, error)
+	GetUserByID(ctx context.Context, id uint, tx ...*gorm.DB) (*models.User, error)
+	CreateUser(ctx context.Context, user *models.User, tx ...*gorm.DB) (userId int, err error)
+	UpdateUser(ctx context.Context, user *models.User) error
+	DeleteUser(ctx context.Context, id uint) error
+	GetUsersByRole(ctx context.Context, roleID int) ([]models.User, error)
+	ListUser(ctx context.Context) []models.User
 }
 
 type UserUsecase struct {
@@ -31,52 +29,37 @@ func NewUserUsecase(repo UserRepo, logger log.Logger) *UserUsecase {
 }
 
 // RegisterUser 用户注册逻辑
-func (uc *UserUsecase) RegisterUser(ctx context.Context, username, password, email, phone string) (*User, error) {
-	// TODO: 执行用户注册的业务逻辑，例如验证参数、生成用户ID、存储用户信息等
-	// 这里只是一个示例，你需要根据实际需求进行实现
-
-	// 验证参数
+func (uc *UserUsecase) RegisterUser(ctx context.Context, username, password, email, phone string) (*models.User, error) {
 	if username == "" || password == "" {
-		return nil, nil
+		return nil, errors.New("用户名和密码不能为空")
 	}
 
-	// 生成用户ID
-	userID := 1
-
 	// 创建用户对象
-	user := &User{
-		ID:       int64(userID),
+	user := &models.User{
 		Username: username,
 		Password: password,
 		Email:    email,
 		Phone:    phone,
-		// 其他个人信息字段...
 	}
 
-	// 存储用户信息到数据仓库
-	err := uc.repo.CreateUser(ctx, user)
+	userId, err := uc.repo.CreateUser(ctx, user)
 	if err != nil {
-		// 存储失败，返回错误信息
 		return nil, err
 	}
-
+	user.ID = uint(userId)
 	return user, nil
 }
 
-func (uc *UserUsecase) GetUserList(ctx context.Context, req *emptypb.Empty) (*userv1.UserListResponse, error) {
-	users, err := uc.repo.ListUser(ctx)
-	if err != nil {
-		return nil, err
-	}
-	
+func (uc *UserUsecase) ListUser(ctx context.Context) (*userv1.UserListResponse, error) {
+	users := uc.repo.ListUser(ctx)
+
 	resp := new(userv1.UserListResponse)
-	for _, v := range users {
+	for _, user := range users {
 		resp.Users = append(resp.Users, &userv1.User{
-			Id:       "1",
-			Username: v.Username,
-			Password: v.Password,
-			Email:    v.Email,
-			Phone:    v.Phone,
+			Id:       int64(user.ID),
+			Username: user.Username,
+			Email:    user.Email,
+			Phone:    user.Phone,
 		})
 	}
 	return resp, nil
