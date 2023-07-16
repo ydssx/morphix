@@ -1,17 +1,16 @@
 package models
 
 import (
-	"time"
-
+	"github.com/Gre-Z/common/jtime"
 	"github.com/ydssx/morphix/pkg/mysql"
 	"gorm.io/gorm"
 )
 
 type BaseModel struct {
-	ID        uint           `json:"id" gorm:"primary_key"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `json:"deleted_at"`
+	ID        uint            `json:"id" gorm:"primary_key"`
+	CreatedAt *jtime.JsonTime `json:"created_at"`
+	UpdatedAt *jtime.JsonTime `json:"updated_at"`
+	DeletedAt *gorm.DeletedAt `json:"deleted_at"`
 }
 
 type DB struct {

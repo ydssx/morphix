@@ -108,6 +108,7 @@ require (
 )
 
 require (
+	github.com/Gre-Z/common v0.0.0-20191024025434-2dbc6bd196f9
 	github.com/bsm/redislock v0.9.3
 	github.com/bufbuild/connect-grpchealth-go v1.1.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible

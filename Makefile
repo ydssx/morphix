@@ -61,6 +61,14 @@ generate:
 dev:
 	skaffold dev --no-prune=false --cache-artifacts=false
 
+.PHONY: gateway
+gateway:
+	kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.7.1/experimental-install.yaml
+
+.PHONY: cert
+cert:
+	kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.12.0/cert-manager.yaml
+
 .PHONY: secret
 secret:
 	kubectl -n morphix create secret docker-registry aliyun-registry-secret --docker-server=registry.cn-shenzhen.aliyuncs.com \
