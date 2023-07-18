@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package aiartv1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/ydssx/morphix/api/aiart/v1;aiartv1";
+
+service ArtService {
+  // 生成图像
+  rpc GenerateImage(GenerateImageRequest) returns (GenerateImageResponse) {
+    option (google.api.http) = {
+      post: "/v1/images/generate"
+      body: "*"
+    };
+  }
+
+  // 获取生成任务状态
+  rpc GetGenerateStatus(GetGenerateStatusRequest) returns (GenerateStatusResponse) {
+    option (google.api.http) = {get: "/v1/images/generate_status"};
+  }
+
+  // 获取已生成的图像
+  rpc GetGeneratedImage(GetGeneratedImageRequest) returns (GetGeneratedImageResponse) {
+    option (google.api.http) = {get: "/v1/images/{image_id}"};
+  }
+
+  // 获取模型信息
+  rpc GetModelInfo(google.protobuf.Empty) returns (GetModelInfoResponse);
+}
+
+// 图像生成请求
+message GenerateImageRequest {
+  // 原始图像数据
+  bytes original_image = 1;
+
+  // 生成提示文本
+  string prompt = 2;
+
+  // 图像大小
+  int32 image_size = 3;
+
+  // 指导尺度
+  double guidance_scale = 4;
+
+  // 其他生成参数
+  GenerationParameters generation_parameters = 5;
+}
+
+// 图像生成响应
+message GenerateImageResponse {
+  // 生成的图像ID
+  string image_id = 1;
+}
+
+// 生成参数
+message GenerationParameters {
+  // 模型名称
+  string model_name = 1;
+
+  // 采样步数
+  int32 sampling_steps = 2;
+
+  // 采样方法
+  string sampling_method = 3;
+}
+
+// 获取生成状态请求
+message GetGenerateStatusRequest {
+  string image_id = 1;
+}
+
+// 生成状态响应
+message GenerateStatusResponse {
+  GenerateStatus status = 1;
+}
+
+// 获取生成图像请求
+message GetGeneratedImageRequest {
+  string image_id = 1;
+}
+
+// 获取生成图像响应
+message GetGeneratedImageResponse {
+  bytes image_data = 1;
+}
+
+// 模型信息响应
+message GetModelInfoResponse {
+  // 模型名称
+  string model_name = 1;
+
+  // 模型版本
+  string model_version = 2;
+}
+
+enum GenerateStatus {
+  PENDING = 0;
+  RUNNING = 1;
+  COMPLETED = 2;
+  FAILED = 3;
+}

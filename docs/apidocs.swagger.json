@@ -1,10 +1,19 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api/sms/v1/sms.proto",
+    "title": "api/aiart/v1/aiart.proto",
     "version": "version not set"
   },
   "tags": [
+    {
+      "name": "ArtService"
+    },
+    {
+      "name": "MediaService"
+    },
+    {
+      "name": "PaymentService"
+    },
     {
       "name": "SMSService"
     },
@@ -351,6 +360,151 @@
         ]
       }
     },
+    "/api/v1/payments": {
+      "post": {
+        "summary": "发起支付",
+        "operationId": "PaymentService_MakePayment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/paymentv1PaymentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/paymentv1MakePaymentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PaymentService"
+        ]
+      }
+    },
+    "/api/v1/payments/{orderId}": {
+      "get": {
+        "summary": "查询支付状态",
+        "operationId": "PaymentService_GetPayment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/paymentv1GetPaymentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "orderId",
+            "description": "其他字段...",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PaymentService"
+        ]
+      },
+      "delete": {
+        "summary": "取消支付",
+        "operationId": "PaymentService_CancelPayment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/paymentv1CancelPaymentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "orderId",
+            "description": "其他字段...",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PaymentService"
+        ]
+      }
+    },
+    "/api/v1/payments/{orderId}/refund": {
+      "post": {
+        "summary": "退款",
+        "operationId": "PaymentService_Refund",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/paymentv1RefundResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "format": "double"
+                },
+                "currency": {
+                  "type": "string",
+                  "description": "其他字段..."
+                }
+              },
+              "title": "退款请求"
+            }
+          }
+        ],
+        "tags": [
+          "PaymentService"
+        ]
+      }
+    },
     "/api/v1/sms/send": {
       "post": {
         "summary": "发送短信",
@@ -383,9 +537,321 @@
           "SMSService"
         ]
       }
+    },
+    "/v1/images/generate": {
+      "post": {
+        "summary": "生成图像",
+        "operationId": "ArtService_GenerateImage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/aiartv1GenerateImageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/aiartv1GenerateImageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ArtService"
+        ]
+      }
+    },
+    "/v1/images/generate_status": {
+      "get": {
+        "summary": "获取生成任务状态",
+        "operationId": "ArtService_GetGenerateStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/aiartv1GenerateStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "imageId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ArtService"
+        ]
+      }
+    },
+    "/v1/images/{imageId}": {
+      "get": {
+        "summary": "获取已生成的图像",
+        "operationId": "ArtService_GetGeneratedImage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/aiartv1GetGeneratedImageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "imageId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ArtService"
+        ]
+      }
     }
   },
   "definitions": {
+    "aiartv1GenerateImageRequest": {
+      "type": "object",
+      "properties": {
+        "originalImage": {
+          "type": "string",
+          "format": "byte",
+          "title": "原始图像数据"
+        },
+        "prompt": {
+          "type": "string",
+          "title": "生成提示文本"
+        },
+        "imageSize": {
+          "type": "integer",
+          "format": "int32",
+          "title": "图像大小"
+        },
+        "guidanceScale": {
+          "type": "number",
+          "format": "double",
+          "title": "指导尺度"
+        },
+        "generationParameters": {
+          "$ref": "#/definitions/aiartv1GenerationParameters",
+          "title": "其他生成参数"
+        }
+      },
+      "title": "图像生成请求"
+    },
+    "aiartv1GenerateImageResponse": {
+      "type": "object",
+      "properties": {
+        "imageId": {
+          "type": "string",
+          "title": "生成的图像ID"
+        }
+      },
+      "title": "图像生成响应"
+    },
+    "aiartv1GenerateStatus": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "RUNNING",
+        "COMPLETED",
+        "FAILED"
+      ],
+      "default": "PENDING"
+    },
+    "aiartv1GenerateStatusResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/aiartv1GenerateStatus"
+        }
+      },
+      "title": "生成状态响应"
+    },
+    "aiartv1GenerationParameters": {
+      "type": "object",
+      "properties": {
+        "modelName": {
+          "type": "string",
+          "title": "模型名称"
+        },
+        "samplingSteps": {
+          "type": "integer",
+          "format": "int32",
+          "title": "采样步数"
+        },
+        "samplingMethod": {
+          "type": "string",
+          "title": "采样方法"
+        }
+      },
+      "title": "生成参数"
+    },
+    "aiartv1GetGeneratedImageResponse": {
+      "type": "object",
+      "properties": {
+        "imageData": {
+          "type": "string",
+          "format": "byte"
+        }
+      },
+      "title": "获取生成图像响应"
+    },
+    "aiartv1GetModelInfoResponse": {
+      "type": "object",
+      "properties": {
+        "modelName": {
+          "type": "string",
+          "title": "模型名称"
+        },
+        "modelVersion": {
+          "type": "string",
+          "title": "模型版本"
+        }
+      },
+      "title": "模型信息响应"
+    },
+    "mediav1VideoPlaybackResponse": {
+      "type": "object",
+      "properties": {
+        "playbackUrl": {
+          "type": "string",
+          "description": "其他字段..."
+        }
+      },
+      "title": "视频播放响应"
+    },
+    "mediav1VideoScreenshotResponse": {
+      "type": "object",
+      "properties": {
+        "screenshotUrl": {
+          "type": "string",
+          "description": "其他字段..."
+        }
+      },
+      "title": "视频截图响应"
+    },
+    "mediav1VideoTranscodeResponse": {
+      "type": "object",
+      "properties": {
+        "transcodedVideoIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "其他字段..."
+        }
+      },
+      "title": "视频转码响应"
+    },
+    "mediav1VideoUploadResponse": {
+      "type": "object",
+      "properties": {
+        "videoId": {
+          "type": "string",
+          "description": "其他字段..."
+        }
+      },
+      "title": "视频上传响应"
+    },
+    "paymentv1CancelPaymentResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "其他字段..."
+        }
+      },
+      "title": "取消支付响应"
+    },
+    "paymentv1GetPaymentResponse": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "description": "其他字段..."
+        }
+      },
+      "title": "查询支付响应"
+    },
+    "paymentv1MakePaymentRequest": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string",
+          "description": "其他字段..."
+        }
+      },
+      "title": "支付请求"
+    },
+    "paymentv1PaymentResponse": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "description": "其他字段..."
+        }
+      },
+      "title": "支付响应"
+    },
+    "paymentv1RefundResponse": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "description": "其他字段..."
+        }
+      },
+      "title": "退款响应"
+    },
     "protobufAny": {
       "type": "object",
       "properties": {

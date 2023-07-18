@@ -174,6 +174,87 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /api/v1/payments:
+        post:
+            tags:
+                - PaymentService
+            description: 发起支付
+            operationId: PaymentService_MakePayment
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/paymentv1.MakePaymentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/paymentv1.PaymentResponse'
+    /api/v1/payments/{orderId}:
+        get:
+            tags:
+                - PaymentService
+            description: 查询支付状态
+            operationId: PaymentService_GetPayment
+            parameters:
+                - name: orderId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/paymentv1.GetPaymentResponse'
+        delete:
+            tags:
+                - PaymentService
+            description: 取消支付
+            operationId: PaymentService_CancelPayment
+            parameters:
+                - name: orderId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/paymentv1.CancelPaymentResponse'
+    /api/v1/payments/{orderId}/refund:
+        post:
+            tags:
+                - PaymentService
+            description: 退款
+            operationId: PaymentService_Refund
+            parameters:
+                - name: orderId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/paymentv1.RefundRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/paymentv1.RefundResponse'
     /api/v1/sms/send:
         post:
             tags:
@@ -193,8 +274,177 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/smsv1.SendSMSResponse'
+    /v1/images/generate:
+        post:
+            tags:
+                - ArtService
+            description: 生成图像
+            operationId: ArtService_GenerateImage
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/aiartv1.GenerateImageRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/aiartv1.GenerateImageResponse'
+    /v1/images/generate_status:
+        get:
+            tags:
+                - ArtService
+            description: 获取生成任务状态
+            operationId: ArtService_GetGenerateStatus
+            parameters:
+                - name: imageId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/aiartv1.GenerateStatusResponse'
+    /v1/images/{imageId}:
+        get:
+            tags:
+                - ArtService
+            description: 获取已生成的图像
+            operationId: ArtService_GetGeneratedImage
+            parameters:
+                - name: imageId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/aiartv1.GetGeneratedImageResponse'
 components:
     schemas:
+        aiartv1.GenerateImageRequest:
+            type: object
+            properties:
+                originalImage:
+                    type: string
+                    description: 原始图像数据
+                    format: bytes
+                prompt:
+                    type: string
+                    description: 生成提示文本
+                imageSize:
+                    type: integer
+                    description: 图像大小
+                    format: int32
+                guidanceScale:
+                    type: number
+                    description: 指导尺度
+                    format: double
+                generationParameters:
+                    $ref: '#/components/schemas/aiartv1.GenerationParameters'
+            description: 图像生成请求
+        aiartv1.GenerateImageResponse:
+            type: object
+            properties:
+                imageId:
+                    type: string
+                    description: 生成的图像ID
+            description: 图像生成响应
+        aiartv1.GenerateStatusResponse:
+            type: object
+            properties:
+                status:
+                    type: integer
+                    format: enum
+            description: 生成状态响应
+        aiartv1.GenerationParameters:
+            type: object
+            properties:
+                modelName:
+                    type: string
+                    description: 模型名称
+                samplingSteps:
+                    type: integer
+                    description: 采样步数
+                    format: int32
+                samplingMethod:
+                    type: string
+                    description: 采样方法
+            description: 生成参数
+        aiartv1.GetGeneratedImageResponse:
+            type: object
+            properties:
+                imageData:
+                    type: string
+                    format: bytes
+            description: 获取生成图像响应
+        paymentv1.CancelPaymentResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+            description: 取消支付响应
+        paymentv1.GetPaymentResponse:
+            type: object
+            properties:
+                orderId:
+                    type: string
+                amount:
+                    type: number
+                    format: double
+                currency:
+                    type: string
+                status:
+                    type: string
+            description: 查询支付响应
+        paymentv1.MakePaymentRequest:
+            type: object
+            properties:
+                orderId:
+                    type: string
+                amount:
+                    type: number
+                    format: double
+                currency:
+                    type: string
+            description: 支付请求
+        paymentv1.PaymentResponse:
+            type: object
+            properties:
+                orderId:
+                    type: string
+                status:
+                    type: string
+            description: 支付响应
+        paymentv1.RefundRequest:
+            type: object
+            properties:
+                orderId:
+                    type: string
+                amount:
+                    type: number
+                    format: double
+                currency:
+                    type: string
+            description: 退款请求
+        paymentv1.RefundResponse:
+            type: object
+            properties:
+                orderId:
+                    type: string
+                status:
+                    type: string
+            description: 退款响应
         smsv1.SendSMSRequest:
             type: object
             properties:
@@ -330,6 +580,9 @@ components:
                     items:
                         $ref: '#/components/schemas/userv1.User'
 tags:
+    - name: ArtService
+    - name: PaymentService
+      description: 定义支付服务接口
     - name: SMSService
       description: 短信服务接口
     - name: UserService

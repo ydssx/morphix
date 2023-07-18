@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package paymentv1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/ydssx/morphix/api/payment/v1;paymentv1";
+
+// 支付请求
+message MakePaymentRequest {
+  string order_id = 1;
+  double amount = 2;
+  string currency = 3;
+  // 其他字段...
+}
+
+// 支付响应
+message PaymentResponse {
+  string order_id = 1;
+  string status = 2;
+  // 其他字段...
+}
+
+// 查询支付请求
+message GetPaymentRequest {
+  string order_id = 1;
+  // 其他字段...
+}
+
+// 查询支付响应
+message GetPaymentResponse {
+  string order_id = 1;
+  double amount = 2;
+  string currency = 3;
+  string status = 4;
+  // 其他字段...
+}
+
+// 取消支付请求
+message CancelPaymentRequest {
+  string order_id = 1;
+  // 其他字段...
+}
+
+// 取消支付响应
+message CancelPaymentResponse {
+  string status = 1;
+  // 其他字段...
+}
+
+// 退款请求
+message RefundRequest {
+  string order_id = 1;
+  double amount = 2;
+  string currency = 3;
+  // 其他字段...
+}
+
+// 退款响应
+message RefundResponse {
+  string order_id = 1;
+  string status = 2;
+  // 其他字段...
+}
+
+// 定义支付服务接口
+service PaymentService {
+  // 发起支付
+  rpc MakePayment(MakePaymentRequest) returns (PaymentResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/payments"
+      body: "*"
+    };
+  }
+
+  // 查询支付状态
+  rpc GetPayment(GetPaymentRequest) returns (GetPaymentResponse) {
+    option (google.api.http) = {get: "/api/v1/payments/{order_id}"};
+  }
+
+  // 取消支付
+  rpc CancelPayment(CancelPaymentRequest) returns (CancelPaymentResponse) {
+    option (google.api.http) = {delete: "/api/v1/payments/{order_id}"};
+  }
+
+  // 退款
+  rpc Refund(RefundRequest) returns (RefundResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/payments/{order_id}/refund"
+      body: "*"
+    };
+  }
+  // 其他服务方法...
+}

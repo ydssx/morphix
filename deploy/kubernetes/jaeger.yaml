@@ -19,6 +19,7 @@ spec:
     metadata:
       labels:
         app: jaeger
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
         - name: jaeger
@@ -62,7 +63,7 @@ spec:
               value: "debug"
           args:
             - "--memory.max-traces"
-            - "10000"
+            - "100"
             - "--query.base-path"
             - "/jaeger/ui"
             - "--prometheus.server-url"

@@ -2,11 +2,10 @@ syntax = "proto3";
 
 package userv1;
 
-option go_package="github.com/ydssx/morphix/api/user/v1;userv1";
-
 import "google/api/annotations.proto";
-
 import "google/protobuf/empty.proto";
+
+option go_package = "github.com/ydssx/morphix/api/user/v1;userv1";
 
 // 用户服务
 service UserService {
@@ -61,9 +60,7 @@ service UserService {
   }
 
   rpc GetUserList(google.protobuf.Empty) returns (UserListResponse) {
-    option (google.api.http) = {
-      get: "/api/users"
-    };
+    option (google.api.http) = {get: "/api/users"};
   }
 
   rpc ManageUserPermission(ManageUserPermissionRequest) returns (User) {
@@ -152,4 +149,3 @@ message LogEntry {
   string timestamp = 3;
   // 其他日志信息字段...
 }
-
