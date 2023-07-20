@@ -8,14 +8,16 @@ import (
 
 // Config
 type Config struct {
-	Gateway       Gateway   `yaml:"gateway"`
-	User          User      `yaml:"user"`
-	Sms           Sms       `yaml:"sms"`
-	Etcd          Etcd      `yaml:"etcd"`
-	Jaeger        Jaeger    `yaml:"jaeger"`
-	Otelcol       Otelcol   `yaml:"otelcol"`
-	UserRpcClient RpcClient `yaml:"userRpcClient"`
-	SmsRpcClient  RpcClient `yaml:"smsRpcClient"`
+	Gateway          Gateway   `yaml:"gateway"`
+	User             User      `yaml:"user"`
+	Sms              Sms       `yaml:"sms"`
+	Payment          Payment   `yaml:"payment"`
+	Etcd             Etcd      `yaml:"etcd"`
+	Jaeger           Jaeger    `yaml:"jaeger"`
+	Otelcol          Otelcol   `yaml:"otelcol"`
+	UserRpcClient    RpcClient `yaml:"userRpcClient"`
+	SmsRpcClient     RpcClient `yaml:"smsRpcClient"`
+	PaymentRpcClient RpcClient `yaml:"paymentRpcClient"`
 }
 
 // Server
@@ -31,8 +33,8 @@ type Database struct {
 
 // SmsData
 type SmsData struct {
-	Database SmsDataDatabase `yaml:"database"`
-	Redis    Redis           `yaml:"redis"`
+	Database Database `yaml:"database"`
+	Redis    Redis    `yaml:"redis"`
 }
 
 // RpcClient
@@ -56,14 +58,9 @@ type Gateway struct {
 
 // Sms
 type Sms struct {
-	Name   string    `yaml:"name"`
-	Server SmsServer `yaml:"server"`
-	Data   SmsData   `yaml:"data"`
-}
-
-// SmsServer
-type SmsServer struct {
-	Grpc SmsServerGrpc `yaml:"grpc"`
+	Name   string `yaml:"name"`
+	Server Server `yaml:"server"`
+	Data   Data   `yaml:"data"`
 }
 
 // Grpc
@@ -102,17 +99,16 @@ type User struct {
 	Data   Data   `yaml:"data"`
 	Name   string `yaml:"name"`
 }
+type Payment struct {
+	Server Server `yaml:"server"`
+	Data   Data   `yaml:"data"`
+	Name   string `yaml:"name"`
+}
 
 // Data
 type Data struct {
 	Database Database `yaml:"database"`
 	Redis    Redis    `yaml:"redis"`
-}
-
-// SmsDataDatabase
-type SmsDataDatabase struct {
-	Driver string `yaml:"driver"`
-	Source string `yaml:"source"`
 }
 
 func MustLoad(out *Config, path string) {

@@ -1,9 +1,6 @@
-package main
+package mq
 
 import (
-	"log"
-	"time"
-
 	"github.com/nats-io/nats.go"
 )
 
@@ -62,33 +59,5 @@ func (mq *NATSMessageQueueService) QueueSubscribeToTopic(topic, queue string, ha
 
 // Close 关闭与 NATS 服务器的连接
 func (mq *NATSMessageQueueService) Close() {
-	mq.nc.Close()
-}
-
-func main() {
-	type msg struct {
-		Id int `json:"id,omitempty"`
-	}
-	conn, _ := NewNATSMessageQueueService()
-	queue := "test-queue"
-	topic := "test-topic"
-	err := conn.QueueSubscribeToTopic(topic, queue, func(m *msg) {
-		log.Printf("这是第一个订阅者,Id:%v", m.Id)
-	})
-	if err != nil {
-		log.Print(err)
-	}
-	err = conn.QueueSubscribeToTopic(topic, queue, func(m *msg) {
-		log.Printf("这是第二个订阅者,Id:%v", m.Id)
-	})
-	if err != nil {
-		log.Print(err)
-	}
-	for i := 0; i < 10; i++ {
-		err = conn.PublishMessage(topic, msg{Id: i})
-		if err != nil {
-			log.Print(err)
-		}
-	}
-	time.Sleep(time.Second * 10)
+	mq.nc.Drain()
 }
