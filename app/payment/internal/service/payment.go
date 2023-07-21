@@ -4,7 +4,7 @@ import (
 	"context"
 
 	paymentv1 "github.com/ydssx/morphix/api/payment/v1"
-	"github.com/ydssx/morphix/constants"
+	"github.com/ydssx/morphix/common/event"
 	"github.com/ydssx/morphix/pkg/mq"
 )
 
@@ -30,7 +30,12 @@ func (*PaymentService) GetPayment(context.Context, *paymentv1.GetPaymentRequest)
 
 // MakePayment implements paymentv1.PaymentServiceServer.
 func (*PaymentService) MakePayment(ctx context.Context, req *paymentv1.MakePaymentRequest) (*paymentv1.PaymentResponse, error) {
-	err := mq.Send(ctx, string(constants.TopicUserCharge), mq.NewEvent(nil))
+	payload := event.PayloadUserCharge{
+		UserId:  1,
+		Amount:  req.Amount,
+		OrderId: req.OrderId,
+	}
+	err := mq.Send(ctx, string(event.TopicUserCharge), payload)
 	if err != nil {
 		return nil, err
 	}

@@ -1,11 +1,13 @@
 package mq
 
 import (
+	"context"
 	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Example struct {
@@ -17,6 +19,7 @@ type Event struct {
 	contentType ContentType
 	source      string
 	eventType   string
+	traceID     string
 }
 
 type ContentType string
@@ -27,11 +30,38 @@ const (
 	TextPlain       ContentType = cloudevents.TextPlain
 )
 
-func newDefaultEvent() *Event {
+type EventSource struct{}
+type EventType struct{}
+
+func getEventSourceFromCtx(ctx context.Context) string {
+	t, ok := ctx.Value(EventSource{}).(string)
+	if ok {
+		return t
+	}
+	return "api"
+}
+
+func getEventTypeFromCtx(ctx context.Context) string {
+	t, ok := ctx.Value(EventType{}).(string)
+	if ok {
+		return t
+	}
+	return "null"
+}
+
+func getTraceIDFromCtx(ctx context.Context) string {
+	if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
+		return span.TraceID().String()
+	}
+	return ""
+}
+
+func newDefaultEvent(ctx context.Context) *Event {
 	return &Event{
 		contentType: ApplicationJSON,
-		source:      "api",
-		eventType:   "update",
+		source:      getEventSourceFromCtx(ctx),
+		eventType:   getEventTypeFromCtx(ctx),
+		traceID:     getTraceIDFromCtx(ctx),
 	}
 }
 
@@ -49,8 +79,8 @@ func WithEventType(t string) Option {
 	return func(e *Event) { e.eventType = t }
 }
 
-func NewEvent(payload interface{}, opts ...Option) event.Event {
-	ev := newDefaultEvent()
+func NewEvent(ctx context.Context, payload interface{}, opts ...Option) (event.Event, error) {
+	ev := newDefaultEvent(ctx)
 	for _, v := range opts {
 		v(ev)
 	}
@@ -58,9 +88,10 @@ func NewEvent(payload interface{}, opts ...Option) event.Event {
 	e := cloudevents.NewEvent()
 	e.SetID(uuid.New().String())
 	e.SetType(ev.eventType)
-	e.SetTime(time.Now())
+	e.SetTime(time.Now().Local())
 	e.SetSource(ev.source)
-	_ = e.SetData(string(ev.contentType), payload)
+	e.SetExtension("traceid", ev.traceID)
+	err := e.SetData(string(ev.contentType), payload)
 
-	return e
+	return e, err
 }

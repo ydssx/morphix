@@ -15,7 +15,7 @@ func TestNewConsumer(t *testing.T) {
 	go NewConsumer(sub, receive)
 	for i := 0; i < 10; i++ {
 		payload := Example{Sequence: i, Message: "hello world"}
-		Send(context.Background(), sub, NewEvent(payload, WithEventType("user login")))
+		Send(context.Background(), sub, payload,WithSource("user login"))
 	}
 	time.Sleep(time.Second * 10)
 }
