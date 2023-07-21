@@ -15,6 +15,6 @@ WORKDIR /usr/src/app/
 COPY --from=builder /bin ./
 COPY --from=builder /src/configs ./
 
-EXPOSE 8000
+EXPOSE 9002
 
 CMD [ "./payment","-f","/etc/morphix/config.yaml" ]
