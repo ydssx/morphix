@@ -27,6 +27,10 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /etc/morphix
+          livenessProbe:
+            grpc:
+              port: 9001
+            initialDelaySeconds: 10
       imagePullSecrets:
         - name: aliyun-registry-secret
       volumes:

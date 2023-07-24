@@ -43,7 +43,7 @@ func Run(ctx context.Context, c common.Config) error {
 
 	openAPIhandler := openapiv2.NewHandler()
 	httpSrv.HandlePrefix("/q/", openAPIhandler)
-	
+
 	ginHandler := newGinHandler(ctx, c)
 	httpSrv.HandlePrefix("/", ginHandler)
 
@@ -67,6 +67,7 @@ func newGinHandler(ctx context.Context, c common.Config) *gin.Engine {
 	server := gin.New()
 	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), gin.Recovery())
 	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	server.GET("/healthz", healthzServer)
 
 	opts := []gwruntime.ServeMuxOption{}
 
