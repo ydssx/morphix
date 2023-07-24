@@ -12,6 +12,9 @@
       "name": "MediaService"
     },
     {
+      "name": "OrderService"
+    },
+    {
       "name": "PaymentService"
     },
     {
@@ -357,6 +360,196 @@
         ],
         "tags": [
           "UserService"
+        ]
+      }
+    },
+    "/api/v1/orders": {
+      "get": {
+        "summary": "查询订单列表",
+        "operationId": "OrderService_ListOrders",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderv1ListOrdersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "customerId",
+            "description": "可选：根据客户ID筛选订单列表",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "status",
+            "description": "可选：根据订单状态筛选订单列表\n\n - PENDING: 待处理\n - PROCESSING: 处理中\n - COMPLETED: 已完成\n - CANCELED: 已取消",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "CANCELED"
+            ],
+            "default": "PENDING"
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      },
+      "post": {
+        "summary": "创建订单",
+        "operationId": "OrderService_CreateOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderv1CreateOrderResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/orderv1CreateOrderRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/orders/{orderId}": {
+      "get": {
+        "summary": "查询订单",
+        "operationId": "OrderService_GetOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderv1GetOrderResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "orderId",
+            "description": "要查询的订单ID",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      },
+      "delete": {
+        "summary": "删除订单",
+        "operationId": "OrderService_DeleteOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderv1DeleteOrderResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "orderId",
+            "description": "要删除的订单ID",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/orders/{orderId}/status": {
+      "put": {
+        "summary": "更新订单状态",
+        "operationId": "OrderService_UpdateOrderStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderv1UpdateOrderStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "orderId",
+            "description": "要更新状态的订单ID",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "$ref": "#/definitions/orderv1OrderStatus",
+                  "title": "新的订单状态"
+                }
+              },
+              "title": "更新订单状态请求消息"
+            }
+          }
+        ],
+        "tags": [
+          "OrderService"
         ]
       }
     },
@@ -778,6 +971,143 @@
         }
       },
       "title": "视频上传响应"
+    },
+    "orderv1CreateOrderRequest": {
+      "type": "object",
+      "properties": {
+        "customerId": {
+          "type": "integer",
+          "format": "int32",
+          "title": "客户ID"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/orderv1OrderItem"
+          },
+          "title": "订单商品列表"
+        }
+      },
+      "title": "创建订单请求消息"
+    },
+    "orderv1CreateOrderResponse": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "$ref": "#/definitions/orderv1Order",
+          "title": "创建成功后返回的订单信息"
+        }
+      },
+      "title": "创建订单响应消息"
+    },
+    "orderv1DeleteOrderResponse": {
+      "type": "object",
+      "title": "删除订单响应消息"
+    },
+    "orderv1GetOrderResponse": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "$ref": "#/definitions/orderv1Order",
+          "title": "查询到的订单信息"
+        }
+      },
+      "title": "查询订单响应消息"
+    },
+    "orderv1ListOrdersResponse": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/orderv1Order"
+          },
+          "title": "查询到的订单列表"
+        }
+      },
+      "title": "查询订单列表响应消息"
+    },
+    "orderv1Order": {
+      "type": "object",
+      "properties": {
+        "orderId": {
+          "type": "integer",
+          "format": "int32",
+          "title": "订单ID"
+        },
+        "customerId": {
+          "type": "integer",
+          "format": "int32",
+          "title": "客户ID"
+        },
+        "amount": {
+          "type": "number",
+          "format": "float",
+          "title": "订单金额"
+        },
+        "status": {
+          "$ref": "#/definitions/orderv1OrderStatus",
+          "title": "订单状态"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/orderv1OrderItem"
+          },
+          "title": "订单商品列表"
+        }
+      },
+      "title": "订单消息"
+    },
+    "orderv1OrderItem": {
+      "type": "object",
+      "properties": {
+        "productId": {
+          "type": "integer",
+          "format": "int32",
+          "title": "商品ID"
+        },
+        "productName": {
+          "type": "string",
+          "title": "商品名称"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int32",
+          "title": "商品数量"
+        },
+        "price": {
+          "type": "number",
+          "format": "float",
+          "title": "商品单价"
+        }
+      },
+      "title": "订单商品消息"
+    },
+    "orderv1OrderStatus": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "PROCESSING",
+        "COMPLETED",
+        "CANCELED"
+      ],
+      "default": "PENDING",
+      "description": "- PENDING: 待处理\n - PROCESSING: 处理中\n - COMPLETED: 已完成\n - CANCELED: 已取消",
+      "title": "订单状态枚举"
+    },
+    "orderv1UpdateOrderStatusResponse": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "$ref": "#/definitions/orderv1Order",
+          "title": "更新后的订单信息"
+        }
+      },
+      "title": "更新订单状态响应消息"
     },
     "paymentv1CancelPaymentResponse": {
       "type": "object",

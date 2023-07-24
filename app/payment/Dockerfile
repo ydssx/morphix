@@ -6,7 +6,7 @@ WORKDIR /src
 
 COPY . .
 
-RUN go build -o /bin ./app/payment/cmd/payment
+RUN CGO_ENABLED=0 go build -o /bin ./app/payment/cmd/payment
 
 FROM alpine
 

@@ -2,9 +2,12 @@ package mq
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"testing"
 	"time"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 )
 
 func TestNewConsumer(t *testing.T) {
@@ -15,7 +18,7 @@ func TestNewConsumer(t *testing.T) {
 	go NewConsumer(sub, receive)
 	for i := 0; i < 10; i++ {
 		payload := Example{Sequence: i, Message: "hello world"}
-		Send(context.Background(), sub, payload,WithSource("user login"))
+		Send(context.Background(), sub, payload, WithSource("user login"))
 	}
 	time.Sleep(time.Second * 10)
 }
@@ -46,4 +49,16 @@ func TestMQ(t *testing.T) {
 		}
 	}
 	time.Sleep(time.Second * 10)
+}
+
+func receive(ctx context.Context, event cloudevents.Event) error {
+	fmt.Printf("Got Event Context: %+v\n", event.Context)
+	data := &Example{}
+	if err := event.DataAs(data); err != nil {
+		fmt.Printf("Got Data Error: %s\n", err.Error())
+	}
+	fmt.Printf("Got Data: %+v\n", data)
+
+	fmt.Printf("----------------------------\n")
+	return nil
 }

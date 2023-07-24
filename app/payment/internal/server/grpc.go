@@ -20,6 +20,7 @@ func NewGRPCServer(c *common.Config, svc *service.PaymentService, logger log.Log
 			interceptors.TraceServerInterceptor(),
 			interceptors.LoggingServerInterceptor(logger),
 			interceptors.ValidatorServerInterceptor(),
+			interceptors.EventInterceptors(),
 		),
 		grpc.Middleware(
 			kratos.MetricServer(),

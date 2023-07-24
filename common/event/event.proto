@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package event;
+
+option go_package = "github.com/ydssx/morphix/common/event;event";
+
+enum Subject {
+  PaymentProcessed = 0;
+  OrderCreated = 1;
+}
+
+message MessageName {
+  map<string, string> contact_info = 3;
+}
+
+message PayloadUserCharge {
+  int64 user_id = 1;
+  float amount = 2;
+  string order_id = 3;
+  Subject subject = 4;
+}

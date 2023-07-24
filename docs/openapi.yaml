@@ -174,6 +174,113 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /api/v1/orders:
+        get:
+            tags:
+                - OrderService
+            description: 查询订单列表
+            operationId: OrderService_ListOrders
+            parameters:
+                - name: customerId
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/orderv1.ListOrdersResponse'
+        post:
+            tags:
+                - OrderService
+            description: 创建订单
+            operationId: OrderService_CreateOrder
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/orderv1.CreateOrderRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/orderv1.CreateOrderResponse'
+    /api/v1/orders/{orderId}:
+        get:
+            tags:
+                - OrderService
+            description: 查询订单
+            operationId: OrderService_GetOrder
+            parameters:
+                - name: orderId
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/orderv1.GetOrderResponse'
+        delete:
+            tags:
+                - OrderService
+            description: 删除订单
+            operationId: OrderService_DeleteOrder
+            parameters:
+                - name: orderId
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/orderv1.DeleteOrderResponse'
+    /api/v1/orders/{orderId}/status:
+        put:
+            tags:
+                - OrderService
+            description: 更新订单状态
+            operationId: OrderService_UpdateOrderStatus
+            parameters:
+                - name: orderId
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: int32
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/orderv1.UpdateOrderStatusRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/orderv1.UpdateOrderStatusResponse'
     /api/v1/payments:
         post:
             tags:
@@ -388,6 +495,92 @@ components:
                     type: string
                     format: bytes
             description: 获取生成图像响应
+        orderv1.CreateOrderRequest:
+            type: object
+            properties:
+                customerId:
+                    type: integer
+                    format: int32
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/orderv1.OrderItem'
+            description: 创建订单请求消息
+        orderv1.CreateOrderResponse:
+            type: object
+            properties:
+                order:
+                    $ref: '#/components/schemas/orderv1.Order'
+            description: 创建订单响应消息
+        orderv1.DeleteOrderResponse:
+            type: object
+            properties: {}
+            description: 删除订单响应消息
+        orderv1.GetOrderResponse:
+            type: object
+            properties:
+                order:
+                    $ref: '#/components/schemas/orderv1.Order'
+            description: 查询订单响应消息
+        orderv1.ListOrdersResponse:
+            type: object
+            properties:
+                orders:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/orderv1.Order'
+            description: 查询订单列表响应消息
+        orderv1.Order:
+            type: object
+            properties:
+                orderId:
+                    type: integer
+                    format: int32
+                customerId:
+                    type: integer
+                    format: int32
+                amount:
+                    type: number
+                    format: float
+                status:
+                    type: integer
+                    format: enum
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/orderv1.OrderItem'
+            description: 订单消息
+        orderv1.OrderItem:
+            type: object
+            properties:
+                productId:
+                    type: integer
+                    format: int32
+                productName:
+                    type: string
+                quantity:
+                    type: integer
+                    format: int32
+                price:
+                    type: number
+                    format: float
+            description: 订单商品消息
+        orderv1.UpdateOrderStatusRequest:
+            type: object
+            properties:
+                orderId:
+                    type: integer
+                    format: int32
+                status:
+                    type: integer
+                    format: enum
+            description: 更新订单状态请求消息
+        orderv1.UpdateOrderStatusResponse:
+            type: object
+            properties:
+                order:
+                    $ref: '#/components/schemas/orderv1.Order'
+            description: 更新订单状态响应消息
         paymentv1.CancelPaymentResponse:
             type: object
             properties:
@@ -581,6 +774,8 @@ components:
                         $ref: '#/components/schemas/userv1.User'
 tags:
     - name: ArtService
+    - name: OrderService
+      description: 订单管理服务接口
     - name: PaymentService
       description: 定义支付服务接口
     - name: SMSService

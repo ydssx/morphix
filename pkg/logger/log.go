@@ -24,3 +24,13 @@ func Infof(ctx context.Context, format string, msg ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, fmt.Sprintf(format, msg...)}
 	log.Log(log.LevelInfo, append(kv, logTraceID(ctx)...))
 }
+
+func Error(ctx context.Context, msg ...interface{}) {
+	kv := []interface{}{log.DefaultMessageKey, fmt.Sprint(msg...)}
+	log.Log(log.LevelError, append(kv, logTraceID(ctx)...))
+}
+
+func Errorf(ctx context.Context, format string, msg ...interface{}) {
+	kv := []interface{}{log.DefaultMessageKey, fmt.Sprintf(format, msg...)}
+	log.Log(log.LevelError, append(kv, logTraceID(ctx)...))
+}

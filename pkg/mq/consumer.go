@@ -2,7 +2,6 @@ package mq
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	cenats "github.com/cloudevents/sdk-go/protocol/nats/v2"
@@ -27,17 +26,4 @@ func NewConsumer(subject string, handler EventHandler) {
 	if err := c.StartReceiver(ctx, handler); err != nil {
 		log.Printf("failed to start nats receiver, %s", err.Error())
 	}
-}
-
-func receive(ctx context.Context, event cloudevents.Event) error {
-	fmt.Printf("Got Event Context: %+v\n", event.Context)
-
-	data := &Example{}
-	if err := event.DataAs(data); err != nil {
-		fmt.Printf("Got Data Error: %s\n", err.Error())
-	}
-	fmt.Printf("Got Data: %+v\n", data)
-
-	fmt.Printf("----------------------------\n")
-	return nil
 }

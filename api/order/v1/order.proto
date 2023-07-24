@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+package orderv1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/ydssx/morphix/api/order/v1;orderv1";
+
+// 订单消息
+message Order {
+  int32 order_id = 1; // 订单ID
+  int32 customer_id = 2; // 客户ID
+  float amount = 3; // 订单金额
+  OrderStatus status = 4; // 订单状态
+  repeated OrderItem items = 5; // 订单商品列表
+}
+
+// 订单状态枚举
+enum OrderStatus {
+  PENDING = 0; // 待处理
+  PROCESSING = 1; // 处理中
+  COMPLETED = 2; // 已完成
+  CANCELED = 3; // 已取消
+}
+
+// 订单商品消息
+message OrderItem {
+  int32 product_id = 1; // 商品ID
+  string product_name = 2; // 商品名称
+  int32 quantity = 3; // 商品数量
+  float price = 4; // 商品单价
+}
+
+// 创建订单请求消息
+message CreateOrderRequest {
+  int32 customer_id = 1; // 客户ID
+  repeated OrderItem items = 2; // 订单商品列表
+}
+
+// 创建订单响应消息
+message CreateOrderResponse {
+  Order order = 1; // 创建成功后返回的订单信息
+}
+
+// 查询订单请求消息
+message GetOrderRequest {
+  int32 order_id = 1; // 要查询的订单ID
+}
+
+// 查询订单响应消息
+message GetOrderResponse {
+  Order order = 1; // 查询到的订单信息
+}
+
+// 更新订单状态请求消息
+message UpdateOrderStatusRequest {
+  int32 order_id = 1; // 要更新状态的订单ID
+  OrderStatus status = 2; // 新的订单状态
+}
+
+// 更新订单状态响应消息
+message UpdateOrderStatusResponse {
+  Order order = 1; // 更新后的订单信息
+}
+
+// 删除订单请求消息
+message DeleteOrderRequest {
+  int32 order_id = 1; // 要删除的订单ID
+}
+
+// 删除订单响应消息
+message DeleteOrderResponse {}
+
+// 查询订单列表请求消息
+message ListOrdersRequest {
+  int32 customer_id = 1; // 可选：根据客户ID筛选订单列表
+  OrderStatus status = 2; // 可选：根据订单状态筛选订单列表
+}
+
+// 查询订单列表响应消息
+message ListOrdersResponse {
+  repeated Order orders = 1; // 查询到的订单列表
+}
+
+// 订单管理服务接口
+service OrderService {
+  // 创建订单
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/orders"
+      body: "*"
+    };
+  }
+
+  // 查询订单
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse) {
+    option (google.api.http) = {get: "/api/v1/orders/{order_id}"};
+  }
+
+  // 更新订单状态
+  rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/orders/{order_id}/status"
+      body: "*"
+    };
+  }
+
+  // 删除订单
+  rpc DeleteOrder(DeleteOrderRequest) returns (DeleteOrderResponse) {
+    option (google.api.http) = {delete: "/api/v1/orders/{order_id}"};
+  }
+
+  // 查询订单列表
+  rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse) {
+    option (google.api.http) = {get: "/api/v1/orders"};
+  }
+}

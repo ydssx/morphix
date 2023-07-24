@@ -32,10 +32,10 @@ func (*PaymentService) GetPayment(context.Context, *paymentv1.GetPaymentRequest)
 func (*PaymentService) MakePayment(ctx context.Context, req *paymentv1.MakePaymentRequest) (*paymentv1.PaymentResponse, error) {
 	payload := event.PayloadUserCharge{
 		UserId:  1,
-		Amount:  req.Amount,
+		Amount:  float32(req.Amount),
 		OrderId: req.OrderId,
 	}
-	err := mq.Send(ctx, string(event.TopicUserCharge), payload)
+	err := mq.Send(ctx, string(event.Subject_name[int32(event.Subject_PaymentProcessed)]), &payload)
 	if err != nil {
 		return nil, err
 	}
