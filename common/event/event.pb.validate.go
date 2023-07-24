@@ -136,22 +136,22 @@ var _ interface {
 	ErrorName() string
 } = MessageNameValidationError{}
 
-// Validate checks the field values on PayloadUserCharge with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *PayloadUserCharge) Validate() error {
+// Validate checks the field values on PayloadPaymentCompleted with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PayloadPaymentCompleted) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on PayloadUserCharge with the rules
-// defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on PayloadPaymentCompleted with the
+// rules defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// PayloadUserChargeMultiError, or nil if none found.
-func (m *PayloadUserCharge) ValidateAll() error {
+// PayloadPaymentCompletedMultiError, or nil if none found.
+func (m *PayloadPaymentCompleted) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *PayloadUserCharge) validate(all bool) error {
+func (m *PayloadPaymentCompleted) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -167,19 +167,19 @@ func (m *PayloadUserCharge) validate(all bool) error {
 	// no validation rules for Subject
 
 	if len(errors) > 0 {
-		return PayloadUserChargeMultiError(errors)
+		return PayloadPaymentCompletedMultiError(errors)
 	}
 
 	return nil
 }
 
-// PayloadUserChargeMultiError is an error wrapping multiple validation errors
-// returned by PayloadUserCharge.ValidateAll() if the designated constraints
-// aren't met.
-type PayloadUserChargeMultiError []error
+// PayloadPaymentCompletedMultiError is an error wrapping multiple validation
+// errors returned by PayloadPaymentCompleted.ValidateAll() if the designated
+// constraints aren't met.
+type PayloadPaymentCompletedMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m PayloadUserChargeMultiError) Error() string {
+func (m PayloadPaymentCompletedMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -188,11 +188,11 @@ func (m PayloadUserChargeMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m PayloadUserChargeMultiError) AllErrors() []error { return m }
+func (m PayloadPaymentCompletedMultiError) AllErrors() []error { return m }
 
-// PayloadUserChargeValidationError is the validation error returned by
-// PayloadUserCharge.Validate if the designated constraints aren't met.
-type PayloadUserChargeValidationError struct {
+// PayloadPaymentCompletedValidationError is the validation error returned by
+// PayloadPaymentCompleted.Validate if the designated constraints aren't met.
+type PayloadPaymentCompletedValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -200,24 +200,24 @@ type PayloadUserChargeValidationError struct {
 }
 
 // Field function returns field value.
-func (e PayloadUserChargeValidationError) Field() string { return e.field }
+func (e PayloadPaymentCompletedValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e PayloadUserChargeValidationError) Reason() string { return e.reason }
+func (e PayloadPaymentCompletedValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e PayloadUserChargeValidationError) Cause() error { return e.cause }
+func (e PayloadPaymentCompletedValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e PayloadUserChargeValidationError) Key() bool { return e.key }
+func (e PayloadPaymentCompletedValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e PayloadUserChargeValidationError) ErrorName() string {
-	return "PayloadUserChargeValidationError"
+func (e PayloadPaymentCompletedValidationError) ErrorName() string {
+	return "PayloadPaymentCompletedValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e PayloadUserChargeValidationError) Error() string {
+func (e PayloadPaymentCompletedValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -229,14 +229,14 @@ func (e PayloadUserChargeValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sPayloadUserCharge.%s: %s%s",
+		"invalid %sPayloadPaymentCompleted.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = PayloadUserChargeValidationError{}
+var _ error = PayloadPaymentCompletedValidationError{}
 
 var _ interface {
 	Field() string
@@ -244,4 +244,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = PayloadUserChargeValidationError{}
+} = PayloadPaymentCompletedValidationError{}

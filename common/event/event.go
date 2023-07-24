@@ -6,5 +6,5 @@ type QueueHandler struct {
 }
 
 var EventSubPayloadMap = map[Subject]any{
-	Subject_PaymentProcessed: PayloadUserCharge{},
+	Subject_PaymentCompleted: PayloadPaymentCompleted{},
 }

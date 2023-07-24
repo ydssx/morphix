@@ -8,6 +8,8 @@ import (
 	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"github.com/ydssx/morphix/common/event"
+	"github.com/ydssx/morphix/pkg/util"
 )
 
 func TestNewConsumer(t *testing.T) {
@@ -15,14 +17,28 @@ func TestNewConsumer(t *testing.T) {
 	sub := "test-pubsub"
 	close, _ := InitNats(url)
 	defer close(context.Background())
-	go NewConsumer(sub, receive)
+	go AddEventHandler(context.Background(), sub, receive)
 	for i := 0; i < 10; i++ {
 		payload := Example{Sequence: i, Message: "hello world"}
-		Send(context.Background(), sub, payload, WithSource("user login"))
+		Send(context.Background(), sub, &payload, WithSource("user login"))
 	}
 	time.Sleep(time.Second * 10)
 }
+func TestMq(t *testing.T) {
+	url := "http://localhost:4222"
+	close, _ := InitNats(url)
+	defer close(context.Background())
+	payload := event.PayloadPaymentCompleted{
+		UserId:  1,
+		Amount:  100,
+		OrderId: util.GenerateCode(6),
+	}
+	x := event.Subject_name[int32(event.Subject_PaymentCompleted)]
+	// go AddEventHandler(x, receive)
+	Send(context.Background(), x, &payload)
+	time.Sleep(time.Second * 5)
 
+}
 func TestMQ(t *testing.T) {
 	type msg struct {
 		Id int `json:"id,omitempty"`
@@ -51,10 +67,10 @@ func TestMQ(t *testing.T) {
 	time.Sleep(time.Second * 10)
 }
 
-func receive(ctx context.Context, event cloudevents.Event) error {
-	fmt.Printf("Got Event Context: %+v\n", event.Context)
-	data := &Example{}
-	if err := event.DataAs(data); err != nil {
+func receive(ctx context.Context, e cloudevents.Event) error {
+	fmt.Printf("Got Event Context: %+v\n", e.Context)
+	data := &event.PayloadPaymentCompleted{}
+	if err := e.DataAs(data); err != nil {
 		fmt.Printf("Got Data Error: %s\n", err.Error())
 	}
 	fmt.Printf("Got Data: %+v\n", data)

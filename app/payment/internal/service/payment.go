@@ -30,16 +30,16 @@ func (*PaymentService) GetPayment(context.Context, *paymentv1.GetPaymentRequest)
 
 // MakePayment implements paymentv1.PaymentServiceServer.
 func (*PaymentService) MakePayment(ctx context.Context, req *paymentv1.MakePaymentRequest) (*paymentv1.PaymentResponse, error) {
-	payload := event.PayloadUserCharge{
+	payload := event.PayloadPaymentCompleted{
 		UserId:  1,
 		Amount:  float32(req.Amount),
 		OrderId: req.OrderId,
 	}
-	err := mq.Send(ctx, string(event.Subject_name[int32(event.Subject_PaymentProcessed)]), &payload)
+	err := mq.Send(ctx, event.Subject_name[int32(event.Subject_PaymentCompleted)], &payload)
 	if err != nil {
 		return nil, err
 	}
-	return &paymentv1.PaymentResponse{}, nil
+	return &paymentv1.PaymentResponse{OrderId: req.OrderId, Status: "COMPLETED"}, nil
 }
 
 // Refund implements paymentv1.PaymentServiceServer.
