@@ -7,9 +7,23 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/ydssx/morphix/common/event"
 	"github.com/ydssx/morphix/pkg/logger"
+	"github.com/ydssx/morphix/pkg/mq"
 )
 
-func UpdateOrderStatus(ctx context.Context, e cloudevents.Event) error { 
+var subjectHandlerMap = map[event.Subject]mq.EventHandler{
+	event.Subject_PaymentCompleted: updateOrderStatus,
+}
+
+func Init() {
+	for subject, handler := range subjectHandlerMap {
+		err := mq.AddEventHandlerAsync(event.Subject_name[int32(subject)], handler)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func updateOrderStatus(ctx context.Context, e cloudevents.Event) error {
 	fmt.Printf("Got Event Context: %+v\n", e.Context)
 	data := &event.PayloadPaymentCompleted{}
 	if err := e.DataAs(data); err != nil {
