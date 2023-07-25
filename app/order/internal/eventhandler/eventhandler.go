@@ -9,7 +9,7 @@ import (
 	"github.com/ydssx/morphix/pkg/logger"
 )
 
-func UpdateOrderStatus(ctx context.Context, e cloudevents.Event) error {
+func UpdateOrderStatus(ctx context.Context, e cloudevents.Event) error { 
 	fmt.Printf("Got Event Context: %+v\n", e.Context)
 	data := &event.PayloadPaymentCompleted{}
 	if err := e.DataAs(data); err != nil {

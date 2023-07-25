@@ -5,17 +5,18 @@ import (
 
 	paymentv1 "github.com/ydssx/morphix/api/payment/v1"
 	"github.com/ydssx/morphix/common/event"
-	"github.com/ydssx/morphix/pkg/mq"
 )
 
 var _ paymentv1.PaymentServiceServer = (*PaymentService)(nil)
 
 type PaymentService struct {
 	paymentv1.UnimplementedPaymentServiceServer
+
+	eventSink PaymentEvents
 }
 
-func NewPaymentService() *PaymentService {
-	return &PaymentService{}
+func NewPaymentService(eventSink PaymentEvents) *PaymentService {
+	return &PaymentService{eventSink: eventSink}
 }
 
 // CancelPayment implements paymentv1.PaymentServiceServer.
@@ -29,16 +30,17 @@ func (*PaymentService) GetPayment(context.Context, *paymentv1.GetPaymentRequest)
 }
 
 // MakePayment implements paymentv1.PaymentServiceServer.
-func (*PaymentService) MakePayment(ctx context.Context, req *paymentv1.MakePaymentRequest) (*paymentv1.PaymentResponse, error) {
+func (p *PaymentService) MakePayment(ctx context.Context, req *paymentv1.MakePaymentRequest) (*paymentv1.PaymentResponse, error) {
 	payload := event.PayloadPaymentCompleted{
 		UserId:  1,
 		Amount:  float32(req.Amount),
 		OrderId: req.OrderId,
 	}
-	err := mq.Send(ctx, event.Subject_name[int32(event.Subject_PaymentCompleted)], &payload)
+	err := p.eventSink.OnMakePayment(ctx, &payload)
 	if err != nil {
 		return nil, err
 	}
+
 	return &paymentv1.PaymentResponse{OrderId: req.OrderId, Status: "COMPLETED"}, nil
 }
 

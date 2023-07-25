@@ -21,7 +21,8 @@ import (
 // Injectors from wire.go:
 
 func wireApp(config *common.Config, logger log.Logger) (*kratos.App, func(), error) {
-	paymentService := service.NewPaymentService()
+	paymentEvents := service.NewEventSender()
+	paymentService := service.NewPaymentService(paymentEvents)
 	grpcServer := server.NewGRPCServer(config, paymentService, logger)
 	app := newApp(grpcServer, config)
 	return app, func() {
