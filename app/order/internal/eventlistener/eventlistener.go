@@ -1,4 +1,4 @@
-package eventhandler
+package eventlistener
 
 import (
 	"context"
@@ -16,7 +16,7 @@ var subjectHandlerMap = map[event.Subject]mq.EventHandler{
 
 func Init() {
 	for subject, handler := range subjectHandlerMap {
-		err := mq.AddEventHandlerAsync(event.Subject_name[int32(subject)], handler)
+		err := mq.AddEventListenerAsync(event.Subject_name[int32(subject)], handler)
 		if err != nil {
 			panic(err)
 		}

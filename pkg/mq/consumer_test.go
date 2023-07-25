@@ -17,7 +17,7 @@ func TestNewConsumer(t *testing.T) {
 	sub := "test-pubsub"
 	close, _ := InitNats(url)
 	defer close(context.Background())
-	go AddEventHandler(context.Background(), sub, receive)
+	go AddEventListener(context.Background(), sub, receive)
 	for i := 0; i < 10; i++ {
 		payload := Example{Sequence: i, Message: "hello world"}
 		Send(context.Background(), sub, &payload, WithSource("user login"))

@@ -11,7 +11,7 @@ import (
 
 type EventHandler func(ctx context.Context, event cloudevents.Event) error
 
-func AddEventHandler(ctx context.Context, subject string, handler EventHandler) (err error) {
+func AddEventListener(ctx context.Context, subject string, handler EventHandler) (err error) {
 	p, err := cenats.NewConsumerFromConn(natsServer, subject)
 	if err != nil {
 		log.Fatalf("failed to create nats protocol, %s", err.Error())
@@ -28,14 +28,14 @@ func AddEventHandler(ctx context.Context, subject string, handler EventHandler) 
 	return
 }
 
-func AddEventHandlerAsync(subject string, handler EventHandler) (err error) {
+func AddEventListenerAsync(subject string, handler EventHandler) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
 	errChan := make(chan error, 1)
 
 	go func() {
-		errChan <- AddEventHandler(context.Background(), subject, handler)
+		errChan <- AddEventListener(context.Background(), subject, handler)
 	}()
 
 	select {

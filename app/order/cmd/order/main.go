@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/ydssx/morphix/app/order/internal/eventhandler"
+	"github.com/ydssx/morphix/app/order/internal/eventlistener"
 	"github.com/ydssx/morphix/pkg/mq"
 )
 
@@ -16,7 +16,7 @@ func main() {
 	ctx := context.Background()
 	defer close(ctx)
 
-	eventhandler.Init()
+	eventlistener.Init()
 
 	log.Print("handler register success.")
 	<-ctx.Done()
