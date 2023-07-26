@@ -9,6 +9,10 @@ jaeger:
 otelcol:
   addr: otelcol:4317
 
+nats:
+  addr: nats://nats.morphix:4222
+  timeout: 5
+
 userRpcClient:
   network: tcp
   addr: discovery:///user-rpc
@@ -22,6 +26,11 @@ smsRpcClient:
 paymentRpcClient:
   network: tcp
   addr: discovery:///payment-rpc
+  timeout: 2
+
+orderRpcClient:
+  network: tcp
+  addr: discovery:///order-rpc
   timeout: 2
 
 # gateway配置
@@ -70,6 +79,25 @@ payment:
   server:
     grpc:
       addr: 0.0.0.0:9002
+      timeout: 2
+  data:
+    database:
+      driver: mysql
+      source: root:root@tcp(127.0.0.1:3306)/test
+    redis:
+      addr: redis.morphix:6379
+      username:
+      password:
+      read_timeout: 2
+      write_timeout: 2
+      dial_timeout: 5
+
+# order服务配置
+order:
+  name: order-rpc
+  server:
+    grpc:
+      addr: 0.0.0.0:9003
       timeout: 2
   data:
     database:

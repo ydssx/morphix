@@ -7,6 +7,8 @@ resources:
   - gateway-svc.yaml
   - sms-svc.yaml
   - user-svc.yaml
+  - payment-svc.yaml
+  - order-svc.yaml
 generatorOptions:
   disableNameSuffixHash: true
 namespace: morphix

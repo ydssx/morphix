@@ -11,13 +11,16 @@ type Config struct {
 	Gateway          Gateway   `yaml:"gateway"`
 	User             User      `yaml:"user"`
 	Sms              Sms       `yaml:"sms"`
+	Order            Order     `yaml:"order"`
 	Payment          Payment   `yaml:"payment"`
 	Etcd             Etcd      `yaml:"etcd"`
 	Jaeger           Jaeger    `yaml:"jaeger"`
 	Otelcol          Otelcol   `yaml:"otelcol"`
+	Nats             Nats      `yaml:"nats"`
 	UserRpcClient    RpcClient `yaml:"userRpcClient"`
 	SmsRpcClient     RpcClient `yaml:"smsRpcClient"`
 	PaymentRpcClient RpcClient `yaml:"paymentRpcClient"`
+	OrderRpcClient   RpcClient `yaml:"orderRpcClient"`
 }
 
 // Server
@@ -93,6 +96,11 @@ type Otelcol struct {
 	Addr string `yaml:"addr"`
 }
 
+type Nats struct {
+	Addr    string `yaml:"addr"`
+	Timeout int    `yaml:"timeout"`
+}
+
 // User
 type User struct {
 	Server Server `yaml:"server"`
@@ -100,6 +108,11 @@ type User struct {
 	Name   string `yaml:"name"`
 }
 type Payment struct {
+	Server Server `yaml:"server"`
+	Data   Data   `yaml:"data"`
+	Name   string `yaml:"name"`
+}
+type Order struct {
 	Server Server `yaml:"server"`
 	Data   Data   `yaml:"data"`
 	Name   string `yaml:"name"`

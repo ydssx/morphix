@@ -1,4 +1,4 @@
-package eventlistener
+package listener
 
 import (
 	"context"
@@ -12,15 +12,6 @@ import (
 
 var subjectHandlerMap = map[event.Subject]mq.EventHandler{
 	event.Subject_PaymentCompleted: updateOrderStatus,
-}
-
-func Init() {
-	for subject, handler := range subjectHandlerMap {
-		err := mq.AddEventListenerAsync(event.Subject_name[int32(subject)], handler)
-		if err != nil {
-			panic(err)
-		}
-	}
 }
 
 func updateOrderStatus(ctx context.Context, e cloudevents.Event) error {

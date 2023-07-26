@@ -7,6 +7,8 @@ import (
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	kgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	orderv1 "github.com/ydssx/morphix/api/order/v1"
+	paymentv1 "github.com/ydssx/morphix/api/payment/v1"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/common"
@@ -22,6 +24,8 @@ var handlers = make(map[string]registerFn)
 func registerRpcHandler(c common.Config) {
 	handlers[c.UserRpcClient.Addr] = userv1.RegisterUserServiceHandler
 	handlers[c.SmsRpcClient.Addr] = smsv1.RegisterSMSServiceHandler
+	handlers[c.PaymentRpcClient.Addr] = paymentv1.RegisterPaymentServiceHandler
+	handlers[c.OrderRpcClient.Addr] = orderv1.RegisterOrderServiceHandler
 }
 
 func newGateway(ctx context.Context, r *etcd.Registry, opts ...gwruntime.ServeMuxOption) (http.Handler, error) {

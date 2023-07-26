@@ -13,10 +13,12 @@ spec:
     metadata:
       labels:
         app: gateway-service
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "false"
     spec:
       containers:
         - name: gateway-service
-          image: registry.cn-shenzhen.aliyuncs.com/ydssx/gateway:1.0.2
+          image: registry.cn-shenzhen.aliyuncs.com/ydssx/gateway:1.0.3
           imagePullPolicy: Always
           resources:
             limits:
@@ -51,7 +53,7 @@ metadata:
 spec:
   selector:
     app: gateway-service
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - name: http
       port: 8000

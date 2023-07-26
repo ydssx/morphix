@@ -1,37 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sms-service
+  name: order-service
   labels:
-    app: sms-service
+    app: order-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: sms-service
+      app: order-service
   template:
     metadata:
       labels:
-        app: sms-service
+        app: order-service
+        # sidecar.istio.io/inject: "false"
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "false"
     spec:
       containers:
-        - name: sms-service
-          image: registry.cn-shenzhen.aliyuncs.com/ydssx/sms:1.0.3
+        - name: order-service
+          image: registry.cn-shenzhen.aliyuncs.com/ydssx/order:1.0.3
           imagePullPolicy: Always
           resources:
             limits:
               memory: "50Mi"
               cpu: "100m"
           ports:
-            - containerPort: 9001
+            - containerPort: 9003
           volumeMounts:
             - name: config-volume
               mountPath: /etc/morphix
           livenessProbe:
             grpc:
-              port: 9001
+              port: 9003
             initialDelaySeconds: 10
       imagePullSecrets:
         - name: aliyun-registry-secret
@@ -44,39 +45,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: sms-service
+  name: order-service
 spec:
   selector:
-    app: sms-service
+    app: order-service
   type: ClusterIP
   ports:
-    - name: sms-service
-      port: 9001
-      targetPort: 9001
+    - name: order-service
+      port: 9003
+      targetPort: 9003
       protocol: TCP
-
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: sms-service
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: sms-service
-  minReplicas: 1
-  maxReplicas: 3
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 50
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 50

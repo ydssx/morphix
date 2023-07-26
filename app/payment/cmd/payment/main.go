@@ -45,7 +45,7 @@ func newApp(gs *grpc.Server, c *common.Config) *kratos.App {
 
 	mp := provider.InitMeterProvider(c.Otelcol.Addr)
 
-	close, _ := mq.InitNats("localhost:4222")
+	close, _ := mq.InitNats(c.Nats.Addr)
 
 	return kratos.New(
 		kratos.Name(c.Payment.Name),

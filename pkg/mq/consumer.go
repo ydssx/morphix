@@ -7,18 +7,19 @@ import (
 
 	cenats "github.com/cloudevents/sdk-go/protocol/nats/v2"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"github.com/cloudevents/sdk-go/v2/client"
 )
 
 type EventHandler func(ctx context.Context, event cloudevents.Event) error
 
-func AddEventListener(ctx context.Context, subject string, handler EventHandler) (err error) {
-	p, err := cenats.NewConsumerFromConn(natsServer, subject)
+func AddEventListener(ctx context.Context, subject string, handler EventHandler, opts ...cenats.ConsumerOption) (err error) {
+	p, err := cenats.NewConsumerFromConn(natsServer, subject, opts...)
 	if err != nil {
 		log.Fatalf("failed to create nats protocol, %s", err.Error())
 	}
 	defer p.Close(ctx)
 
-	c, err := cloudevents.NewClient(p)
+	c, err := cloudevents.NewClient(p, client.WithObservabilityService(NewObserver()))
 	if err != nil {
 		log.Fatalf("failed to create client, %s", err.Error())
 	}
@@ -28,14 +29,14 @@ func AddEventListener(ctx context.Context, subject string, handler EventHandler)
 	return
 }
 
-func AddEventListenerAsync(subject string, handler EventHandler) (err error) {
+func AddEventListenerAsync(subject string, handler EventHandler, opts ...cenats.ConsumerOption) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
 	errChan := make(chan error, 1)
 
 	go func() {
-		errChan <- AddEventListener(context.Background(), subject, handler)
+		errChan <- AddEventListener(context.Background(), subject, handler, opts...)
 	}()
 
 	select {

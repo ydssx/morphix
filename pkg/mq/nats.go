@@ -20,6 +20,7 @@ type MessageQueue interface {
 type NATSMessageQueueService struct {
 	nc *nats.Conn
 	ec *nats.EncodedConn
+	js nats.JetStreamContext
 }
 
 type Handler interface{}
@@ -34,9 +35,15 @@ func NewNATSMessageQueueService() (*NATSMessageQueueService, error) {
 	if err != nil {
 		return nil, err
 	}
+	js, err := nc.JetStream()
+	if err != nil {
+		return nil, err
+	}
+
 	return &NATSMessageQueueService{
 		nc: nc,
 		ec: ec,
+		js: js,
 	}, nil
 }
 
@@ -55,6 +62,15 @@ func (mq *NATSMessageQueueService) SubscribeToTopic(topic string, handler Handle
 func (mq *NATSMessageQueueService) QueueSubscribeToTopic(topic, queue string, handler Handler) error {
 	_, err := mq.ec.QueueSubscribe(topic, queue, handler)
 	return err
+}
+
+func (mq *NATSMessageQueueService) AddStream(cfg *nats.StreamConfig) error {
+	_, err := mq.js.AddStream(cfg)
+	return err
+}
+
+func (mq *NATSMessageQueueService) StreamSubscribe(subj string, cb nats.MsgHandler) {
+	mq.js.Subscribe(subj, cb)
 }
 
 // Close 关闭与 NATS 服务器的连接
