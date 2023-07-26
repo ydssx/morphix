@@ -4,7 +4,7 @@ metadata:
   name: morphix
 build:
   local:
-    concurrency: 0
+    concurrency: 3
     tryImportMissing: false
     useDockerCLI: false
     push: true
@@ -24,6 +24,14 @@ build:
       context: .
       docker:
         dockerfile: app/user/Dockerfile
+    - image: registry.cn-shenzhen.aliyuncs.com/ydssx/payment
+      context: .
+      docker:
+        dockerfile: app/payment/Dockerfile
+    - image: registry.cn-shenzhen.aliyuncs.com/ydssx/order
+      context: .
+      docker:
+        dockerfile: app/order/Dockerfile
 manifests:
   kustomize:
     paths:
