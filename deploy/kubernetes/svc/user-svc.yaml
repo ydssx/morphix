@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service
+  name: user
   labels:
-    app: user-service
+    app: user
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user-service
+      app: user
   template:
     metadata:
       labels:
-        app: user-service
+        app: user
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "false"
     spec:
       containers:
-        - name: user-service
+        - name: user
           image: registry.cn-shenzhen.aliyuncs.com/ydssx/user:1.0.3
           imagePullPolicy: Always
           resources:
@@ -47,7 +47,7 @@ metadata:
   name: user-service
 spec:
   selector:
-    app: user-service
+    app: user
   type: ClusterIP
   ports:
     - name: user-service

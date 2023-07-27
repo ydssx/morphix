@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sms-service
+  name: sms
   labels:
-    app: sms-service
+    app: sms
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: sms-service
+      app: sms
   template:
     metadata:
       labels:
-        app: sms-service
+        app: sms
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "false"
     spec:
       containers:
-        - name: sms-service
+        - name: sms
           image: registry.cn-shenzhen.aliyuncs.com/ydssx/sms:1.0.3
           imagePullPolicy: Always
           resources:
@@ -50,7 +50,7 @@ spec:
     app: sms-service
   type: ClusterIP
   ports:
-    - name: sms-service
+    - name: sms
       port: 9001
       targetPort: 9001
       protocol: TCP
@@ -59,12 +59,12 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: sms-service
+  name: sms-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: sms-service
+    name: sms
   minReplicas: 1
   maxReplicas: 3
   metrics:
@@ -73,10 +73,10 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 50
+        averageUtilization: 80
   - type: Resource
     resource:
       name: memory
       target:
         type: Utilization
-        averageUtilization: 50
+        averageUtilization: 80

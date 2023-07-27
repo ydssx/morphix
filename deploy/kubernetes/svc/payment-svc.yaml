@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: payment-service
+  name: payment
   labels:
-    app: payment-service
+    app: payment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: payment-service
+      app: payment
   template:
     metadata:
       labels:
-        app: payment-service
+        app: payment
         # sidecar.istio.io/inject: "false"
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "false"
     spec:
       containers:
-        - name: payment-service
+        - name: payment
           image: registry.cn-shenzhen.aliyuncs.com/ydssx/payment:1.0.3
           imagePullPolicy: Always
           resources:
@@ -48,7 +48,7 @@ metadata:
   name: payment-service
 spec:
   selector:
-    app: payment-service
+    app: payment
   type: ClusterIP
   ports:
     - name: payment-service

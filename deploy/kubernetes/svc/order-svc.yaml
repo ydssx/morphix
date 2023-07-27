@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: order-service
+  name: order
   labels:
-    app: order-service
+    app: order
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: order-service
+      app: order
   template:
     metadata:
       labels:
-        app: order-service
+        app: order
         # sidecar.istio.io/inject: "false"
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "false"
     spec:
       containers:
-        - name: order-service
+        - name: order
           image: registry.cn-shenzhen.aliyuncs.com/ydssx/order:1.0.3
           imagePullPolicy: Always
           resources:
@@ -48,7 +48,7 @@ metadata:
   name: order-service
 spec:
   selector:
-    app: order-service
+    app: order
   type: ClusterIP
   ports:
     - name: order-service
