@@ -86,6 +86,8 @@ type Redis struct {
 type Etcd struct {
 	Endpoints []string `yaml:"endpoints"`
 	Timeout   int      `yaml:"timeout"`
+	Username  string   `yaml:"username"`
+	Password  string   `yaml:"password"`
 }
 
 // Jaeger

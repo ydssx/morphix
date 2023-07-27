@@ -11,6 +11,8 @@ func NewEtcdRegistry(c Etcd) *etcd.Registry {
 	client, err := etcdclient.New(etcdclient.Config{
 		Endpoints:   c.Endpoints,
 		DialTimeout: time.Duration(c.Timeout) * time.Second,
+		Username:    c.Username,
+		Password:    c.Password,
 	})
 	if err != nil {
 		panic(err)

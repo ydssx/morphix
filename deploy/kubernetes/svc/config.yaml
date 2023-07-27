@@ -2,6 +2,8 @@ etcd:
   endpoints:
     - etcd:2379
   timeout: 5
+  username: root
+  password: YV2AsfxOTo
 
 jaeger:
   addr: http://jaeger:14268/api/traces
