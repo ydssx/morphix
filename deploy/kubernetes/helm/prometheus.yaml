@@ -413,7 +413,7 @@ server:
 
     ## Prometheus server data Persistent Volume size
     ##
-    size: 8Gi
+    size: 2Gi
 
     ## Prometheus server data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
@@ -605,9 +605,9 @@ server:
 
     loadBalancerIP: ""
     loadBalancerSourceRanges: []
-    servicePort: 80
+    servicePort: 9000
     sessionAffinity: None
-    type: ClusterIP
+    type: LoadBalancer
 
     ## Enable gRPC port on service to allow auto discovery with thanos-querier
     gRPC:
@@ -628,7 +628,7 @@ server:
 
   ## Prometheus data retention period (default if not specified is 15 days)
   ##
-  retention: "15d"
+  retention: "1d"
 
 ## Prometheus server ConfigMap entries for rule files (allow prometheus labels interpolation)
 ruleFiles: {}
@@ -672,6 +672,19 @@ serverFiles:
         static_configs:
           - targets:
             - localhost:9090
+      - job_name: etcd
+        static_configs:
+          - targets:
+            - etcd.default:2379
+      - job_name: gateway-service
+        static_configs:
+          - targets:
+            - gateway-service.morphix:8000
+      - job_name: redis
+        static_configs:
+          - targets:
+            - redis-master.default:9121
+            - redis-replicas.default:9121
 
       # A scrape configuration for running Prometheus on a Kubernetes cluster.
       # This uses separate scrape configs for cluster components (i.e. API server, node)

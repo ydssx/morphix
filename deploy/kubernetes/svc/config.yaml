@@ -1,6 +1,6 @@
 etcd:
   endpoints:
-    - etcd:2379
+    - etcd.default:2379
   timeout: 5
   username: root
   password: YV2AsfxOTo
@@ -12,7 +12,7 @@ otelcol:
   addr: otelcol:4317
 
 nats:
-  addr: nats://nats.morphix:4222
+  addr: nats://nats.default:4222
   timeout: 5
 
 userRpcClient:
@@ -50,11 +50,14 @@ user:
   data:
     database:
       driver: mysql
-      source: root:root@tcp(mysql.morphix:3306)/user
+      source: root:root@tcp(mysql.default:3306)/user
     redis:
-      addr: 127.0.0.1:6379
+      addr: redis-master.default:6379
+      username:
+      password: 1GyY3AHsWg
       read_timeout: 2
       write_timeout: 2
+      dial_timeout: 5
 
 # sms服务配置
 sms:
@@ -66,11 +69,11 @@ sms:
   data:
     database:
       driver: mysql
-      source: root:root@tcp(127.0.0.1:3306)/test
+      source: root:root@tcp(mysql.default:3306)/sms
     redis:
-      addr: redis.morphix:6379
+      addr: redis-master.default:6379
       username:
-      password:
+      password: 1GyY3AHsWg
       read_timeout: 2
       write_timeout: 2
       dial_timeout: 5
@@ -85,11 +88,11 @@ payment:
   data:
     database:
       driver: mysql
-      source: root:root@tcp(127.0.0.1:3306)/test
+      source: root:root@tcp(mysql.default:3306)/payment
     redis:
-      addr: redis.morphix:6379
+      addr: redis-master.default:6379
       username:
-      password:
+      password: 1GyY3AHsWg
       read_timeout: 2
       write_timeout: 2
       dial_timeout: 5
@@ -104,11 +107,11 @@ order:
   data:
     database:
       driver: mysql
-      source: root:root@tcp(127.0.0.1:3306)/test
+      source: root:root@tcp(mysql.default:3306)/order
     redis:
-      addr: redis.morphix:6379
+      addr: redis-master.default:6379
       username:
-      password:
+      password: 1GyY3AHsWg
       read_timeout: 2
       write_timeout: 2
       dial_timeout: 5

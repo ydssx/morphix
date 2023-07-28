@@ -28,7 +28,7 @@ spec:
           ports:
             - containerPort: 9090
           args:
-            - --storage.tsdb.retention.time=3d
+            - --storage.tsdb.retention.time=2h
             - --config.file=/etc/config/prometheus.yml
             - --storage.tsdb.path=/data
             - --web.console.libraries=/etc/prometheus/console_libraries
@@ -67,7 +67,7 @@ data:
   prometheus.yml: |
     global:
       evaluation_interval: 30s
-      scrape_interval: 15s
+      scrape_interval: 30s
       scrape_timeout: 3s
     rule_files:
     - /etc/config/recording_rules.yml
@@ -77,13 +77,18 @@ data:
     scrape_configs:
       - job_name: prometheus
         static_configs:
-          - targets: ["prometheus:9090"]
+          - targets: ["localhost:9090"]
       - job_name: etcd
         static_configs:
-          - targets: ["etcd:2379"]
+          - targets: ["etcd.default:2379"]
       - job_name: gateway-service
         static_configs:
           - targets: ["gateway-service:8000"]
+      - job_name: redis
+        static_configs:
+          - targets:
+            - redis-master.default:9121
+            - redis-replicas.default:9121
       - honor_labels: true
         job_name: morphix
         kubernetes_sd_configs:
@@ -92,9 +97,9 @@ data:
           role: pod
         relabel_configs:
         - action: keep
-          regex: true
-          source_labels:
-          - __meta_kubernetes_pod_annotation_morphix
+          regex:  __meta_kubernetes_pod_label_(.+)
+          # source_labels:
+          # - __meta_kubernetes_pod_label_app
 
 ---
 apiVersion: v1
