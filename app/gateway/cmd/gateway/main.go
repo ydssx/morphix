@@ -78,5 +78,6 @@ func newGinHandler(ctx context.Context, c common.Config) *gin.Engine {
 		panic(err)
 	}
 	server.Any("/api/*any", gin.WrapH(gw))
+	
 	return server
 }

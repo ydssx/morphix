@@ -2,7 +2,9 @@ package common
 
 import (
 	"context"
+	"time"
 
+	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	kgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
@@ -27,9 +29,14 @@ func NewUserClient(c *Config) userv1.UserServiceClient {
 func createConn(etcdConf Etcd, rpcCliConf RpcClient) *grpc.ClientConn {
 	r := NewEtcdRegistry(etcdConf)
 
+	return CreateClientConn(rpcCliConf, r)
+}
+
+func CreateClientConn(rpcCliConf RpcClient, r *etcd.Registry) *grpc.ClientConn {
 	ctx := context.Background()
 	conn, err := kgrpc.DialInsecure(ctx,
 		kgrpc.WithEndpoint(rpcCliConf.Addr),
+		kgrpc.WithTimeout(time.Second*time.Duration(rpcCliConf.Timeout)),
 		kgrpc.WithDiscovery(r),
 		kgrpc.WithUnaryInterceptor(
 			interceptors.TraceClientInterceptor(),
