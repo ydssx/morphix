@@ -21,20 +21,6 @@ func init() {
 	flag.StringVar(&flagconf, "f", "./../../../configs/config.yaml", "config path, eg: -conf config.yaml")
 }
 
-// func main() {
-// 	close, err := mq.InitNats("http://localhost:4222")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	ctx := context.Background()
-// 	defer close(ctx)
-
-// 	listener.NewListenerServer().Start(ctx)
-
-// 	log.Print("handler register success.")
-// 	<-ctx.Done()
-// }
-
 func main() {
 	flag.Parse()
 	var bc common.Config

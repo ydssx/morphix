@@ -3,17 +3,10 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
 
-	"github.com/chenjiandongx/ginprom"
-	"github.com/gin-gonic/gin"
 	"github.com/go-kratos/kratos/v2"
 	khttp "github.com/go-kratos/kratos/v2/transport/http"
-	"github.com/go-kratos/swagger-api/openapiv2"
-	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/ydssx/morphix/common"
-	kmiddleware "github.com/ydssx/morphix/pkg/middleware/kratos"
 	"github.com/ydssx/morphix/pkg/provider"
 )
 
@@ -25,13 +18,18 @@ func main() {
 	var config common.Config
 	common.MustLoad(&config, *configFile)
 
-	if err := Run(context.Background(), config); err != nil {
+	app, cleanup, err := wireApp(&config)
+	if err != nil {
+		panic(err)
+	}
+	defer cleanup()
+
+	if err := app.Run(); err != nil {
 		panic(err)
 	}
 }
 
-func Run(ctx context.Context, c common.Config) error {
-	registerRpcHandler(c)
+func newApp(hs *khttp.Server, c *common.Config) *kratos.App {
 
 	tp, err := provider.InitTraceProvider(c.Otelcol.Addr, c.Gateway.Name)
 	if err != nil {
@@ -39,45 +37,13 @@ func Run(ctx context.Context, c common.Config) error {
 	}
 	mp := provider.InitMeterProvider(c.Otelcol.Addr)
 
-	httpSrv := khttp.NewServer(khttp.Address(c.Gateway.Addr), khttp.Middleware(kmiddleware.MetricServer()))
-
-	openAPIhandler := openapiv2.NewHandler()
-	httpSrv.HandlePrefix("/q/", openAPIhandler)
-
-	ginHandler := newGinHandler(ctx, c)
-	httpSrv.HandlePrefix("/", ginHandler)
-
 	app := kratos.New(
 		kratos.Name(c.Gateway.Name),
-		kratos.Context(ctx),
-		kratos.Server(
-			httpSrv,
-		),
+		kratos.Context(context.Background()),
+		kratos.Server(hs),
 		kratos.AfterStop(tp.Shutdown),
 		kratos.AfterStop(mp.Shutdown),
 	)
-	if err := app.Run(); err != nil {
-		log.Fatal(err)
-	}
 
-	return nil
-}
-
-func newGinHandler(ctx context.Context, c common.Config) *gin.Engine {
-	server := gin.New()
-	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), gin.Recovery())
-	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
-	server.GET("/healthz", healthzServer)
-
-	opts := []gwruntime.ServeMuxOption{}
-
-	r := common.NewEtcdRegistry(c.Etcd)
-
-	gw, err := newGateway(ctx, r, opts...)
-	if err != nil {
-		panic(err)
-	}
-	server.Any("/api/*any", gin.WrapH(gw))
-	
-	return server
+	return app
 }

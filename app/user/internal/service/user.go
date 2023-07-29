@@ -2,8 +2,9 @@ package service
 
 import (
 	"context"
-	"errors"
+	"net/http"
 
+	"github.com/go-kratos/kratos/v2/errors"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/user/internal/biz"
@@ -31,7 +32,7 @@ func (s *UserService) Register(ctx context.Context, req *userv1.RegistrationRequ
 		return nil, err
 	}
 	if !checkResult.Status {
-		return nil, errors.New("校验短信验证码失败")
+		return nil, errors.New(http.StatusBadRequest, "", "校验短信验证码失败")
 	}
 
 	user, err := s.uc.RegisterUser(ctx, req.Username, req.Password, req.Email, req.Phone)
