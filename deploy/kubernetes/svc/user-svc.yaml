@@ -15,6 +15,10 @@ spec:
         app: user
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "false"
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "user"
+        dapr.io/app-port: "9000"
+        dapr.io/app-protocol: "grpc"
     spec:
       containers:
         - name: user

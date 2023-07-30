@@ -1,0 +1,37 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub
+  namespace: morphix
+spec:
+  type: pubsub.natsstreaming
+  version: v1
+  metadata:
+  - name: natsURL
+    value: "nats://nats.default:4222"
+  - name: natsStreamingClusterID
+    value: "mynats"
+    # below are subscription configuration.
+  - name: subscriptionType
+    value: topic # Required. Allowed values: topic, queue.
+  # - name: ackWaitTime
+  #   value: "" # Optional.
+  # - name: maxInFlight
+  #   value: "" # Optional.
+  # - name: durableSubscriptionName
+  #   value: "" # Optional.
+  # following subscription options - only one can be used
+  - name: deliverNew
+    value: true
+  # - name: startAtSequence
+  #   value: 1
+  # - name: startWithLastReceived
+  #   value: false
+  # - name: deliverAll
+  #   value: false
+  # - name: startAtTimeDelta
+  #   value: ""
+  # - name: startAtTime
+  #   value: ""
+  # - name: startAtTimeFormat
+  #   value: ""

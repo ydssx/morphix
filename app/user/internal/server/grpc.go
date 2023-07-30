@@ -3,6 +3,7 @@ package server
 import (
 	"time"
 
+	daprd "github.com/dapr/go-sdk/service/grpc"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
@@ -37,6 +38,8 @@ func NewGRPCServer(c *common.Config, userSvc *service.UserService, logger log.Lo
 	srv := grpc.NewServer(opts...)
 
 	userv1.RegisterUserServiceServer(srv, userSvc)
+
+	daprd.NewServiceWithGrpcServer(nil, srv.Server)
 
 	return srv
 }

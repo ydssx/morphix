@@ -49,7 +49,7 @@ func newGinHandler(ctx context.Context, c *common.Config) *gin.Engine {
 	server := gin.New()
 	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), gin.Recovery())
 	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
-	server.GET("/healthz", func(c *gin.Context) { c.String(200, "%s", "ok") })
+	server.GET("/healthz", func(c *gin.Context) { c.String(http.StatusOK, "%s", "ok") })
 
 	opts := []gwruntime.ServeMuxOption{}
 

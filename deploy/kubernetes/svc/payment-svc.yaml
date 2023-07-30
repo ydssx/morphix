@@ -16,6 +16,10 @@ spec:
         # sidecar.istio.io/inject: "false"
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "false"
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "payment"
+        dapr.io/app-port: "9002"
+        dapr.io/app-protocol: "grpc"
     spec:
       containers:
         - name: payment
