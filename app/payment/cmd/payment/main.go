@@ -8,6 +8,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/ydssx/morphix/common"
+	"github.com/ydssx/morphix/common/dapr"
 	"github.com/ydssx/morphix/pkg/logger"
 	"github.com/ydssx/morphix/pkg/mq"
 	"github.com/ydssx/morphix/pkg/provider"
@@ -46,6 +47,7 @@ func newApp(gs *grpc.Server, c *common.Config) *kratos.App {
 	mp := provider.InitMeterProvider(c.Otelcol.Addr)
 
 	close, _ := mq.InitNats(c.Nats.Addr)
+	closeDapr := dapr.Init()
 
 	return kratos.New(
 		kratos.Name(c.Payment.Name),
@@ -59,5 +61,6 @@ func newApp(gs *grpc.Server, c *common.Config) *kratos.App {
 		kratos.AfterStop(tp.Shutdown),
 		kratos.AfterStop(mp.Shutdown),
 		kratos.AfterStop(close),
+		kratos.AfterStop(closeDapr),
 	)
 }
