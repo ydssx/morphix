@@ -45,6 +45,7 @@ func AddEventListenerAsync(subject string, handler EventHandler, opts ...cenats.
 	case <-ctx.Done():
 		// err = ctx.Err()
 	}
-
+	close(errChan)
+	
 	return err
 }
