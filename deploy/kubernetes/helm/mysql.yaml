@@ -466,7 +466,7 @@ primary:
   service:
     ## @param primary.service.type MySQL Primary K8s service type
     ##
-    type: LoadBalancer
+    type: ClusterIP
     ## @param primary.service.ports.mysql MySQL Primary K8s service port
     ##
     ports:
