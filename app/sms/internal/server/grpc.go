@@ -10,7 +10,7 @@ import (
 
 func NewGRPCServer(c *conf.Bootstrap, smsSvc *service.SMSService) *grpc.Server {
 
-	srv := common.NewGRPCServer(c.User.Server)
+	srv := common.NewGRPCServer(c.Sms.Server)
 
 	smsv1.RegisterSMSServiceServer(srv, smsSvc)
 

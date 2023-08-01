@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/dapr/go-sdk/client"
+	"github.com/go-kratos/kratos/v2/log"
 )
 
 var (
@@ -11,11 +12,11 @@ var (
 	pubSubName = "pubsub"
 )
 
-func Init() func(context.Context) error {
+func Init() func(ctx context.Context) error {
 	var err error
 	cli, err = client.NewClient()
 	if err != nil {
-		panic(err)
+		log.Error(err)
 	}
 
 	return func(context.Context) error {

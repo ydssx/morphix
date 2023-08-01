@@ -1,7 +1,7 @@
 etcd:
   endpoints:
     - etcd.default:2379
-  timeout: 5
+  timeout: 5s
   username: root
   password: YV2AsfxOTo
 
@@ -13,32 +13,35 @@ otelcol:
 
 nats:
   addr: nats://nats.default:4222
-  timeout: 5
+  timeout: 5s
 
 userRpcClient:
   network: tcp
   addr: discovery:///user-rpc
-  timeout: 2
+  timeout: 2s
 
 smsRpcClient:
   network: tcp
   addr: discovery:///sms-rpc
-  timeout: 2
+  timeout: 2s
 
 paymentRpcClient:
   network: tcp
   addr: discovery:///payment-rpc
-  timeout: 2
+  timeout: 2s
 
 orderRpcClient:
   network: tcp
   addr: discovery:///order-rpc
-  timeout: 2
+  timeout: 2s
 
 # gateway配置
 gateway:
   name: gateway
-  addr: 0.0.0.0:8000
+  server:
+    http:
+      addr: 0.0.0.0:8000
+      timeout: 2s
 
 # user服务配置
 user:
@@ -46,7 +49,7 @@ user:
   server:
     grpc:
       addr: 0.0.0.0:9000
-      timeout: 2
+      timeout: 2s
   data:
     database:
       driver: mysql
@@ -55,9 +58,9 @@ user:
       addr: redis-master.default:6379
       username:
       password: 1GyY3AHsWg
-      read_timeout: 2
-      write_timeout: 2
-      dial_timeout: 5
+      read_timeout: 2s
+      write_timeout: 2s
+      dial_timeout: 5s
 
 # sms服务配置
 sms:
@@ -65,7 +68,7 @@ sms:
   server:
     grpc:
       addr: 0.0.0.0:9001
-      timeout: 2
+      timeout: 2s
   data:
     database:
       driver: mysql
@@ -74,9 +77,9 @@ sms:
       addr: redis-master.default:6379
       username:
       password: 1GyY3AHsWg
-      read_timeout: 2
-      write_timeout: 2
-      dial_timeout: 5
+      read_timeout: 2s
+      write_timeout: 2s
+      dial_timeout: 5s
 
 # payment服务配置
 payment:
@@ -84,7 +87,7 @@ payment:
   server:
     grpc:
       addr: 0.0.0.0:9002
-      timeout: 2
+      timeout: 2s
   data:
     database:
       driver: mysql
@@ -93,9 +96,9 @@ payment:
       addr: redis-master.default:6379
       username:
       password: 1GyY3AHsWg
-      read_timeout: 2
-      write_timeout: 2
-      dial_timeout: 5
+      read_timeout: 2s
+      write_timeout: 2s
+      dial_timeout: 5s
 
 # order服务配置
 order:
@@ -103,7 +106,7 @@ order:
   server:
     grpc:
       addr: 0.0.0.0:9003
-      timeout: 2
+      timeout: 2s
   data:
     database:
       driver: mysql
@@ -112,6 +115,6 @@ order:
       addr: redis-master.default:6379
       username:
       password: 1GyY3AHsWg
-      read_timeout: 2
-      write_timeout: 2
-      dial_timeout: 5
+      read_timeout: 2s
+      write_timeout: 2s
+      dial_timeout: 5s
