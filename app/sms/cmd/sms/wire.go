@@ -10,9 +10,9 @@ import (
 	"github.com/ydssx/morphix/app/sms/internal/server"
 	"github.com/ydssx/morphix/app/sms/internal/service"
 	"github.com/ydssx/morphix/app/sms/internal/biz"
-	"github.com/ydssx/morphix/common"
+	"github.com/ydssx/morphix/common/conf"
 )
 
-func wireApp(*common.Config, log.Logger) (*kratos.App, func(), error) {
+func wireApp(*conf.Bootstrap, log.Logger) (*kratos.App, func(), error) {
 	panic(wire.Build(server.ProviderSet,service.ProviderSet,biz.ProviderSet,newApp))
 }

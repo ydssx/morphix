@@ -8,6 +8,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/ydssx/morphix/common"
+	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/logger"
 	"github.com/ydssx/morphix/pkg/mq"
 	"github.com/ydssx/morphix/pkg/provider"
@@ -22,10 +23,11 @@ func init() {
 
 func main() {
 	flag.Parse()
-	var bc common.Config
-	common.MustLoad(&bc, flagconf)
+	var c conf.Bootstrap
+	close := conf.MustLoad(&c, flagconf)
+	defer close()
 
-	app, cleanup, err := wireApp(&bc, logger.DefaultLogger)
+	app, cleanup, err := wireApp(&c, logger.DefaultLogger)
 	if err != nil {
 		panic(err)
 	}
@@ -38,7 +40,7 @@ func main() {
 
 }
 
-func newApp(gs *grpc.Server, c *common.Config) *kratos.App {
+func newApp(gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
 	r := common.NewEtcdRegistry(c.Etcd)
 
 	tp, _ := provider.InitTraceProvider(c.Otelcol.Addr, c.Sms.Name)

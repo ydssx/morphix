@@ -1,0 +1,90 @@
+syntax = "proto3";
+package common.conf;
+
+import "google/protobuf/duration.proto";
+
+option go_package = "morphix/common/conf;conf";
+
+message Bootstrap {
+  Otelcol otelcol = 1;
+  Etcd etcd = 2;
+  Jaeger jaeger = 3;
+  Nats nats = 4;
+
+  ServerConf gateway = 13;
+  ServerConf user = 5;
+  ServerConf sms = 6;
+  ServerConf payment = 7;
+  ServerConf order = 8;
+
+  ClientConf sms_rpc_client = 9;
+  ClientConf user_rpc_client = 10;
+  ClientConf order_rpc_client = 11;
+  ClientConf payment_rpc_client = 12;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  HTTP http = 1;
+  GRPC grpc = 2;
+}
+
+message Data {
+  message Database {
+    string driver = 1;
+    string source = 2;
+  }
+  message Redis {
+    string addr = 1;
+    string username = 2;
+    string password = 3;
+    google.protobuf.Duration read_timeout = 4;
+    google.protobuf.Duration write_timeout = 5;
+    google.protobuf.Duration dial_timeout = 6;
+  }
+  Database database = 1;
+  Redis redis = 2;
+}
+
+message Etcd {
+  repeated string endpoints = 1;
+  google.protobuf.Duration timeout = 2;
+  string username = 3;
+  string password = 4;
+}
+
+message Jaeger {
+  string addr = 1;
+}
+
+message Otelcol {
+  string addr = 1;
+}
+
+message Nats {
+    string addr = 1;
+    google.protobuf.Duration timeout = 2;
+}
+
+// 客户端配置
+message ClientConf {
+  string network = 1;
+  string addr = 2;
+  google.protobuf.Duration timeout = 3;
+}
+
+// 服务端配置
+message ServerConf {
+  string name = 1;
+  Server server = 2;
+  Data data = 3;
+}

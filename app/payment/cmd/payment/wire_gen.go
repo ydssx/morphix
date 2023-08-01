@@ -11,7 +11,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/ydssx/morphix/app/payment/internal/server"
 	"github.com/ydssx/morphix/app/payment/internal/service"
-	"github.com/ydssx/morphix/common"
+	"github.com/ydssx/morphix/common/conf"
 )
 
 import (
@@ -20,11 +20,11 @@ import (
 
 // Injectors from wire.go:
 
-func wireApp(config *common.Config, logger log.Logger) (*kratos.App, func(), error) {
+func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
 	paymentEvents := service.NewEventSender()
 	paymentService := service.NewPaymentService(paymentEvents)
-	grpcServer := server.NewGRPCServer(config, paymentService, logger)
-	app := newApp(grpcServer, config)
+	grpcServer := server.NewGRPCServer(bootstrap, paymentService, logger)
+	app := newApp(grpcServer, bootstrap)
 	return app, func() {
 	}, nil
 }

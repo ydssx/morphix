@@ -10,7 +10,7 @@ import (
 	"github.com/ydssx/morphix/app/user/internal/data"
 	"github.com/ydssx/morphix/app/user/internal/server"
 	"github.com/ydssx/morphix/app/user/internal/service"
-	"github.com/ydssx/morphix/common"
+	"github.com/ydssx/morphix/common/conf"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
@@ -18,6 +18,6 @@ import (
 )
 
 // wireApp init kratos application.
-func wireApp(*common.Config, log.Logger) (*kratos.App, func(), error) {
+func wireApp(*conf.Bootstrap, log.Logger) (*kratos.App, func(), error) {
 	panic(wire.Build(server.ProviderSet, data.ProviderSet, biz.ProviderSet, service.ProviderSet, newApp))
 }

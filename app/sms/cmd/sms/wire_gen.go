@@ -12,7 +12,7 @@ import (
 	"github.com/ydssx/morphix/app/sms/internal/biz"
 	"github.com/ydssx/morphix/app/sms/internal/server"
 	"github.com/ydssx/morphix/app/sms/internal/service"
-	"github.com/ydssx/morphix/common"
+	"github.com/ydssx/morphix/common/conf"
 )
 
 import (
@@ -21,12 +21,12 @@ import (
 
 // Injectors from wire.go:
 
-func wireApp(config *common.Config, logger log.Logger) (*kratos.App, func(), error) {
-	client := biz.NewSmsRedisClient(config)
+func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
+	client := biz.NewSmsRedisClient(bootstrap)
 	smsUseCase := biz.NewSmsUseCase(client)
 	smsService := service.NewSMSService(smsUseCase)
-	grpcServer := server.NewGRPCServer(config, smsService, logger)
-	app := newApp(grpcServer, config)
+	grpcServer := server.NewGRPCServer(bootstrap, smsService)
+	app := newApp(grpcServer, bootstrap)
 	return app, func() {
 	}, nil
 }

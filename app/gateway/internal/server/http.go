@@ -16,36 +16,37 @@ import (
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/common"
+	"github.com/ydssx/morphix/common/conf"
 	kmiddleware "github.com/ydssx/morphix/pkg/middleware/kratos"
 	"google.golang.org/grpc"
 )
 
 type registerFn func(ctx context.Context, mux *gwruntime.ServeMux, conn *grpc.ClientConn) (err error)
 
-var handlers = make(map[common.RpcClient]registerFn)
+var handlers = make(map[*conf.ClientConf]registerFn)
 
-func registerRpcHandler(c common.Config) {
+func registerRpcHandler(c *conf.Bootstrap) {
 	handlers[c.UserRpcClient] = userv1.RegisterUserServiceHandler
 	handlers[c.SmsRpcClient] = smsv1.RegisterSMSServiceHandler
 	handlers[c.PaymentRpcClient] = paymentv1.RegisterPaymentServiceHandler
 	handlers[c.OrderRpcClient] = orderv1.RegisterOrderServiceHandler
 }
 
-func NewHTTPServer(c *common.Config) *khttp.Server {
-	registerRpcHandler(*c)
+func NewHTTPServer(c *conf.Bootstrap) *khttp.Server {
+	registerRpcHandler(c)
 
-	httpSrv := khttp.NewServer(khttp.Address(c.Gateway.Addr), khttp.Middleware(kmiddleware.MetricServer()))
+	httpSrv := khttp.NewServer(khttp.Address(c.Gateway.Server.Http.Addr), khttp.Middleware(kmiddleware.MetricServer()))
 
 	openAPIhandler := openapiv2.NewHandler()
 	httpSrv.HandlePrefix("/q/", openAPIhandler)
 
 	ginHandler := newGinHandler(context.Background(), c)
 	httpSrv.HandlePrefix("/", ginHandler)
-	
+
 	return httpSrv
 }
 
-func newGinHandler(ctx context.Context, c *common.Config) *gin.Engine {
+func newGinHandler(ctx context.Context, c *conf.Bootstrap) *gin.Engine {
 	server := gin.New()
 	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), gin.Recovery())
 	server.GET("/metrics", gin.WrapH(promhttp.Handler()))

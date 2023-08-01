@@ -9,14 +9,14 @@ package main
 import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/ydssx/morphix/app/gateway/internal/server"
-	"github.com/ydssx/morphix/common"
+	"github.com/ydssx/morphix/common/conf"
 )
 
 // Injectors from wire.go:
 
-func wireApp(config *common.Config) (*kratos.App, func(), error) {
-	httpServer := server.NewHTTPServer(config)
-	app := newApp(httpServer, config)
+func wireApp(bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
+	httpServer := server.NewHTTPServer(bootstrap)
+	app := newApp(httpServer, bootstrap)
 	return app, func() {
 	}, nil
 }

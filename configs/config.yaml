@@ -1,7 +1,9 @@
 etcd:
   endpoints:
-    - etcd:2379
-  timeout: 5
+    - etcd.default:2379
+  timeout: 5s
+  username: root
+  password: YV2AsfxOTo
 
 jaeger:
   addr: http://jaeger:14268/api/traces
@@ -9,20 +11,29 @@ jaeger:
 otelcol:
   addr: otelcol:4317
 
+nats:
+  addr: nats://nats.default:4222
+  timeout: 5s
+
 userRpcClient:
   network: tcp
   addr: discovery:///user-rpc
-  timeout: 2
+  timeout: 2s
 
 smsRpcClient:
   network: tcp
   addr: discovery:///sms-rpc
-  timeout: 2
+  timeout: 2s
 
 paymentRpcClient:
   network: tcp
   addr: discovery:///payment-rpc
-  timeout: 2
+  timeout: 2s
+
+orderRpcClient:
+  network: tcp
+  addr: discovery:///order-rpc
+  timeout: 2s
 
 # gateway配置
 gateway:
@@ -35,15 +46,18 @@ user:
   server:
     grpc:
       addr: 0.0.0.0:9000
-      timeout: 2
+      timeout: 2s
   data:
     database:
       driver: mysql
-      source: root:root@tcp(mysql.morphix:3306)/user
+      source: root:root@tcp(mysql.default:3306)/user
     redis:
-      addr: 127.0.0.1:6379
-      read_timeout: 2
-      write_timeout: 2
+      addr: redis-master.default:6379
+      username:
+      password: 1GyY3AHsWg
+      read_timeout: 2s
+      write_timeout: 2s
+      dial_timeout: 5s
 
 # sms服务配置
 sms:
@@ -51,18 +65,18 @@ sms:
   server:
     grpc:
       addr: 0.0.0.0:9001
-      timeout: 2
+      timeout: 2s
   data:
     database:
       driver: mysql
-      source: root:root@tcp(127.0.0.1:3306)/test
+      source: root:root@tcp(mysql.default:3306)/sms
     redis:
-      addr: redis.morphix:6379
+      addr: redis-master.default:6379
       username:
-      password:
-      read_timeout: 2
-      write_timeout: 2
-      dial_timeout: 5
+      password: 1GyY3AHsWg
+      read_timeout: 2s
+      write_timeout: 2s
+      dial_timeout: 5s
 
 # payment服务配置
 payment:
@@ -70,15 +84,34 @@ payment:
   server:
     grpc:
       addr: 0.0.0.0:9002
-      timeout: 2
+      timeout: 2s
   data:
     database:
       driver: mysql
-      source: root:root@tcp(127.0.0.1:3306)/test
+      source: root:root@tcp(mysql.default:3306)/payment
     redis:
-      addr: redis.morphix:6379
+      addr: redis-master.default:6379
       username:
-      password:
-      read_timeout: 2
-      write_timeout: 2
-      dial_timeout: 5
+      password: 1GyY3AHsWg
+      read_timeout: 2s
+      write_timeout: 2s
+      dial_timeout: 5s
+
+# order服务配置
+order:
+  name: order-rpc
+  server:
+    grpc:
+      addr: 0.0.0.0:9003
+      timeout: 2s
+  data:
+    database:
+      driver: mysql
+      source: root:root@tcp(mysql.default:3306)/order
+    redis:
+      addr: redis-master.default:6379
+      username:
+      password: 1GyY3AHsWg
+      read_timeout: 2s
+      write_timeout: 2s
+      dial_timeout: 5s

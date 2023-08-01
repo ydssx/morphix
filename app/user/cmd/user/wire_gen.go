@@ -14,6 +14,7 @@ import (
 	"github.com/ydssx/morphix/app/user/internal/server"
 	"github.com/ydssx/morphix/app/user/internal/service"
 	"github.com/ydssx/morphix/common"
+	"github.com/ydssx/morphix/common/conf"
 )
 
 import (
@@ -23,17 +24,17 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(config *common.Config, logger log.Logger) (*kratos.App, func(), error) {
+func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
 	dataData, cleanup, err := data.NewData(logger)
 	if err != nil {
 		return nil, nil, err
 	}
 	userRepo := data.NewUserRepo(dataData, logger)
 	userUsecase := biz.NewUserUsecase(userRepo, logger)
-	smsServiceClient := common.NewSMSClient(config)
+	smsServiceClient := common.NewSMSClient(bootstrap)
 	userService := service.NewUserService(userUsecase, smsServiceClient)
-	grpcServer := server.NewGRPCServer(config, userService, logger)
-	app := newApp(grpcServer, config)
+	grpcServer := server.NewGRPCServer(bootstrap, userService)
+	app := newApp(grpcServer, bootstrap)
 	return app, func() {
 		cleanup()
 	}, nil

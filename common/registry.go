@@ -1,16 +1,15 @@
 package common
 
 import (
-	"time"
-
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
+	"github.com/ydssx/morphix/common/conf"
 	etcdclient "go.etcd.io/etcd/client/v3"
 )
 
-func NewEtcdRegistry(c Etcd) *etcd.Registry {
+func NewEtcdRegistry(c *conf.Etcd) *etcd.Registry {
 	client, err := etcdclient.New(etcdclient.Config{
 		Endpoints:   c.Endpoints,
-		DialTimeout: time.Duration(c.Timeout) * time.Second,
+		DialTimeout: c.Timeout.AsDuration(),
 		Username:    c.Username,
 		Password:    c.Password,
 	})

@@ -12,7 +12,7 @@ import (
 	"github.com/ydssx/morphix/app/order/internal/listener"
 	"github.com/ydssx/morphix/app/order/internal/server"
 	"github.com/ydssx/morphix/app/order/internal/service"
-	"github.com/ydssx/morphix/common"
+	"github.com/ydssx/morphix/common/conf"
 )
 
 import (
@@ -21,11 +21,11 @@ import (
 
 // Injectors from wire.go:
 
-func wireApp(config *common.Config, logger log.Logger) (*kratos.App, func(), error) {
+func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
 	orderService := service.NewOrderService()
-	grpcServer := server.NewGRPCServer(config, orderService, logger)
+	grpcServer := server.NewGRPCServer(bootstrap, orderService)
 	listenerServer := listener.NewListenerServer()
-	app := newApp(grpcServer, listenerServer, config)
+	app := newApp(grpcServer, listenerServer, bootstrap)
 	return app, func() {
 	}, nil
 }
