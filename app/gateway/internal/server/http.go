@@ -6,7 +6,6 @@ import (
 
 	"github.com/chenjiandongx/ginprom"
 	"github.com/gin-gonic/gin"
-	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	khttp "github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/go-kratos/swagger-api/openapiv2"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -21,6 +20,7 @@ import (
 	kmiddleware "github.com/ydssx/morphix/pkg/middleware/kratos"
 	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 type registerFn func(ctx context.Context, mux *gwruntime.ServeMux, conn *grpc.ClientConn) (err error)
@@ -35,11 +35,9 @@ func registerRpcHandler(c *conf.Bootstrap) {
 }
 
 func NewHTTPServer(c *conf.Bootstrap) *khttp.Server {
-	registerRpcHandler(c)
-
 	httpSrv := khttp.NewServer(
 		khttp.Address(c.Gateway.Server.Http.Addr),
-		khttp.Middleware(kmiddleware.MetricServer()),
+		khttp.Middleware(kmiddleware.MetricServer(), kmiddleware.AuthServer()),
 	)
 
 	openAPIhandler := openapiv2.NewHandler()
@@ -63,29 +61,30 @@ func newGinHandler(ctx context.Context, c *conf.Bootstrap) *gin.Engine {
 		auth := middleware.AuthFromGinContext(ctx)
 		util.OKWithData(ctx, auth)
 	})
-	
-	opts := []gwruntime.ServeMuxOption{}
 
-	r := common.NewEtcdRegistry(c.Etcd)
-
-	gw, err := newGateway(ctx, r, opts...)
-	if err != nil {
-		panic(err)
-	}
+	gw := newGateway(ctx, c)
 	server.Any("/api/*any", gin.WrapH(gw))
 
 	return server
 }
 
-func newGateway(ctx context.Context, r *etcd.Registry, opts ...gwruntime.ServeMuxOption) (http.Handler, error) {
-	mux := gwruntime.NewServeMux(opts...)
+func newGateway(ctx context.Context, c *conf.Bootstrap) http.Handler {
+	registerRpcHandler(c)
 
+	opts := []gwruntime.ServeMuxOption{gwruntime.WithMetadata(func(ctx context.Context, r *http.Request) metadata.MD {
+		auth := r.Header.Get("Authorization")
+		return metadata.New(map[string]string{"Authorization": auth})
+	})}
+
+	r := common.NewEtcdRegistry(c.Etcd)
+
+	mux := gwruntime.NewServeMux(opts...)
 	for cliConf, f := range handlers {
 		conn := common.CreateClientConn(cliConf, r)
 		if err := f(ctx, mux, conn); err != nil {
-			return nil, err
+			panic(err)
 		}
 	}
 
-	return mux, nil
+	return mux
 }

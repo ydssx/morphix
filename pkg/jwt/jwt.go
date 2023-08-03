@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	"context"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -45,11 +44,4 @@ func VerifyToken(tokenString string) (*Claims, error) {
 		return nil, jwt.ErrInvalidKey
 	}
 	return claims, nil
-}
-
-type authKey struct{}
-
-func AuthFromContext(ctx context.Context) *jwt.Claims {
-	data := ctx.Value(authKey{}).(*jwt.Claims)
-	return data
 }

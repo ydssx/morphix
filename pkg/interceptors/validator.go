@@ -5,10 +5,10 @@ import (
 	"google.golang.org/grpc"
 )
 
-func ValidatorServerInterceptor(opts ...validator.Option) grpc.UnaryServerInterceptor {
+func ValidatorServer(opts ...validator.Option) grpc.UnaryServerInterceptor {
 	return validator.UnaryServerInterceptor(opts...)
 }
 
-func ValidatorClientInterceptor(opts ...validator.Option) grpc.UnaryClientInterceptor {
+func ValidatorClient(opts ...validator.Option) grpc.UnaryClientInterceptor {
 	return validator.UnaryClientInterceptor(opts...)
 }

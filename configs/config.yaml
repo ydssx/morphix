@@ -38,7 +38,10 @@ orderRpcClient:
 # gateway配置
 gateway:
   name: gateway
-  addr: 0.0.0.0:8000
+  server:
+    http:
+      addr: 0.0.0.0:8000
+      timeout: 2s
 
 # user服务配置
 user:

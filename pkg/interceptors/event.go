@@ -10,7 +10,7 @@ import (
 type EventSource struct{}
 type EventType struct{}
 
-func EventServerInterceptors() grpc.UnaryServerInterceptor {
+func EventServer() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 		app, ok := kratos.FromContext(ctx)
 		if ok {

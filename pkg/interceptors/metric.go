@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func MetricClientInterceptor() grpc.UnaryClientInterceptor {
+func MetricClient() grpc.UnaryClientInterceptor {
 	reg := prometheus.DefaultRegisterer
 	clMetrics := grpcprom.NewClientMetrics(
 		// grpcprom.WithClientHandlingTimeHistogram(

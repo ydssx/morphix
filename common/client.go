@@ -39,8 +39,8 @@ func CreateClientConn(rpcCliConf *conf.ClientConf, r *etcd.Registry) *grpc.Clien
 		kgrpc.WithTimeout(rpcCliConf.Timeout.AsDuration()),
 		kgrpc.WithDiscovery(r),
 		kgrpc.WithUnaryInterceptor(
-			interceptors.TraceClientInterceptor(),
-			interceptors.LoggingClientInterceptor(logger.DefaultLogger),
+			interceptors.TraceClient(),
+			interceptors.LoggingClient(logger.DefaultLogger),
 			// interceptors.MetricClientInterceptor(),
 		),
 	)

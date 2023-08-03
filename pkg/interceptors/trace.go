@@ -5,10 +5,10 @@ import (
 	"google.golang.org/grpc"
 )
 
-func TraceServerInterceptor() grpc.UnaryServerInterceptor {
+func TraceServer() grpc.UnaryServerInterceptor {
 	return otelgrpc.UnaryServerInterceptor()
 }
 
-func TraceClientInterceptor() grpc.UnaryClientInterceptor {
+func TraceClient() grpc.UnaryClientInterceptor {
 	return otelgrpc.UnaryClientInterceptor()
 }

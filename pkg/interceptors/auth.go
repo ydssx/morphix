@@ -1,0 +1,56 @@
+package interceptors
+
+import (
+	"context"
+
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/selector"
+	"github.com/ydssx/morphix/pkg/jwt"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/status"
+)
+
+func AuthServer() grpc.UnaryServerInterceptor {
+	authFn := func(ctx context.Context) (context.Context, error) {
+		token, err := auth.AuthFromMD(ctx, "bearer")
+		if err != nil {
+			return nil, err
+		}
+		claims, err := jwt.VerifyToken(token)
+		if err != nil {
+			return nil, status.Error(codes.Unauthenticated, "invalid auth token")
+		}
+		return newContext(ctx, claims), nil
+	}
+
+	// Setup auth matcher.
+	allButHealthZ := func(ctx context.Context, callMeta interceptors.CallMeta) bool {
+		return healthpb.Health_ServiceDesc.ServiceName != callMeta.Service
+	}
+
+	return selector.UnaryServerInterceptor(auth.UnaryServerInterceptor(authFn), selector.MatchFunc(allButHealthZ))
+}
+
+type authKey struct{}
+
+type AuthInfo struct {
+	Claims *jwt.Claims
+}
+
+func newContext(ctx context.Context, c *jwt.Claims) context.Context {
+	info := &AuthInfo{
+		Claims: c,
+	}
+	return context.WithValue(ctx, authKey{}, info)
+}
+
+func AuthFromContext(ctx context.Context) (*jwt.Claims, bool) {
+	info, ok := ctx.Value(authKey{}).(*AuthInfo)
+	if !ok {
+		return nil, false
+	}
+	return info.Claims, true
+}

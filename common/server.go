@@ -1,26 +1,26 @@
 package common
 
 import (
-	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/interceptors"
 	"github.com/ydssx/morphix/pkg/logger"
-	"github.com/ydssx/morphix/pkg/middleware/kratos"
 )
 
 func NewGRPCServer(server *conf.Server) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.UnaryInterceptor(
-			interceptors.TraceServerInterceptor(),
-			interceptors.LoggingServerInterceptor(logger.DefaultLogger),
-			interceptors.ValidatorServerInterceptor(),
-			interceptors.EventServerInterceptors(),
+			interceptors.TraceServer(),
+			interceptors.LoggingServer(logger.DefaultLogger),
+			interceptors.ValidatorServer(),
+			interceptors.EventServer(),
+			interceptors.AuthServer(),
+			interceptors.RecoveryServer(),
 		),
-		grpc.Middleware(
-			kratos.MetricServer(),
-			recovery.Recovery(),
-		),
+		// grpc.Middleware(
+		// 	kratos.MetricServer(),
+		// 	recovery.Recovery(),
+		// ),
 	}
 	if server.Grpc.Addr != "" {
 		opts = append(opts, grpc.Address(server.Grpc.Addr))

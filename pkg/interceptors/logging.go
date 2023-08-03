@@ -51,11 +51,11 @@ func interceptorLogger(lg log.Logger) logging.Logger {
 	})
 }
 
-func LoggingServerInterceptor(l log.Logger) grpc.UnaryServerInterceptor {
+func LoggingServer(l log.Logger) grpc.UnaryServerInterceptor {
 	return logging.UnaryServerInterceptor(interceptorLogger(l), initOpt()...)
 }
 
-func LoggingClientInterceptor(l log.Logger) grpc.UnaryClientInterceptor {
+func LoggingClient(l log.Logger) grpc.UnaryClientInterceptor {
 	return logging.UnaryClientInterceptor(interceptorLogger(l), initOpt()...)
 }
 
