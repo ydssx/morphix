@@ -16,6 +16,6 @@ func NewGRPCServer(c *conf.Bootstrap, userSvc *service.UserService) *grpc.Server
 	userv1.RegisterUserServiceServer(srv, userSvc)
 
 	daprd.NewServiceWithGrpcServer(nil, srv.Server)
-
+	
 	return srv
 }

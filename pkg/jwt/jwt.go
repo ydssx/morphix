@@ -1,24 +1,27 @@
 package jwt
 
 import (
+	"context"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
 var (
-	SecretKey      = []byte("123456") // 秘钥
-	ExpireDuration = time.Hour               // 过期时间
+	SecretKey      = []byte("123456")    // 秘钥
+	ExpireDuration = time.Hour * 24 * 30 // 过期时间
 )
 
 type Claims struct {
+	Uid      int64  `json:"uid"`
 	Username string `json:"username"`
 	Role     string `json:"role"`
 	jwt.StandardClaims
 }
 
-func GenerateToken(username, role string) (string, error) {
+func GenerateToken(uid int64, username, role string) (string, error) {
 	claims := &Claims{
+		Uid:      uid,
 		Username: username,
 		Role:     role,
 		StandardClaims: jwt.StandardClaims{
@@ -42,4 +45,11 @@ func VerifyToken(tokenString string) (*Claims, error) {
 		return nil, jwt.ErrInvalidKey
 	}
 	return claims, nil
+}
+
+type authKey struct{}
+
+func AuthFromContext(ctx context.Context) *jwt.Claims {
+	data := ctx.Value(authKey{}).(*jwt.Claims)
+	return data
 }

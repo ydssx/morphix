@@ -19,12 +19,12 @@ type response struct {
 const (
 	ERROR      = -1
 	SUCCESS    = 0
-	ErrorMsg   = "操作成功"
-	SuccessMsg = "操作失败"
+	ErrorMsg   = "操作失败"
+	SuccessMsg = "操作成功"
 )
 
-func result(c *gin.Context, code int, data interface{}, msg string) {
-	c.JSON(http.StatusOK, response{
+func result(c *gin.Context, httpCode int, code int, data interface{}, msg string) {
+	c.JSON(httpCode, response{
 		Code: code,
 		Msg:  msg,
 		Data: data,
@@ -32,19 +32,19 @@ func result(c *gin.Context, code int, data interface{}, msg string) {
 }
 
 func OK(c *gin.Context) {
-	result(c, 0, nil, SuccessMsg)
+	result(c, http.StatusOK, SUCCESS, nil, SuccessMsg)
 }
 
 func OKWithData(c *gin.Context, data interface{}) {
-	result(c, SUCCESS, data, SuccessMsg)
+	result(c, http.StatusOK, SUCCESS, data, SuccessMsg)
 }
 
 func FailWithMsg(c *gin.Context, msg string) {
-	result(c, ERROR, nil, msg)
+	result(c, http.StatusBadRequest, ERROR, nil, msg)
 }
 
 func FailWithError(c *gin.Context, err error) {
-	result(c, ERROR, nil, wrapValidateErrMsg(err))
+	result(c, http.StatusBadRequest, ERROR, nil, wrapValidateErrMsg(err))
 }
 
 func wrapValidateErrMsg(err error) (msg string) {

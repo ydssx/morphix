@@ -15,9 +15,11 @@ import (
 	paymentv1 "github.com/ydssx/morphix/api/payment/v1"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
+	"github.com/ydssx/morphix/app/gateway/internal/middleware"
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
 	kmiddleware "github.com/ydssx/morphix/pkg/middleware/kratos"
+	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/grpc"
 )
 
@@ -35,7 +37,10 @@ func registerRpcHandler(c *conf.Bootstrap) {
 func NewHTTPServer(c *conf.Bootstrap) *khttp.Server {
 	registerRpcHandler(c)
 
-	httpSrv := khttp.NewServer(khttp.Address(c.Gateway.Server.Http.Addr), khttp.Middleware(kmiddleware.MetricServer()))
+	httpSrv := khttp.NewServer(
+		khttp.Address(c.Gateway.Server.Http.Addr),
+		khttp.Middleware(kmiddleware.MetricServer()),
+	)
 
 	openAPIhandler := openapiv2.NewHandler()
 	httpSrv.HandlePrefix("/q/", openAPIhandler)
@@ -48,10 +53,17 @@ func NewHTTPServer(c *conf.Bootstrap) *khttp.Server {
 
 func newGinHandler(ctx context.Context, c *conf.Bootstrap) *gin.Engine {
 	server := gin.New()
+	server.ContextWithFallback = true
 	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), gin.Recovery())
 	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	server.GET("/healthz", func(c *gin.Context) { c.String(http.StatusOK, "%s", "ok") })
 
+	server.Use(middleware.Auth())
+	server.GET("/auth", func(ctx *gin.Context) {
+		auth := middleware.AuthFromGinContext(ctx)
+		util.OKWithData(ctx, auth)
+	})
+	
 	opts := []gwruntime.ServeMuxOption{}
 
 	r := common.NewEtcdRegistry(c.Etcd)
