@@ -7,6 +7,7 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/google/uuid"
+	"github.com/ydssx/morphix/pkg/interceptors"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -30,25 +31,6 @@ const (
 	TextPlain       ContentType = cloudevents.TextPlain
 )
 
-type EventSource struct{}
-type EventType struct{}
-
-func getEventSourceFromCtx(ctx context.Context) string {
-	t, ok := ctx.Value(EventSource{}).(string)
-	if ok {
-		return t
-	}
-	return "api"
-}
-
-func getEventTypeFromCtx(ctx context.Context) string {
-	t, ok := ctx.Value(EventType{}).(string)
-	if ok {
-		return t
-	}
-	return "null"
-}
-
 func getTraceIDFromCtx(ctx context.Context) string {
 	if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
 		return span.TraceID().String()
@@ -59,8 +41,8 @@ func getTraceIDFromCtx(ctx context.Context) string {
 func newDefaultEvent(ctx context.Context) *Event {
 	return &Event{
 		contentType: ApplicationJSON,
-		source:      getEventSourceFromCtx(ctx),
-		eventType:   getEventTypeFromCtx(ctx),
+		source:      interceptors.EventSourceFromCtx(ctx),
+		eventType:   interceptors.EventTypeFromCtx(ctx),
 		traceID:     getTraceIDFromCtx(ctx),
 	}
 }
