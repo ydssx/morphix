@@ -9,14 +9,14 @@ registry_username="$REGISTRY_USERNAME"
 registry_password="$REGISTRY_PASSWORD"
 
 # 定义版本号
-version="1.0.1"
+version="1.0.3"
 
 # 登录镜像仓库
 echo "$registry_password" | docker login --username "$registry_username" --password-stdin $REGISTRY_URL
 
 
 # 查找微服务目录下的 Dockerfile 文件，并迭代构建和推送镜像
-services=("gateway" "user" "sms")
+services=("gateway" "user" "sms" "order" "payment")
 for service in "${services[@]}"; do
     image_name="$REGISTRY_URL/$REGISTRY_NAMESPACE/$service:$version"
     

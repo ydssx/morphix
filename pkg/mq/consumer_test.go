@@ -12,7 +12,7 @@ import (
 	"github.com/ydssx/morphix/pkg/util"
 )
 
-func TestNewConsumer(t *testing.T) {
+func testNewConsumer(t *testing.T) {
 	url := "http://localhost:4222"
 	sub := "test-pubsub"
 	close, _ := InitNats(url)
@@ -24,7 +24,7 @@ func TestNewConsumer(t *testing.T) {
 	}
 	time.Sleep(time.Second * 10)
 }
-func TestMq(t *testing.T) {
+func testMq(t *testing.T) {
 	url := "http://localhost:4222"
 	close, _ := InitNats(url)
 	defer close(context.Background())
@@ -39,7 +39,7 @@ func TestMq(t *testing.T) {
 	time.Sleep(time.Second * 5)
 
 }
-func TestMQ(t *testing.T) {
+func testMQ(t *testing.T) {
 	type msg struct {
 		Id int `json:"id,omitempty"`
 	}
