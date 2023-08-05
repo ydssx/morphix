@@ -25,6 +25,7 @@ init:
 	go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
 	go install github.com/google/wire/cmd/wire@latest
 	go install github.com/bufbuild/buf/cmd/buf@latest
+	go install github.com/stern/stern@latest
 
 
 .PHONY: api
@@ -73,6 +74,13 @@ cert:
 secret:
 	kubectl -n morphix create secret docker-registry aliyun-registry-secret --docker-server=registry.cn-shenzhen.aliyuncs.com \
 			--docker-username=$(registry_username) --docker-password=$(registry_password)
+
+.PHONY: k8s
+k8s:
+	make secret;
+	make gateway;
+	make cert;
+	
 
 .PHONY: all
 # generate all

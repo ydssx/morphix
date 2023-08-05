@@ -101,7 +101,10 @@ data:
         resource_to_telemetry_conversion:
           enabled: true
         enable_open_metrics: true
-
+      prometheusremotewrite:
+        endpoint: http://prometheus:9090/api/v1/write
+        target_info:
+          enabled: true
     processors:
       batch:
       filter:

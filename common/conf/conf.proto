@@ -71,8 +71,8 @@ message Otelcol {
 }
 
 message Nats {
-    string addr = 1;
-    google.protobuf.Duration timeout = 2;
+  string addr = 1;
+  google.protobuf.Duration timeout = 2;
 }
 
 // 客户端配置
