@@ -12,27 +12,44 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func MetricClient() grpc.UnaryClientInterceptor {
-	reg := prometheus.DefaultRegisterer
-	clMetrics := grpcprom.NewClientMetrics(
-		// grpcprom.WithClientHandlingTimeHistogram(
-		// 	grpcprom.WithHistogramBuckets([]float64{0.001, 0.01, 0.1, 0.3, 0.6, 1, 3, 6, 9, 20, 30, 60, 90, 120}),
-		// ),
-	)
-	reg.MustRegister(clMetrics)
-	exemplarFromContext := func(ctx context.Context) prometheus.Labels {
+var (
+	reg = prometheus.DefaultRegisterer
+
+	exemplarFromContext = func(ctx context.Context) prometheus.Labels {
 		if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
 			return prometheus.Labels{"traceID": span.TraceID().String()}
 		}
 		return nil
 	}
-	panicsTotal := promauto.With(reg).NewCounter(prometheus.CounterOpts{
+
+	panicsTotal = promauto.With(reg).NewCounter(prometheus.CounterOpts{
 		Name: "grpc_req_panics_recovered_total",
 		Help: "Total number of gRPC requests recovered from internal panic.",
 	})
-	_ = func(p any) (err error) {
+
+	grpcPanicRecoveryHandler = func(p any) (err error) {
 		panicsTotal.Inc()
 		return status.Errorf(codes.Internal, "%s", p)
 	}
+)
+
+func MetricServer() grpc.UnaryServerInterceptor {
+	clMetrics := grpcprom.NewServerMetrics(
+		grpcprom.WithServerHandlingTimeHistogram(
+			grpcprom.WithHistogramBuckets([]float64{0.001, 0.01, 0.1, 0.3, 0.6, 1, 3, 6, 9, 20, 30, 60, 90, 120}),
+		),
+	)
+	reg.MustRegister(clMetrics)
+	return clMetrics.UnaryServerInterceptor(grpcprom.WithExemplarFromContext(exemplarFromContext))
+}
+
+func MetricClient() grpc.UnaryClientInterceptor {
+	clMetrics := grpcprom.NewClientMetrics(
+		grpcprom.WithClientHandlingTimeHistogram(
+			grpcprom.WithHistogramBuckets([]float64{0.001, 0.01, 0.1, 0.3, 0.6, 1, 3, 6, 9, 20, 30, 60, 90, 120}),
+		),
+	)
+	reg := prometheus.NewRegistry()
+	reg.MustRegister(clMetrics)
 	return clMetrics.UnaryClientInterceptor(grpcprom.WithExemplarFromContext(exemplarFromContext))
 }

@@ -41,7 +41,7 @@ func CreateClientConn(rpcCliConf *conf.ClientConf, r *etcd.Registry) *grpc.Clien
 		kgrpc.WithUnaryInterceptor(
 			interceptors.TraceClient(),
 			interceptors.LoggingClient(logger.DefaultLogger),
-			// interceptors.MetricClientInterceptor(),
+			interceptors.MetricClient(),
 		),
 	)
 	if err != nil {

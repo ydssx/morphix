@@ -17,7 +17,6 @@ import (
 	"github.com/ydssx/morphix/app/gateway/internal/middleware"
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
-	kmiddleware "github.com/ydssx/morphix/pkg/middleware/kratos"
 	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -37,7 +36,6 @@ func registerRpcHandler(c *conf.Bootstrap) {
 func NewHTTPServer(c *conf.Bootstrap) *khttp.Server {
 	httpSrv := khttp.NewServer(
 		khttp.Address(c.Gateway.Server.Http.Addr),
-		khttp.Middleware(kmiddleware.MetricServer(), kmiddleware.AuthServer()),
 	)
 
 	openAPIhandler := openapiv2.NewHandler()
@@ -72,8 +70,9 @@ func newGateway(ctx context.Context, c *conf.Bootstrap) http.Handler {
 	registerRpcHandler(c)
 
 	opts := []gwruntime.ServeMuxOption{gwruntime.WithMetadata(func(ctx context.Context, r *http.Request) metadata.MD {
-		auth := r.Header.Get("Authorization")
-		return metadata.New(map[string]string{"Authorization": auth})
+		authKey := "Authorization"
+		auth := r.Header.Get(authKey)
+		return metadata.New(map[string]string{authKey: auth})
 	})}
 
 	r := common.NewEtcdRegistry(c.Etcd)

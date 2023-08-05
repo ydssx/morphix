@@ -73,10 +73,9 @@ func InitMeterProvider(endpoint string) *sdkmetric.MeterProvider {
 		panic(err)
 	}
 	provider := sdkmetric.NewMeterProvider(
-		sdkmetric.WithReader(sdkmetric.NewPeriodicReader(exporter, sdkmetric.WithInterval(time.Second*10))),
+		sdkmetric.WithReader(sdkmetric.NewPeriodicReader(exporter, sdkmetric.WithInterval(time.Second*30))),
 		sdkmetric.WithResource(initResource()),
 	)
-
 	otel.SetMeterProvider(provider)
 	return provider
 }

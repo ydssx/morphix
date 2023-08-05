@@ -10,6 +10,7 @@ import (
 var (
 	cli        client.Client
 	pubSubName = "pubsub"
+	storeName  = "statestore"
 )
 
 func Init() func(ctx context.Context) error {

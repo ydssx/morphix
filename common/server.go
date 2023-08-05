@@ -5,7 +5,6 @@ import (
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/interceptors"
 	"github.com/ydssx/morphix/pkg/logger"
-	"github.com/ydssx/morphix/pkg/middleware/kratos"
 )
 
 func NewGRPCServer(server *conf.Server) *grpc.Server {
@@ -16,11 +15,8 @@ func NewGRPCServer(server *conf.Server) *grpc.Server {
 			interceptors.ValidatorServer(),
 			interceptors.EventServer(),
 			interceptors.AuthServer(),
+			interceptors.MetricServer(),
 			interceptors.RecoveryServer(),
-		),
-		grpc.Middleware(
-			kratos.MetricServer(),
-			// recovery.Recovery(),
 		),
 	}
 	if server.Grpc.Addr != "" {
@@ -30,5 +26,6 @@ func NewGRPCServer(server *conf.Server) *grpc.Server {
 		opts = append(opts, grpc.Timeout(server.Grpc.Timeout.AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
+	
 	return srv
 }
