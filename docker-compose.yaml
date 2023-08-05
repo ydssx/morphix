@@ -230,6 +230,36 @@ services:
       - jaeger
     networks:
       - morphix_net
+  order:
+    image: registry.cn-shenzhen.aliyuncs.com/ydssx/order:${TAG:-latest}
+    container_name: order-service
+    volumes:
+      - ./configs/:/etc/morphix/:ro
+    build:
+      context: ./
+      dockerfile: ./app/order/Dockerfile
+      args:
+        - TAG=${TAG:-latest}
+    depends_on:
+      - etcd
+      - jaeger
+    networks:
+      - morphix_net
+  payment:
+    image: registry.cn-shenzhen.aliyuncs.com/ydssx/payment:${TAG:-latest}
+    container_name: paymnet-service
+    volumes:
+      - ./configs/:/etc/morphix/:ro
+    build:
+      context: ./
+      dockerfile: ./app/payment/Dockerfile
+      args:
+        - TAG=${TAG:-latest}
+    depends_on:
+      - etcd
+      - jaeger
+    networks:
+      - morphix_net
 
   nginx:
     image: nginx
