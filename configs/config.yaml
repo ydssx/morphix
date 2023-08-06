@@ -15,6 +15,17 @@ nats:
   addr: nats://nats.default:4222
   timeout: 5s
 
+redisCluster:
+  addr:
+    - redis-master.default:6379
+    - redis-replicas.default:6379
+  username:
+  password: 1GyY3AHsWg
+  read_timeout: 2s
+  write_timeout: 2s
+  dial_timeout: 5s
+
+
 userRpcClient:
   network: tcp
   addr: discovery:///user-rpc

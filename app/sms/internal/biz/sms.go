@@ -13,10 +13,10 @@ import (
 )
 
 type SmsUseCase struct {
-	rdb *redis.Client
+	rdb *redis.ClusterClient
 }
 
-func NewSmsUseCase(rdb *redis.Client) *SmsUseCase {
+func NewSmsUseCase(rdb *redis.ClusterClient) *SmsUseCase {
 	return &SmsUseCase{rdb: rdb}
 }
 

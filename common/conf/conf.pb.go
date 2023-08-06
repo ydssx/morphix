@@ -26,19 +26,20 @@ type Bootstrap struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Otelcol          *Otelcol    `protobuf:"bytes,1,opt,name=otelcol,proto3" json:"otelcol,omitempty"`
-	Etcd             *Etcd       `protobuf:"bytes,2,opt,name=etcd,proto3" json:"etcd,omitempty"`
-	Jaeger           *Jaeger     `protobuf:"bytes,3,opt,name=jaeger,proto3" json:"jaeger,omitempty"`
-	Nats             *Nats       `protobuf:"bytes,4,opt,name=nats,proto3" json:"nats,omitempty"`
-	Gateway          *ServerConf `protobuf:"bytes,13,opt,name=gateway,proto3" json:"gateway,omitempty"`
-	User             *ServerConf `protobuf:"bytes,5,opt,name=user,proto3" json:"user,omitempty"`
-	Sms              *ServerConf `protobuf:"bytes,6,opt,name=sms,proto3" json:"sms,omitempty"`
-	Payment          *ServerConf `protobuf:"bytes,7,opt,name=payment,proto3" json:"payment,omitempty"`
-	Order            *ServerConf `protobuf:"bytes,8,opt,name=order,proto3" json:"order,omitempty"`
-	SmsRpcClient     *ClientConf `protobuf:"bytes,9,opt,name=sms_rpc_client,json=smsRpcClient,proto3" json:"sms_rpc_client,omitempty"`
-	UserRpcClient    *ClientConf `protobuf:"bytes,10,opt,name=user_rpc_client,json=userRpcClient,proto3" json:"user_rpc_client,omitempty"`
-	OrderRpcClient   *ClientConf `protobuf:"bytes,11,opt,name=order_rpc_client,json=orderRpcClient,proto3" json:"order_rpc_client,omitempty"`
-	PaymentRpcClient *ClientConf `protobuf:"bytes,12,opt,name=payment_rpc_client,json=paymentRpcClient,proto3" json:"payment_rpc_client,omitempty"`
+	Otelcol          *Otelcol      `protobuf:"bytes,1,opt,name=otelcol,proto3" json:"otelcol,omitempty"`
+	Etcd             *Etcd         `protobuf:"bytes,2,opt,name=etcd,proto3" json:"etcd,omitempty"`
+	Jaeger           *Jaeger       `protobuf:"bytes,3,opt,name=jaeger,proto3" json:"jaeger,omitempty"`
+	Nats             *Nats         `protobuf:"bytes,4,opt,name=nats,proto3" json:"nats,omitempty"`
+	Gateway          *ServerConf   `protobuf:"bytes,13,opt,name=gateway,proto3" json:"gateway,omitempty"`
+	User             *ServerConf   `protobuf:"bytes,5,opt,name=user,proto3" json:"user,omitempty"`
+	Sms              *ServerConf   `protobuf:"bytes,6,opt,name=sms,proto3" json:"sms,omitempty"`
+	Payment          *ServerConf   `protobuf:"bytes,7,opt,name=payment,proto3" json:"payment,omitempty"`
+	Order            *ServerConf   `protobuf:"bytes,8,opt,name=order,proto3" json:"order,omitempty"`
+	SmsRpcClient     *ClientConf   `protobuf:"bytes,9,opt,name=sms_rpc_client,json=smsRpcClient,proto3" json:"sms_rpc_client,omitempty"`
+	UserRpcClient    *ClientConf   `protobuf:"bytes,10,opt,name=user_rpc_client,json=userRpcClient,proto3" json:"user_rpc_client,omitempty"`
+	OrderRpcClient   *ClientConf   `protobuf:"bytes,11,opt,name=order_rpc_client,json=orderRpcClient,proto3" json:"order_rpc_client,omitempty"`
+	PaymentRpcClient *ClientConf   `protobuf:"bytes,12,opt,name=payment_rpc_client,json=paymentRpcClient,proto3" json:"payment_rpc_client,omitempty"`
+	RedisCluster     *RedisCluster `protobuf:"bytes,14,opt,name=redis_cluster,json=redisCluster,proto3" json:"redis_cluster,omitempty"`
 }
 
 func (x *Bootstrap) Reset() {
@@ -160,6 +161,13 @@ func (x *Bootstrap) GetOrderRpcClient() *ClientConf {
 func (x *Bootstrap) GetPaymentRpcClient() *ClientConf {
 	if x != nil {
 		return x.PaymentRpcClient
+	}
+	return nil
+}
+
+func (x *Bootstrap) GetRedisCluster() *RedisCluster {
+	if x != nil {
+		return x.RedisCluster
 	}
 	return nil
 }
@@ -622,6 +630,93 @@ func (x *ServerConf) GetData() *Data {
 	return nil
 }
 
+type RedisCluster struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Addr         []string             `protobuf:"bytes,1,rep,name=addr,proto3" json:"addr,omitempty"`
+	Username     string               `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Password     string               `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	ReadTimeout  *durationpb.Duration `protobuf:"bytes,4,opt,name=read_timeout,json=readTimeout,proto3" json:"read_timeout,omitempty"`
+	WriteTimeout *durationpb.Duration `protobuf:"bytes,5,opt,name=write_timeout,json=writeTimeout,proto3" json:"write_timeout,omitempty"`
+	DialTimeout  *durationpb.Duration `protobuf:"bytes,6,opt,name=dial_timeout,json=dialTimeout,proto3" json:"dial_timeout,omitempty"`
+}
+
+func (x *RedisCluster) Reset() {
+	*x = RedisCluster{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_common_conf_conf_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RedisCluster) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RedisCluster) ProtoMessage() {}
+
+func (x *RedisCluster) ProtoReflect() protoreflect.Message {
+	mi := &file_common_conf_conf_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RedisCluster.ProtoReflect.Descriptor instead.
+func (*RedisCluster) Descriptor() ([]byte, []int) {
+	return file_common_conf_conf_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *RedisCluster) GetAddr() []string {
+	if x != nil {
+		return x.Addr
+	}
+	return nil
+}
+
+func (x *RedisCluster) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *RedisCluster) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+func (x *RedisCluster) GetReadTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.ReadTimeout
+	}
+	return nil
+}
+
+func (x *RedisCluster) GetWriteTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.WriteTimeout
+	}
+	return nil
+}
+
+func (x *RedisCluster) GetDialTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.DialTimeout
+	}
+	return nil
+}
+
 type Server_HTTP struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -635,7 +730,7 @@ type Server_HTTP struct {
 func (x *Server_HTTP) Reset() {
 	*x = Server_HTTP{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_conf_conf_proto_msgTypes[9]
+		mi := &file_common_conf_conf_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -648,7 +743,7 @@ func (x *Server_HTTP) String() string {
 func (*Server_HTTP) ProtoMessage() {}
 
 func (x *Server_HTTP) ProtoReflect() protoreflect.Message {
-	mi := &file_common_conf_conf_proto_msgTypes[9]
+	mi := &file_common_conf_conf_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -698,7 +793,7 @@ type Server_GRPC struct {
 func (x *Server_GRPC) Reset() {
 	*x = Server_GRPC{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_conf_conf_proto_msgTypes[10]
+		mi := &file_common_conf_conf_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -711,7 +806,7 @@ func (x *Server_GRPC) String() string {
 func (*Server_GRPC) ProtoMessage() {}
 
 func (x *Server_GRPC) ProtoReflect() protoreflect.Message {
-	mi := &file_common_conf_conf_proto_msgTypes[10]
+	mi := &file_common_conf_conf_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -760,7 +855,7 @@ type Data_Database struct {
 func (x *Data_Database) Reset() {
 	*x = Data_Database{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_conf_conf_proto_msgTypes[11]
+		mi := &file_common_conf_conf_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -773,7 +868,7 @@ func (x *Data_Database) String() string {
 func (*Data_Database) ProtoMessage() {}
 
 func (x *Data_Database) ProtoReflect() protoreflect.Message {
-	mi := &file_common_conf_conf_proto_msgTypes[11]
+	mi := &file_common_conf_conf_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -819,7 +914,7 @@ type Data_Redis struct {
 func (x *Data_Redis) Reset() {
 	*x = Data_Redis{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_common_conf_conf_proto_msgTypes[12]
+		mi := &file_common_conf_conf_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -832,7 +927,7 @@ func (x *Data_Redis) String() string {
 func (*Data_Redis) ProtoMessage() {}
 
 func (x *Data_Redis) ProtoReflect() protoreflect.Message {
-	mi := &file_common_conf_conf_proto_msgTypes[12]
+	mi := &file_common_conf_conf_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -897,7 +992,7 @@ var file_common_conf_conf_proto_rawDesc = []byte{
 	0x6e, 0x66, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0b, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e,
 	0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x1a, 0x1e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72,
 	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xad, 0x05, 0x0a, 0x09, 0x42, 0x6f, 0x6f, 0x74, 0x73, 0x74,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xed, 0x05, 0x0a, 0x09, 0x42, 0x6f, 0x6f, 0x74, 0x73, 0x74,
 	0x72, 0x61, 0x70, 0x12, 0x2e, 0x0a, 0x07, 0x6f, 0x74, 0x65, 0x6c, 0x63, 0x6f, 0x6c, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x63, 0x6f,
 	0x6e, 0x66, 0x2e, 0x4f, 0x74, 0x65, 0x6c, 0x63, 0x6f, 0x6c, 0x52, 0x07, 0x6f, 0x74, 0x65, 0x6c,
@@ -940,7 +1035,11 @@ var file_common_conf_conf_proto_rawDesc = []byte{
 	0x69, 0x65, 0x6e, 0x74, 0x18, 0x0c, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x63, 0x6f, 0x6d,
 	0x6d, 0x6f, 0x6e, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x43,
 	0x6f, 0x6e, 0x66, 0x52, 0x10, 0x70, 0x61, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x70, 0x63, 0x43,
-	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x22, 0xba, 0x02, 0x0a, 0x06, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72,
+	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x12, 0x3e, 0x0a, 0x0d, 0x72, 0x65, 0x64, 0x69, 0x73, 0x5f, 0x63,
+	0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x18, 0x0e, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63,
+	0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x2e, 0x52, 0x65, 0x64, 0x69, 0x73,
+	0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x52, 0x0c, 0x72, 0x65, 0x64, 0x69, 0x73, 0x43, 0x6c,
+	0x75, 0x73, 0x74, 0x65, 0x72, 0x22, 0xba, 0x02, 0x0a, 0x06, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72,
 	0x12, 0x2c, 0x0a, 0x04, 0x68, 0x74, 0x74, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18,
 	0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x2e, 0x53, 0x65, 0x72,
 	0x76, 0x65, 0x72, 0x2e, 0x48, 0x54, 0x54, 0x50, 0x52, 0x04, 0x68, 0x74, 0x74, 0x70, 0x12, 0x2c,
@@ -1020,9 +1119,27 @@ var file_common_conf_conf_proto_rawDesc = []byte{
 	0x6f, 0x6e, 0x66, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x52, 0x06, 0x73, 0x65, 0x72, 0x76,
 	0x65, 0x72, 0x12, 0x25, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x11, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x2e, 0x44,
-	0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x42, 0x1a, 0x5a, 0x18, 0x6d, 0x6f, 0x72,
-	0x70, 0x68, 0x69, 0x78, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2f, 0x63, 0x6f, 0x6e, 0x66,
-	0x3b, 0x63, 0x6f, 0x6e, 0x66, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0x96, 0x02, 0x0a, 0x0c, 0x52, 0x65,
+	0x64, 0x69, 0x73, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x61, 0x64,
+	0x64, 0x72, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x04, 0x61, 0x64, 0x64, 0x72, 0x12, 0x1a,
+	0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61,
+	0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61,
+	0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x12, 0x3c, 0x0a, 0x0c, 0x72, 0x65, 0x61, 0x64, 0x5f, 0x74,
+	0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67,
+	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44,
+	0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0b, 0x72, 0x65, 0x61, 0x64, 0x54, 0x69, 0x6d,
+	0x65, 0x6f, 0x75, 0x74, 0x12, 0x3e, 0x0a, 0x0d, 0x77, 0x72, 0x69, 0x74, 0x65, 0x5f, 0x74, 0x69,
+	0x6d, 0x65, 0x6f, 0x75, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67, 0x6f,
+	0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44, 0x75,
+	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0c, 0x77, 0x72, 0x69, 0x74, 0x65, 0x54, 0x69, 0x6d,
+	0x65, 0x6f, 0x75, 0x74, 0x12, 0x3c, 0x0a, 0x0c, 0x64, 0x69, 0x61, 0x6c, 0x5f, 0x74, 0x69, 0x6d,
+	0x65, 0x6f, 0x75, 0x74, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67, 0x6f, 0x6f,
+	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44, 0x75, 0x72,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0b, 0x64, 0x69, 0x61, 0x6c, 0x54, 0x69, 0x6d, 0x65, 0x6f,
+	0x75, 0x74, 0x42, 0x1a, 0x5a, 0x18, 0x6d, 0x6f, 0x72, 0x70, 0x68, 0x69, 0x78, 0x2f, 0x63, 0x6f,
+	0x6d, 0x6d, 0x6f, 0x6e, 0x2f, 0x63, 0x6f, 0x6e, 0x66, 0x3b, 0x63, 0x6f, 0x6e, 0x66, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1037,7 +1154,7 @@ func file_common_conf_conf_proto_rawDescGZIP() []byte {
 	return file_common_conf_conf_proto_rawDescData
 }
 
-var file_common_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_common_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_common_conf_conf_proto_goTypes = []interface{}{
 	(*Bootstrap)(nil),           // 0: common.conf.Bootstrap
 	(*Server)(nil),              // 1: common.conf.Server
@@ -1048,11 +1165,12 @@ var file_common_conf_conf_proto_goTypes = []interface{}{
 	(*Nats)(nil),                // 6: common.conf.Nats
 	(*ClientConf)(nil),          // 7: common.conf.ClientConf
 	(*ServerConf)(nil),          // 8: common.conf.ServerConf
-	(*Server_HTTP)(nil),         // 9: common.conf.Server.HTTP
-	(*Server_GRPC)(nil),         // 10: common.conf.Server.GRPC
-	(*Data_Database)(nil),       // 11: common.conf.Data.Database
-	(*Data_Redis)(nil),          // 12: common.conf.Data.Redis
-	(*durationpb.Duration)(nil), // 13: google.protobuf.Duration
+	(*RedisCluster)(nil),        // 9: common.conf.RedisCluster
+	(*Server_HTTP)(nil),         // 10: common.conf.Server.HTTP
+	(*Server_GRPC)(nil),         // 11: common.conf.Server.GRPC
+	(*Data_Database)(nil),       // 12: common.conf.Data.Database
+	(*Data_Redis)(nil),          // 13: common.conf.Data.Redis
+	(*durationpb.Duration)(nil), // 14: google.protobuf.Duration
 }
 var file_common_conf_conf_proto_depIdxs = []int32{
 	5,  // 0: common.conf.Bootstrap.otelcol:type_name -> common.conf.Otelcol
@@ -1068,25 +1186,29 @@ var file_common_conf_conf_proto_depIdxs = []int32{
 	7,  // 10: common.conf.Bootstrap.user_rpc_client:type_name -> common.conf.ClientConf
 	7,  // 11: common.conf.Bootstrap.order_rpc_client:type_name -> common.conf.ClientConf
 	7,  // 12: common.conf.Bootstrap.payment_rpc_client:type_name -> common.conf.ClientConf
-	9,  // 13: common.conf.Server.http:type_name -> common.conf.Server.HTTP
-	10, // 14: common.conf.Server.grpc:type_name -> common.conf.Server.GRPC
-	11, // 15: common.conf.Data.database:type_name -> common.conf.Data.Database
-	12, // 16: common.conf.Data.redis:type_name -> common.conf.Data.Redis
-	13, // 17: common.conf.Etcd.timeout:type_name -> google.protobuf.Duration
-	13, // 18: common.conf.Nats.timeout:type_name -> google.protobuf.Duration
-	13, // 19: common.conf.ClientConf.timeout:type_name -> google.protobuf.Duration
-	1,  // 20: common.conf.ServerConf.server:type_name -> common.conf.Server
-	2,  // 21: common.conf.ServerConf.data:type_name -> common.conf.Data
-	13, // 22: common.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
-	13, // 23: common.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
-	13, // 24: common.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
-	13, // 25: common.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
-	13, // 26: common.conf.Data.Redis.dial_timeout:type_name -> google.protobuf.Duration
-	27, // [27:27] is the sub-list for method output_type
-	27, // [27:27] is the sub-list for method input_type
-	27, // [27:27] is the sub-list for extension type_name
-	27, // [27:27] is the sub-list for extension extendee
-	0,  // [0:27] is the sub-list for field type_name
+	9,  // 13: common.conf.Bootstrap.redis_cluster:type_name -> common.conf.RedisCluster
+	10, // 14: common.conf.Server.http:type_name -> common.conf.Server.HTTP
+	11, // 15: common.conf.Server.grpc:type_name -> common.conf.Server.GRPC
+	12, // 16: common.conf.Data.database:type_name -> common.conf.Data.Database
+	13, // 17: common.conf.Data.redis:type_name -> common.conf.Data.Redis
+	14, // 18: common.conf.Etcd.timeout:type_name -> google.protobuf.Duration
+	14, // 19: common.conf.Nats.timeout:type_name -> google.protobuf.Duration
+	14, // 20: common.conf.ClientConf.timeout:type_name -> google.protobuf.Duration
+	1,  // 21: common.conf.ServerConf.server:type_name -> common.conf.Server
+	2,  // 22: common.conf.ServerConf.data:type_name -> common.conf.Data
+	14, // 23: common.conf.RedisCluster.read_timeout:type_name -> google.protobuf.Duration
+	14, // 24: common.conf.RedisCluster.write_timeout:type_name -> google.protobuf.Duration
+	14, // 25: common.conf.RedisCluster.dial_timeout:type_name -> google.protobuf.Duration
+	14, // 26: common.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
+	14, // 27: common.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
+	14, // 28: common.conf.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
+	14, // 29: common.conf.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
+	14, // 30: common.conf.Data.Redis.dial_timeout:type_name -> google.protobuf.Duration
+	31, // [31:31] is the sub-list for method output_type
+	31, // [31:31] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_common_conf_conf_proto_init() }
@@ -1204,7 +1326,7 @@ func file_common_conf_conf_proto_init() {
 			}
 		}
 		file_common_conf_conf_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Server_HTTP); i {
+			switch v := v.(*RedisCluster); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1216,7 +1338,7 @@ func file_common_conf_conf_proto_init() {
 			}
 		}
 		file_common_conf_conf_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Server_GRPC); i {
+			switch v := v.(*Server_HTTP); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1228,7 +1350,7 @@ func file_common_conf_conf_proto_init() {
 			}
 		}
 		file_common_conf_conf_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Data_Database); i {
+			switch v := v.(*Server_GRPC); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1240,6 +1362,18 @@ func file_common_conf_conf_proto_init() {
 			}
 		}
 		file_common_conf_conf_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Data_Database); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_common_conf_conf_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Data_Redis); i {
 			case 0:
 				return &v.state
@@ -1258,7 +1392,7 @@ func file_common_conf_conf_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_common_conf_conf_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

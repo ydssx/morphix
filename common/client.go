@@ -5,11 +5,13 @@ import (
 
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	kgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
+	goredis "github.com/redis/go-redis/v9"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/interceptors"
 	"github.com/ydssx/morphix/pkg/logger"
+	"github.com/ydssx/morphix/pkg/redis"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 )
@@ -63,4 +65,16 @@ func CreateClientConn(rpcCliConf *conf.ClientConf, r *etcd.Registry) *grpc.Clien
 	}()
 
 	return conn
+}
+
+func NewRedisCluster(c *conf.Bootstrap) *goredis.ClusterClient {
+	clusterConf := c.RedisCluster
+	return redis.NewRedisCluster(&goredis.ClusterOptions{
+		Addrs:        clusterConf.Addr,
+		Username:     clusterConf.Username,
+		Password:     clusterConf.Password,
+		ReadTimeout:  clusterConf.ReadTimeout.AsDuration(),
+		DialTimeout:  clusterConf.DialTimeout.AsDuration(),
+		WriteTimeout: clusterConf.WriteTimeout.AsDuration(),
+	})
 }
