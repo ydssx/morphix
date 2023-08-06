@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
+	"github.com/ydssx/morphix/common/dapr"
 	"github.com/ydssx/morphix/common/event"
-	"github.com/ydssx/morphix/pkg/mq"
 )
 
 type PaymentEvents interface {
@@ -22,5 +22,5 @@ func NewEventSender() PaymentEvents {
 
 // OnMakePayment implements PaymentEvents.
 func (*eventSender) OnMakePayment(ctx context.Context, payload *event.PayloadPaymentCompleted) error {
-	return mq.Send(ctx, event.Subject_name[int32(event.Subject_PaymentCompleted)], payload)
+	return dapr.PublishEvent(ctx, event.Subject_name[int32(event.Subject_PaymentCompleted)], payload)
 }
