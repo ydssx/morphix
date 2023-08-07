@@ -6,7 +6,9 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/selector"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/metadata"
 	"github.com/ydssx/morphix/pkg/jwt"
+	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
@@ -23,15 +25,19 @@ func AuthServer() grpc.UnaryServerInterceptor {
 		if err != nil {
 			return nil, status.Error(codes.Unauthenticated, "invalid auth token")
 		}
-		return newContext(ctx, claims), nil
+		md := metadata.ExtractIncoming(ctx)
+		return newContext(md.ToOutgoing(ctx), claims), nil
 	}
 
 	// Setup auth matcher.
-	allButHealthZ := func(ctx context.Context, callMeta interceptors.CallMeta) bool {
-		return healthpb.Health_ServiceDesc.ServiceName != callMeta.Service
+	authMatcher := func(ctx context.Context, callMeta interceptors.CallMeta) bool {
+		srvNames := []string{
+			healthpb.Health_ServiceDesc.ServiceName,
+		}
+		return !util.SliceContain(srvNames, callMeta.Service)
 	}
 
-	return selector.UnaryServerInterceptor(auth.UnaryServerInterceptor(authFn), selector.MatchFunc(allButHealthZ))
+	return selector.UnaryServerInterceptor(auth.UnaryServerInterceptor(authFn), selector.MatchFunc(authMatcher))
 }
 
 type authKey struct{}

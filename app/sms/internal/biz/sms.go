@@ -10,13 +10,15 @@ import (
 	"github.com/redis/go-redis/v9"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	"github.com/ydssx/morphix/pkg/util"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type SmsUseCase struct {
-	rdb *redis.ClusterClient
+	rdb *redis.Client
 }
 
-func NewSmsUseCase(rdb *redis.ClusterClient) *SmsUseCase {
+func NewSmsUseCase(rdb *redis.Client) *SmsUseCase {
 	return &SmsUseCase{rdb: rdb}
 }
 
@@ -35,6 +37,9 @@ func (s *SmsUseCase) SendSMS(ctx context.Context, req *smsv1.SendSMSRequest) (re
 func (s *SmsUseCase) CheckSMSStatus(ctx context.Context, req *smsv1.QuerySMSStatusRequest) (*smsv1.QuerySMSStatusResponse, error) {
 	key := fmt.Sprintf("%s-%s", req.MobileNumber, req.Scene)
 	code, err := s.rdb.Get(ctx, key).Result()
+	if err == redis.Nil {
+		return nil, status.Error(codes.NotFound, "验证码不存在或已失效")
+	}
 	if err != nil {
 		return nil, err
 	}

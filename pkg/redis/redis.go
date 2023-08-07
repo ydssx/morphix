@@ -12,7 +12,7 @@ func NewRedis(opt *redis.Options) *redis.Client {
 	cli := redis.NewClient(opt)
 	_, err := cli.Ping(context.Background()).Result()
 	if err != nil {
-		log.Error(err)
+		panic(err)
 	}
 	return cli
 }
