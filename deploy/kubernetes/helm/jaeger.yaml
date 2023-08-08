@@ -20,7 +20,19 @@ allInOne:
   enabled: true
   image: jaegertracing/all-in-one
   pullPolicy: IfNotPresent
-  extraEnv: []
+  extraEnv: 
+    - name: PROMETHEUS_QUERY_SUPPORT_SPANMETRICS_CONNECTOR
+      value: "true"
+    - name: METRICS_STORAGE_TYPE
+      value: prometheus
+    # - name: SPAN_STORAGE_TYPE
+    #   value: memory
+    # - name: JAEGER_DISABLED
+    #   value: "false"
+    # - name: COLLECTOR_OTLP_ENABLED
+    #   value: "true"
+    - name: LOG_LEVEL
+      value: "debug"
   extraSecretMounts: []
     # - name: jaeger-tls
     #   mountPath: /tls
@@ -29,7 +41,14 @@ allInOne:
     #   readOnly: true
   # command line arguments / CLI flags
   # See https://www.jaegertracing.io/docs/cli/
-  args: []
+  args: 
+    - "--memory.max-traces"
+    - "100"
+    - "--query.base-path"
+    - "/jaeger/ui"
+    - "--prometheus.server-url"
+    - "http://prometheus.morphix:9090"
+
   # samplingConfig: |-
   #   {
   #     "default_strategy": {
@@ -77,7 +96,7 @@ allInOne:
 
 storage:
   # allowed values (cassandra, elasticsearch)
-  type: cassandra
+  type: none
   cassandra:
     host: cassandra
     port: 9042
@@ -553,10 +572,10 @@ query:
   replicaCount: 1
   service:
     annotations: {}
-    type: ClusterIP
+    type: LoadBalancer
     # List of IP ranges that are allowed to access the load balancer (if supported)
     loadBalancerSourceRanges: []
-    port: 80
+    port: 16686
     # Specify a custom target port (e.g. port of auth proxy)
     # targetPort: 8080
     # Specify a specific node port when type is NodePort
