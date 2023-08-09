@@ -41,7 +41,10 @@ spec:
               - name: Custom-Header
                 value: Awesome
             initialDelaySeconds: 5
-            periodSeconds: 10
+            periodSeconds: 30
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"
       imagePullSecrets:
         - name: aliyun-registry-secret
       volumes:

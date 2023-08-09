@@ -8,8 +8,8 @@ import (
 
 type BaseModel struct {
 	ID        uint            `json:"id" gorm:"primary_key"`
-	CreatedAt *jtime.JsonTime `json:"created_at"`
-	UpdatedAt *jtime.JsonTime `json:"updated_at"`
+	CreatedAt jtime.JsonTime  `json:"created_at"`
+	UpdatedAt jtime.JsonTime  `json:"updated_at"`
 	DeletedAt *gorm.DeletedAt `json:"deleted_at"`
 }
 

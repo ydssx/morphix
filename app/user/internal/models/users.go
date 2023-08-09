@@ -23,6 +23,11 @@ func (u *userModel) SetId(id uint) *userModel {
 	return u
 }
 
+func (u *userModel) SetUsername(username string) *userModel {
+	u.db = u.db.Where("username = ?", username)
+	return u
+}
+
 func (u *userModel) Create(user User) (User, error) {
 	err := u.db.Create(&user).Error
 	return user, err

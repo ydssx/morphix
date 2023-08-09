@@ -17,6 +17,15 @@ type userRepo struct {
 	log  *log.Helper
 }
 
+// GetUserByName implements biz.UserRepo.
+func (*userRepo) GetUserByName(ctx context.Context, username string) (*models.User, error) {
+	user, err := models.NewUserModel().SetUsername(username).FirstOne()
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+	return &user, nil
+}
+
 func NewUserRepo(data *Data, log log.Logger) biz.UserRepo {
 	return &userRepo{data: data}
 }

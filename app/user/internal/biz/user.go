@@ -3,11 +3,15 @@ package biz
 import (
 	"context"
 	"errors"
+	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/user/internal/models"
+	"github.com/ydssx/morphix/pkg/jwt"
 	"github.com/ydssx/morphix/pkg/util"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 )
 
@@ -18,6 +22,7 @@ type UserRepo interface {
 	DeleteUser(ctx context.Context, id uint) error
 	GetUsersByRole(ctx context.Context, roleID int) ([]models.User, error)
 	ListUser(ctx context.Context) []models.User
+	GetUserByName(ctx context.Context, username string) (*models.User, error)
 }
 
 type UserUsecase struct {
@@ -64,4 +69,19 @@ func (uc *UserUsecase) ListUser(ctx context.Context) (*userv1.UserListResponse, 
 		})
 	}
 	return resp, nil
+}
+
+func (uc *UserUsecase) Login(ctx context.Context, req *userv1.LoginRequest) (*userv1.AuthenticationResponse, error) {
+	userInfo, err := uc.repo.GetUserByName(ctx, req.Username)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "用户不存在")
+	}
+	if util.MD5(req.Password) != userInfo.Password {
+		return nil, status.Error(codes.InvalidArgument, "密码错误")
+	}
+	token, err := jwt.GenerateToken(int64(userInfo.ID), userInfo.Username, "")
+	if err != nil {
+		return nil, status.Error(codes.Internal, "token生成失败")
+	}
+	return &userv1.AuthenticationResponse{Token: token, UserId: strconv.Itoa(int(userInfo.ID))}, nil
 }

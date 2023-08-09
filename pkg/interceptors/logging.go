@@ -68,7 +68,7 @@ func initOpt() []logging.Option {
 	}
 
 	opts := []logging.Option{
-		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall, logging.PayloadReceived, logging.PayloadSent),
+		logging.WithLogOnEvents(logging.PayloadReceived, logging.PayloadSent),
 		logging.WithFieldsFromContext(logTraceID),
 		logging.WithTimestampFormat("2006-01-02 15:04:05"),
 		// Add any other option (check functions starting with logging.With).

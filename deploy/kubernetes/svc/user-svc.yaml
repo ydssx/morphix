@@ -37,6 +37,10 @@ spec:
             grpc:
               port: 9000
             initialDelaySeconds: 10
+            periodSeconds: 30
+          env:
+            - name: TZ
+              value: "Asia/Shanghai"
       imagePullSecrets:
         - name: aliyun-registry-secret
       volumes:

@@ -52,9 +52,7 @@ func (s *UserService) Register(ctx context.Context, req *userv1.RegistrationRequ
 
 // Login 实现用户登录接口
 func (s *UserService) Login(ctx context.Context, req *userv1.LoginRequest) (*userv1.AuthenticationResponse, error) {
-	// 在这里实现用户登录逻辑
-	// 使用 s.userRepository 进行数据库操作
-	return nil, nil
+	return s.uc.Login(ctx, req)
 }
 
 // Logout 实现用户登出接口
