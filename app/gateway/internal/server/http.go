@@ -52,15 +52,13 @@ func newGinHandler(ctx context.Context, c *conf.Bootstrap) *gin.Engine {
 	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), gin.Recovery())
 	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	server.GET("/healthz", func(c *gin.Context) { c.String(http.StatusOK, "%s", "ok") })
+	server.Any("/api/*any", gin.WrapH(newGateway(ctx, c)))
 
 	server.Use(middleware.Auth())
 	server.GET("/auth", func(ctx *gin.Context) {
 		auth := middleware.AuthFromGinContext(ctx)
 		util.OKWithData(ctx, auth)
 	})
-
-	gw := newGateway(ctx, c)
-	server.Any("/api/*any", gin.WrapH(gw))
 
 	return server
 }

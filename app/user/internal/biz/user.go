@@ -7,8 +7,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/user/internal/models"
-	"github.com/ydssx/morphix/pkg/interceptors"
-	"github.com/ydssx/morphix/pkg/logger"
+	"github.com/ydssx/morphix/pkg/util"
 	"gorm.io/gorm"
 )
 
@@ -39,7 +38,7 @@ func (uc *UserUsecase) RegisterUser(ctx context.Context, username, password, ema
 	// 创建用户对象
 	user := &models.User{
 		Username: username,
-		Password: password,
+		Password: util.MD5(password),
 		Email:    email,
 		Phone:    phone,
 	}
@@ -53,9 +52,6 @@ func (uc *UserUsecase) RegisterUser(ctx context.Context, username, password, ema
 }
 
 func (uc *UserUsecase) ListUser(ctx context.Context) (*userv1.UserListResponse, error) {
-	userInfo, _ := interceptors.AuthFromContext(ctx)
-	logger.Infof(ctx, "userInfo: %#+v", userInfo)
-
 	users := uc.repo.ListUser(ctx)
 
 	resp := new(userv1.UserListResponse)

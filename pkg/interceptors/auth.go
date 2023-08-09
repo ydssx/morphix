@@ -7,6 +7,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/selector"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/metadata"
+	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/pkg/jwt"
 	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/grpc"
@@ -30,11 +31,15 @@ func AuthServer() grpc.UnaryServerInterceptor {
 	}
 
 	// Setup auth matcher.
-	authMatcher := func(ctx context.Context, callMeta interceptors.CallMeta) bool {
+	authMatcher := func(_ context.Context, callMeta interceptors.CallMeta) bool {
 		srvNames := []string{
 			healthpb.Health_ServiceDesc.ServiceName,
 		}
-		return !util.SliceContain(srvNames, callMeta.Service)
+		methNames := []string{
+			userv1.UserService_Login_FullMethodName,
+			userv1.UserService_Register_FullMethodName,
+		}
+		return !util.SliceContain(srvNames, callMeta.Service) && !util.SliceContain(methNames, callMeta.FullMethod())
 	}
 
 	return selector.UnaryServerInterceptor(auth.UnaryServerInterceptor(authFn), selector.MatchFunc(authMatcher))
