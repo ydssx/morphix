@@ -39,7 +39,7 @@ func AuthServer() grpc.UnaryServerInterceptor {
 			userv1.UserService_Login_FullMethodName,
 			userv1.UserService_Register_FullMethodName,
 		}
-		return !util.SliceContain(srvNames, callMeta.Service) && !util.SliceContain(methNames, callMeta.FullMethod())
+		return !(util.SliceContain(srvNames, callMeta.Service) || util.SliceContain(methNames, callMeta.FullMethod()))
 	}
 
 	return selector.UnaryServerInterceptor(auth.UnaryServerInterceptor(authFn), selector.MatchFunc(authMatcher))
