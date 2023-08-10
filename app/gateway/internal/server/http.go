@@ -19,6 +19,7 @@ import (
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 type registerFn func(ctx context.Context, mux *gwruntime.ServeMux, conn *grpc.ClientConn) (err error)
@@ -66,12 +67,16 @@ func newGinHandler(ctx context.Context, c *conf.Bootstrap) *gin.Engine {
 func newGateway(ctx context.Context, c *conf.Bootstrap) http.Handler {
 	registerRpcHandler(c)
 
-	// _ = gwruntime.WithMetadata(func(ctx context.Context, r *http.Request) metadata.MD {
-	// 	authKey := "Authorization"
-	// 	auth := r.Header.Get(authKey)
-	// 	return metadata.New(map[string]string{authKey: auth})
+	withMeta := gwruntime.WithMetadata(func(ctx context.Context, r *http.Request) metadata.MD {
+		return metadata.New(map[string]string{"external-request": "true"})
+	})
+	// withTrace := gwruntime.WithOutgoingHeaderMatcher(func(s string) (string, bool) {
+	// 	if s == "trace-id" {
+	// 		return s, true
+	// 	}
+	// 	return s, true
 	// })
-	opts := []gwruntime.ServeMuxOption{}
+	opts := []gwruntime.ServeMuxOption{withMeta}
 
 	r := common.NewEtcdRegistry(c.Etcd)
 

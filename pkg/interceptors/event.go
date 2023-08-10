@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 type eventSource struct{}
@@ -16,7 +18,16 @@ func EventServer() grpc.UnaryServerInterceptor {
 		if ok {
 			ctx = context.WithValue(ctx, eventSource{}, app.Name())
 		}
+		
 		ctx = context.WithValue(ctx, eventType{}, info.FullMethod)
+
+		if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
+			err := grpc.SendHeader(ctx, metadata.Pairs("trace-id", span.TraceID().String()))
+			if err != nil {
+				return nil, err
+			}
+		}
+
 		return handler(ctx, req)
 	}
 }

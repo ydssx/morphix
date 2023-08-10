@@ -19,6 +19,10 @@ import (
 
 func AuthServer() grpc.UnaryServerInterceptor {
 	authFn := func(ctx context.Context) (context.Context, error) {
+		md := metadata.ExtractIncoming(ctx)
+		if !isExternalRequest(md) {
+			return ctx, nil
+		}
 		token, err := auth.AuthFromMD(ctx, "bearer")
 		if err != nil {
 			return nil, err
@@ -27,8 +31,8 @@ func AuthServer() grpc.UnaryServerInterceptor {
 		if err != nil {
 			return nil, status.Error(codes.Unauthenticated, "invalid auth token")
 		}
-		md := metadata.ExtractIncoming(ctx)
-		return newContext(md.ToOutgoing(ctx), claims), nil
+
+		return newContext(ctx, claims), nil
 	}
 
 	// Setup auth matcher.
@@ -48,6 +52,11 @@ func AuthServer() grpc.UnaryServerInterceptor {
 	}
 
 	return selector.UnaryServerInterceptor(auth.UnaryServerInterceptor(authFn), selector.MatchFunc(authMatcher))
+}
+func isExternalRequest(md metadata.MD) bool {
+	// Determine if the request is coming from an external client based on the presence of custom headers.
+	// For example, you can define a custom "external-request" header.
+	return md.Get("external-request") == "true"
 }
 
 type authKey struct{}
