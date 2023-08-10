@@ -8,6 +8,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/selector"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/metadata"
+	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/pkg/jwt"
 	"github.com/ydssx/morphix/pkg/util"
@@ -20,30 +21,27 @@ import (
 func AuthServer() grpc.UnaryServerInterceptor {
 	authFn := func(ctx context.Context) (context.Context, error) {
 		md := metadata.ExtractIncoming(ctx)
+		ctx = md.ToOutgoing(ctx)
 		if !isExternalRequest(md) {
+			newCtx, err := parseToken(ctx)
+			if err == nil {
+				return newCtx, nil
+			}
 			return ctx, nil
 		}
-		token, err := auth.AuthFromMD(ctx, "bearer")
-		if err != nil {
-			return nil, err
-		}
-		claims, err := jwt.VerifyToken(token)
-		if err != nil {
-			return nil, status.Error(codes.Unauthenticated, "invalid auth token")
-		}
-
-		return newContext(ctx, claims), nil
+		return parseToken(ctx)
 	}
 
 	// Setup auth matcher.
-	authMatcher := func(ctx context.Context, callMeta interceptors.CallMeta) bool {
+	authMatcher := func(_ context.Context, callMeta interceptors.CallMeta) bool {
 		srvNames := []string{
 			healthpb.Health_ServiceDesc.ServiceName,
 			runtime.AppCallbackAlpha_ServiceDesc.ServiceName,
 		}
 		methNames := []string{
 			userv1.UserService_Login_FullMethodName,
-			userv1.UserService_Register_FullMethodName,
+			// userv1.UserService_Register_FullMethodName,
+			smsv1.SMSService_SendSMS_FullMethodName,
 		}
 
 		result := !(util.SliceContain(srvNames, callMeta.Service) || util.SliceContain(methNames, callMeta.FullMethod()))
@@ -53,6 +51,20 @@ func AuthServer() grpc.UnaryServerInterceptor {
 
 	return selector.UnaryServerInterceptor(auth.UnaryServerInterceptor(authFn), selector.MatchFunc(authMatcher))
 }
+
+func parseToken(ctx context.Context) (context.Context, error) {
+	token, err := auth.AuthFromMD(ctx, "bearer")
+	if err != nil {
+		return nil, err
+	}
+	claims, err := jwt.VerifyToken(token)
+	if err != nil {
+		return nil, status.Error(codes.Unauthenticated, "invalid auth token")
+	}
+
+	return newContext(ctx, claims), nil
+}
+
 func isExternalRequest(md metadata.MD) bool {
 	// Determine if the request is coming from an external client based on the presence of custom headers.
 	// For example, you can define a custom "external-request" header.
