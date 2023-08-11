@@ -40,7 +40,7 @@ func AuthServer() grpc.UnaryServerInterceptor {
 		}
 		methNames := []string{
 			userv1.UserService_Login_FullMethodName,
-			// userv1.UserService_Register_FullMethodName,
+			userv1.UserService_Register_FullMethodName,
 			smsv1.SMSService_SendSMS_FullMethodName,
 		}
 

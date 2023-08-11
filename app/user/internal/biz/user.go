@@ -40,6 +40,10 @@ func (uc *UserUsecase) RegisterUser(ctx context.Context, username, password, ema
 		return nil, errors.New("用户名和密码不能为空")
 	}
 
+	if !util.IsPhoneNumber(phone) {
+		return nil, errors.New("手机号格式不正确")
+	}
+
 	// 创建用户对象
 	user := &models.User{
 		Username: username,
@@ -53,6 +57,7 @@ func (uc *UserUsecase) RegisterUser(ctx context.Context, username, password, ema
 		return nil, err
 	}
 	user.ID = uint(userId)
+
 	return user, nil
 }
 
@@ -68,6 +73,7 @@ func (uc *UserUsecase) ListUser(ctx context.Context) (*userv1.UserListResponse, 
 			Phone:    user.Phone,
 		})
 	}
+	
 	return resp, nil
 }
 
@@ -76,12 +82,15 @@ func (uc *UserUsecase) Login(ctx context.Context, req *userv1.LoginRequest) (*us
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "用户不存在")
 	}
+
 	if util.MD5(req.Password) != userInfo.Password {
 		return nil, status.Error(codes.InvalidArgument, "密码错误")
 	}
+
 	token, err := jwt.GenerateToken(int64(userInfo.ID), userInfo.Username, "")
 	if err != nil {
 		return nil, status.Error(codes.Internal, "token生成失败")
 	}
+
 	return &userv1.AuthenticationResponse{Token: token, UserId: strconv.Itoa(int(userInfo.ID))}, nil
 }
