@@ -14,13 +14,14 @@ type PaymentEvents interface {
 var _ PaymentEvents = (*eventSender)(nil)
 
 type eventSender struct {
+	*dapr.DaprClient
 }
 
-func NewEventSender() PaymentEvents {
-	return &eventSender{}
+func NewEventSender(daprClient *dapr.DaprClient) PaymentEvents {
+	return &eventSender{daprClient}
 }
 
 // OnMakePayment implements PaymentEvents.
-func (*eventSender) OnMakePayment(ctx context.Context, payload *event.PayloadPaymentCompleted) error {
-	return dapr.PublishEvent(ctx, event.Subject_name[int32(event.Subject_PaymentCompleted)], payload)
+func (e *eventSender) OnMakePayment(ctx context.Context, payload *event.PayloadPaymentCompleted) error {
+	return e.PublishEvent(ctx, event.Subject_name[int32(event.Subject_PaymentCompleted)], payload)
 }

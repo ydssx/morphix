@@ -12,6 +12,7 @@ import (
 	"github.com/ydssx/morphix/app/payment/internal/server"
 	"github.com/ydssx/morphix/app/payment/internal/service"
 	"github.com/ydssx/morphix/common/conf"
+	"github.com/ydssx/morphix/common/dapr"
 )
 
 import (
@@ -21,10 +22,15 @@ import (
 // Injectors from wire.go:
 
 func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
-	paymentEvents := service.NewEventSender()
+	daprClient, cleanup, err := dapr.NewDaprClient()
+	if err != nil {
+		return nil, nil, err
+	}
+	paymentEvents := service.NewEventSender(daprClient)
 	paymentService := service.NewPaymentService(paymentEvents)
 	grpcServer := server.NewGRPCServer(bootstrap, paymentService, logger)
 	app := newApp(grpcServer, bootstrap)
 	return app, func() {
+		cleanup()
 	}, nil
 }
