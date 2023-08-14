@@ -14,7 +14,10 @@ var DB *gorm.DB
 
 func NewDB(dsn string) *gorm.DB {
 	var err error
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: logging.NewGormLogger(zapcore.InfoLevel, zapcore.InfoLevel, time.Second*2)})
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger:      logging.NewGormLogger(zapcore.InfoLevel, zapcore.InfoLevel, time.Second*2),
+		PrepareStmt: true,
+	})
 	if err != nil {
 		panic(err)
 	}

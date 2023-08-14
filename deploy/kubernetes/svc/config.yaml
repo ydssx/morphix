@@ -18,7 +18,7 @@ nats:
 redisCluster:
   addr:
     - redis-master.default:6379
-    - redis-replicas.default:6379
+    # - redis-replicas.default:6379
   username:
   password: 1GyY3AHsWg
   read_timeout: 2s
@@ -64,7 +64,7 @@ user:
   data:
     database:
       driver: mysql
-      source: root:root@tcp(mysql.default:3306)/user
+      source: root:root@tcp(mysql.default:3306)/user?parseTime=true&loc=Local
     redis:
       addr: redis-master.default:6379
       username:
@@ -83,7 +83,7 @@ sms:
   data:
     database:
       driver: mysql
-      source: root:root@tcp(mysql.default:3306)/sms
+      source: root:root@tcp(mysql.default:3306)/sms?parseTime=true&loc=Local
     redis:
       addr: redis-master.default:6379
       username:
@@ -102,7 +102,7 @@ payment:
   data:
     database:
       driver: mysql
-      source: root:root@tcp(mysql.default:3306)/payment
+      source: root:root@tcp(mysql.default:3306)/payment?parseTime=true&loc=Local
     redis:
       addr: redis-master.default:6379
       username:
@@ -121,7 +121,7 @@ order:
   data:
     database:
       driver: mysql
-      source: root:root@tcp(mysql.default:3306)/order
+      source: root:root@tcp(mysql.default:3306)/order?parseTime=true&loc=Local
     redis:
       addr: redis-master.default:6379
       username:
