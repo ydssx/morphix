@@ -26,7 +26,7 @@ func (*userRepo) GetUserByName(ctx context.Context, username string) (*models.Us
 	return &user, nil
 }
 
-func NewUserRepo(data *Data, log log.Logger) biz.UserRepo {
+func NewUserRepo(data *Data, log log.Logger) *userRepo {
 	return &userRepo{data: data}
 }
 

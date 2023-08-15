@@ -25,12 +25,16 @@ type UserRepo interface {
 	GetUserByName(ctx context.Context, username string) (*models.User, error)
 }
 
+type UserRepoWithCache interface {
+	UserRepo
+}
+
 type UserUsecase struct {
-	repo UserRepo
+	repo UserRepoWithCache
 	log  *log.Helper
 }
 
-func NewUserUsecase(repo UserRepo, logger log.Logger) *UserUsecase {
+func NewUserUsecase(repo UserRepoWithCache, logger log.Logger) *UserUsecase {
 	return &UserUsecase{repo: repo, log: log.NewHelper(logger)}
 }
 
