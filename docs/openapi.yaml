@@ -6,6 +6,25 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/user/{userId}:
+        get:
+            tags:
+                - UserService
+            operationId: UserService_GetUser
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: int64
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/userv1.User'
     /api/users:
         get:
             tags:

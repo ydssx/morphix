@@ -108,3 +108,7 @@ func (s *UserService) LogActivity(ctx context.Context, req *userv1.LogEntry) (*e
 	// 使用 s.userRepository 进行数据库操作
 	return nil, nil
 }
+
+func (s *UserService) GetUser(ctx context.Context, req *userv1.GetUserRequest) (*userv1.User, error) {
+	return s.uc.GetUser(ctx, req)
+}

@@ -8,6 +8,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/user/internal/models"
+	"github.com/ydssx/morphix/pkg/cache"
 	"github.com/ydssx/morphix/pkg/jwt"
 	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/grpc/codes"
@@ -16,7 +17,7 @@ import (
 )
 
 type UserRepo interface {
-	GetUserByID(ctx context.Context, id uint, tx ...*gorm.DB) (*models.User, error)
+	GetUserByID(ctx context.Context, id uint) (*models.User, error)
 	CreateUser(ctx context.Context, user *models.User, tx ...*gorm.DB) (userId int, err error)
 	UpdateUser(ctx context.Context, user *models.User) error
 	DeleteUser(ctx context.Context, id uint) error
@@ -27,6 +28,7 @@ type UserRepo interface {
 
 type UserRepoWithCache interface {
 	UserRepo
+	cache.Cache
 }
 
 type UserUsecase struct {
@@ -77,7 +79,7 @@ func (uc *UserUsecase) ListUser(ctx context.Context) (*userv1.UserListResponse, 
 			Phone:    user.Phone,
 		})
 	}
-	
+
 	return resp, nil
 }
 
@@ -97,4 +99,17 @@ func (uc *UserUsecase) Login(ctx context.Context, req *userv1.LoginRequest) (*us
 	}
 
 	return &userv1.AuthenticationResponse{Token: token, UserId: strconv.Itoa(int(userInfo.ID))}, nil
+}
+
+func (uc *UserUsecase) GetUser(ctx context.Context, req *userv1.GetUserRequest) (*userv1.User, error) {
+	user, err := uc.repo.GetUserByID(ctx, uint(req.UserId))
+	if err != nil {
+		return nil, err
+	}
+	return &userv1.User{
+		Id:       int64(user.ID),
+		Username: user.Username,
+		Email:    user.Email,
+		Phone:    user.Email,
+	}, nil
 }

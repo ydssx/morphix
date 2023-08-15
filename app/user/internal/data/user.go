@@ -30,8 +30,8 @@ func NewUserRepo(data *Data, log log.Logger) *userRepo {
 	return &userRepo{data: data}
 }
 
-func (r *userRepo) GetUserByID(ctx context.Context, id uint, tx ...*gorm.DB) (*models.User, error) {
-	user, err := models.NewUserModel(tx...).SetId(id).FirstOne()
+func (r *userRepo) GetUserByID(ctx context.Context, id uint) (*models.User, error) {
+	user, err := models.NewUserModel().SetId(id).FirstOne()
 	if err != nil {
 		return nil, errors.New("user not found")
 	}

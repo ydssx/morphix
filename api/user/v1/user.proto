@@ -76,6 +76,10 @@ service UserService {
       body: "*"
     };
   }
+
+  rpc GetUser(GetUserRequest) returns (User) {
+    option (google.api.http) = {get: "/api/user/{user_id}"};
+  }
 }
 
 message User {
@@ -148,4 +152,8 @@ message LogEntry {
   string action = 2;
   string timestamp = 3;
   // 其他日志信息字段...
+}
+
+message GetUserRequest {
+  int64 user_id = 1;
 }
