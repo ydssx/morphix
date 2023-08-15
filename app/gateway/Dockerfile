@@ -12,6 +12,10 @@ FROM alpine
 
 WORKDIR /usr/src/app/
 
+ENV TZ=Asia/Shanghai
+
+RUN apk add --no-cache ca-certificates
+
 COPY --from=builder /bin ./
 COPY --from=builder /src/configs ./
 
