@@ -41,28 +41,9 @@ current_jobs=0
 
 # 如果传入了服务名参数，则只构建和推送指定的服务
 if [ $# -gt 0 ]; then
-    for service in "$@"; do
-        build_and_push "$service" &
-        ((current_jobs++))
-        
-        if [ $current_jobs -ge $max_concurrency ]; then
-            wait
-            current_jobs=0
-        fi
-    done
+    parallel --jobs 2 build_and_push ::: "$@"
 else
     # 否则，构建和推送所有微服务镜像
     services=("gateway" "user" "sms" "order" "payment")
-    for service in "${services[@]}"; do
-        build_and_push "$service" &
-        ((current_jobs++))
-        
-        if [ $current_jobs -ge $max_concurrency ]; then
-            wait
-            current_jobs=0
-        fi
-    done
+    parallel --jobs 2 build_and_push ::: "${services[@]}"
 fi
-
-# 确保最后一批任务完成
-wait
