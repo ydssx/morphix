@@ -11,7 +11,6 @@ import (
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/logger"
-	"github.com/ydssx/morphix/pkg/mq"
 	"github.com/ydssx/morphix/pkg/provider"
 	_ "go.uber.org/automaxprocs"
 )
@@ -48,8 +47,6 @@ func newApp(gs *grpc.Server, ls *listener.ListenerServer, c *conf.Bootstrap) *kr
 
 	mp := provider.InitMeterProvider(c.Otelcol.Addr)
 
-	close, _ := mq.InitNats(c.Nats.Addr)
-
 	return kratos.New(
 		kratos.Name(c.Order.Name),
 		kratos.Metadata(map[string]string{}),
@@ -61,6 +58,5 @@ func newApp(gs *grpc.Server, ls *listener.ListenerServer, c *conf.Bootstrap) *kr
 		}),
 		kratos.AfterStop(tp.Shutdown),
 		kratos.AfterStop(mp.Shutdown),
-		kratos.AfterStop(close),
 	)
 }

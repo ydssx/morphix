@@ -7,6 +7,7 @@ option go_package = "github.com/ydssx/morphix/common/event;event";
 enum Subject {
   PaymentCompleted = 0; //支付完成
   OrderCreated = 1; //创建订单
+  CancelPayment = 2; //取消支付
 }
 
 message MessageName {
@@ -18,4 +19,8 @@ message PayloadPaymentCompleted {
   float amount = 2;
   string order_id = 3;
   Subject subject = 4;
+}
+
+message PayloadCancelPayment {
+  int64 order_id = 1;
 }

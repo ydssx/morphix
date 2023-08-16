@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 
+	dapr "github.com/dapr/go-sdk/client"
 	"github.com/dapr/go-sdk/service/common"
 	daprd "github.com/dapr/go-sdk/service/http"
-	dapr "github.com/dapr/go-sdk/client"
 )
 
 // Subscription to tell the dapr what topic to subscribe.
@@ -39,11 +39,11 @@ func main() {
 	if err := s.AddTopicEventHandler(defaultSubscription, eventHandler); err != nil {
 		log.Fatalf("error adding topic subscription: %v", err)
 	}
-
+	
 	if err := s.AddTopicEventHandler(importantSubscription, importantEventHandler); err != nil {
 		log.Fatalf("error adding topic subscription: %v", err)
 	}
-
+	
 	if err := s.Start(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("error listenning: %v", err)
 	}
@@ -74,13 +74,14 @@ func main1() {
 	if err != nil {
 		panic(err)
 	}
+	
 	defer client.Close()
-
-	// Publish a single event
+	client.SaveState(context.Background(), "", "", []byte{}, make(map[string]string), dapr.WithConsistency(dapr.StateConsistencyEventual))
+	
 	if err := client.PublishEvent(ctx, pubsubName, topicName, publishEventData); err != nil {
 		panic(err)
 	}
-	
+
 	// Publish multiple events
 	if res := client.PublishEvents(ctx, pubsubName, topicName, publishEventsData); res.Error != nil {
 		panic(err)

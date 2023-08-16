@@ -11,11 +11,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-type Example struct {
-	Sequence int    `json:"id"`
-	Message  string `json:"message"`
-}
-
 type Event struct {
 	contentType ContentType
 	source      string

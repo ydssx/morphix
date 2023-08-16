@@ -10,7 +10,6 @@ import (
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/logger"
-	"github.com/ydssx/morphix/pkg/mysql"
 	"github.com/ydssx/morphix/pkg/provider"
 	_ "go.uber.org/automaxprocs"
 )
@@ -45,8 +44,6 @@ func newApp(gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
 	tp, _ := provider.InitTraceProvider(c.Otelcol.Addr, c.User.Name)
 
 	mp := provider.InitMeterProvider(c.Otelcol.Addr)
-
-	mysql.NewDB(c.User.Data.Database.Source)
 
 	return kratos.New(
 		kratos.Name(c.User.Name),

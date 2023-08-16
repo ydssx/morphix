@@ -34,3 +34,8 @@ func Errorf(ctx context.Context, format string, msg ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, fmt.Sprintf(format, msg...)}
 	log.Log(log.LevelError, append(kv, logTraceID(ctx)...))
 }
+
+func Fatalf(ctx context.Context, format string, msg ...interface{}) {
+	kv := []interface{}{log.DefaultMessageKey, fmt.Sprintf(format, msg...)}
+	log.Log(log.LevelFatal, append(kv, logTraceID(ctx)...))
+}

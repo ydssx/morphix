@@ -18,20 +18,20 @@ type userRepo struct {
 }
 
 // GetUserByName implements biz.UserRepo.
-func (*userRepo) GetUserByName(ctx context.Context, username string) (*models.User, error) {
-	user, err := models.NewUserModel().SetUsername(username).FirstOne()
+func (r *userRepo) GetUserByName(ctx context.Context, username string) (*models.User, error) {
+	user, err := models.NewUserModel(r.data.db).SetUsername(username).FirstOne()
 	if err != nil {
 		return nil, errors.New("user not found")
 	}
 	return &user, nil
 }
 
-func NewUserRepo(data *Data, log log.Logger) *userRepo {
-	return &userRepo{data: data}
+func NewUserRepo(data *Data, logger log.Logger) *userRepo {
+	return &userRepo{data: data, log: log.NewHelper(logger)}
 }
 
 func (r *userRepo) GetUserByID(ctx context.Context, id uint) (*models.User, error) {
-	user, err := models.NewUserModel().SetId(id).FirstOne()
+	user, err := models.NewUserModel(r.data.db).SetId(id).FirstOne()
 	if err != nil {
 		return nil, errors.New("user not found")
 	}
@@ -39,11 +39,11 @@ func (r *userRepo) GetUserByID(ctx context.Context, id uint) (*models.User, erro
 }
 
 func (r *userRepo) UpdateUser(ctx context.Context, user *models.User) error {
-	return models.NewUserModel().SetId(user.ID).Update(user)
+	return models.NewUserModel(r.data.db).SetId(user.ID).Update(user)
 }
 
 func (r *userRepo) DeleteUser(ctx context.Context, id uint) error {
-	return models.NewUserModel().DeleteById(int(id))
+	return models.NewUserModel(r.data.db).DeleteById(int(id))
 }
 
 func (r *userRepo) GetUsersByRole(ctx context.Context, roleID int) (result []models.User, err error) {
@@ -59,7 +59,7 @@ func (*userRepo) CreateUser(ctx context.Context, user *models.User, tx ...*gorm.
 	return int(userInfo.ID), nil
 }
 
-func (*userRepo) ListUser(ctx context.Context) []models.User {
-	users, _, _ := models.NewUserModel().List(10, 0)
+func (r *userRepo) ListUser(ctx context.Context) []models.User {
+	users, _, _ := models.NewUserModel(r.data.db).List(10, 0)
 	return users
 }

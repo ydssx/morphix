@@ -15,7 +15,6 @@ import (
 	"github.com/ydssx/morphix/app/user/internal/service"
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
-	"github.com/ydssx/morphix/pkg/cache"
 )
 
 import (
@@ -27,13 +26,14 @@ import (
 // wireApp init kratos application.
 func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
 	client := data.NewRedisCLient(bootstrap)
-	dataData, cleanup, err := data.NewData(logger, client)
+	db := data.NewMysqlDB(bootstrap)
+	dataData, cleanup, err := data.NewData(logger, client, db)
 	if err != nil {
 		return nil, nil, err
 	}
 	userRepo := data.NewUserRepo(dataData, logger)
-	cacheCache := cache.NewRedisCache(client)
-	userRepoWithCache := data.NewUserRepoCacheDecorator(userRepo, cacheCache)
+	cache := data.NewRedisCache(client)
+	userRepoWithCache := data.NewUserRepoCacheDecorator(userRepo, cache)
 	userUsecase := biz.NewUserUsecase(userRepoWithCache, logger)
 	smsServiceClient := common.NewSMSClient(bootstrap)
 	userService := service.NewUserService(userUsecase, smsServiceClient)

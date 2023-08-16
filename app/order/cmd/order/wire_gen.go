@@ -12,7 +12,9 @@ import (
 	"github.com/ydssx/morphix/app/order/internal/listener"
 	"github.com/ydssx/morphix/app/order/internal/server"
 	"github.com/ydssx/morphix/app/order/internal/service"
+	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
+	"github.com/ydssx/morphix/pkg/mq"
 )
 
 import (
@@ -24,8 +26,14 @@ import (
 func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
 	orderService := service.NewOrderService()
 	grpcServer := server.NewGRPCServer(bootstrap, orderService)
-	listenerServer := listener.NewListenerServer()
+	conn, cleanup, err := common.NewNatsConn(bootstrap)
+	if err != nil {
+		return nil, nil, err
+	}
+	cloudEvent := mq.NewCloudEvent(conn)
+	listenerServer := listener.NewListenerServer(cloudEvent)
 	app := newApp(grpcServer, listenerServer, bootstrap)
 	return app, func() {
+		cleanup()
 	}, nil
 }

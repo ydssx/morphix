@@ -11,6 +11,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/ydssx/morphix/app/payment/internal/server"
 	"github.com/ydssx/morphix/app/payment/internal/service"
+	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/common/dapr"
 )
@@ -26,11 +27,18 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	if err != nil {
 		return nil, nil, err
 	}
-	paymentEvents := service.NewEventSender(daprClient)
+	conn, cleanup2, err := common.NewNatsConn(bootstrap)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	cloudEvent := common.NewCloudEvent(conn)
+	paymentEvents := service.NewEventSender(daprClient, cloudEvent)
 	paymentService := service.NewPaymentService(paymentEvents)
 	grpcServer := server.NewGRPCServer(bootstrap, paymentService, logger)
 	app := newApp(grpcServer, bootstrap)
 	return app, func() {
+		cleanup2()
 		cleanup()
 	}, nil
 }

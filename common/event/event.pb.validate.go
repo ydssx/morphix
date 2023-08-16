@@ -245,3 +245,107 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = PayloadPaymentCompletedValidationError{}
+
+// Validate checks the field values on PayloadCancelPayment with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PayloadCancelPayment) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PayloadCancelPayment with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PayloadCancelPaymentMultiError, or nil if none found.
+func (m *PayloadCancelPayment) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PayloadCancelPayment) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for OrderId
+
+	if len(errors) > 0 {
+		return PayloadCancelPaymentMultiError(errors)
+	}
+
+	return nil
+}
+
+// PayloadCancelPaymentMultiError is an error wrapping multiple validation
+// errors returned by PayloadCancelPayment.ValidateAll() if the designated
+// constraints aren't met.
+type PayloadCancelPaymentMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PayloadCancelPaymentMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PayloadCancelPaymentMultiError) AllErrors() []error { return m }
+
+// PayloadCancelPaymentValidationError is the validation error returned by
+// PayloadCancelPayment.Validate if the designated constraints aren't met.
+type PayloadCancelPaymentValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PayloadCancelPaymentValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PayloadCancelPaymentValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PayloadCancelPaymentValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PayloadCancelPaymentValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PayloadCancelPaymentValidationError) ErrorName() string {
+	return "PayloadCancelPaymentValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PayloadCancelPaymentValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPayloadCancelPayment.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PayloadCancelPaymentValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PayloadCancelPaymentValidationError{}

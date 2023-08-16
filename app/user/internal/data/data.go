@@ -6,23 +6,26 @@ import (
 	goredis "github.com/redis/go-redis/v9"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/cache"
+	"github.com/ydssx/morphix/pkg/mysql"
 	"github.com/ydssx/morphix/pkg/redis"
+	"gorm.io/gorm"
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewUserRepoCacheDecorator, NewUserRepo, NewRedisCLient, cache.NewRedisCache)
+var ProviderSet = wire.NewSet(NewData, NewUserRepoCacheDecorator, NewUserRepo, NewRedisCLient, NewRedisCache, NewMysqlDB)
 
 // Data .
 type Data struct {
 	rdb *goredis.Client
+	db  *gorm.DB
 }
 
 // NewData .
-func NewData(logger log.Logger, rdb *goredis.Client) (*Data, func(), error) {
+func NewData(logger log.Logger, rdb *goredis.Client, db *gorm.DB) (*Data, func(), error) {
 	cleanup := func() {
 		log.NewHelper(logger).Info("closing the data resources")
 	}
-	return &Data{rdb: rdb}, cleanup, nil
+	return &Data{rdb: rdb, db: db}, cleanup, nil
 }
 
 func NewRedisCLient(c *conf.Bootstrap) *goredis.Client {
@@ -35,4 +38,12 @@ func NewRedisCLient(c *conf.Bootstrap) *goredis.Client {
 		WriteTimeout: redisConf.WriteTimeout.AsDuration(),
 		DialTimeout:  redisConf.WriteTimeout.AsDuration(),
 	})
+}
+
+func NewMysqlDB(c *conf.Bootstrap) *gorm.DB {
+	return mysql.NewDB(c.User.Data.Database.Source)
+}
+
+func NewRedisCache(client *goredis.Client) cache.Cache {
+	return cache.NewRedisCache(client)
 }
