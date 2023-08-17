@@ -2,7 +2,6 @@
 
 set -eo pipefail
 
-
 # 阿里云容器镜像服务相关信息
 REGISTRY_URL="registry.cn-shenzhen.aliyuncs.com"
 REGISTRY_NAMESPACE="ydssx"
@@ -37,13 +36,32 @@ build_and_push() {
 
 # 最大并发数
 max_concurrency=3
-current_jobs=0
 
 # 如果传入了服务名参数，则只构建和推送指定的服务
 if [ $# -gt 0 ]; then
-    parallel --jobs 2 build_and_push ::: "$@"
+    for service in "$@"; do
+        build_and_push "$service" &
+
+        # 控制并发数，最大同时运行 4 个任务
+        if [ $(jobs -p | wc -l) -ge $max_concurrency ]; then
+            wait -n
+        fi
+    done
+
+    # 等待所有任务完成
+    wait
 else
     # 否则，构建和推送所有微服务镜像
     services=("gateway" "user" "sms" "order" "payment")
-    parallel --jobs 2 build_and_push ::: "${services[@]}"
+    for service in "${services[@]}"; do
+        build_and_push "$service" &
+
+        # 控制并发数，最大同时运行 4 个任务
+        if [ $(jobs -p | wc -l) -ge $max_concurrency ]; then
+            wait -n
+        fi
+    done
+
+    # 等待所有任务完成
+    wait
 fi
