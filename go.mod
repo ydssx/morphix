@@ -7,6 +7,7 @@ require (
 	github.com/bufbuild/connect-go v1.8.0
 	github.com/chenjiandongx/ginprom v0.0.0-20210617023641-6c809602c38a
 	github.com/dapr/go-sdk v1.8.0
+	github.com/envoyproxy/protoc-gen-validate v1.0.1
 	github.com/go-kratos/kratos/v2 v2.7.0
 	github.com/go-logr/logr v1.2.4
 	github.com/go-playground/validator/v10 v10.14.1
