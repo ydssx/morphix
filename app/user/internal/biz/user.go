@@ -17,13 +17,14 @@ import (
 )
 
 type UserRepo interface {
-	GetUserByID(ctx context.Context, id uint) (*models.User, error)
 	CreateUser(ctx context.Context, user *models.User, tx ...*gorm.DB) (userId int, err error)
 	UpdateUser(ctx context.Context, user *models.User) error
 	DeleteUser(ctx context.Context, id uint) error
-	GetUsersByRole(ctx context.Context, roleID int) ([]models.User, error)
 	ListUser(ctx context.Context) []models.User
+	GetUsersByRole(ctx context.Context, roleID int) ([]models.User, error)
+	GetUserByID(ctx context.Context, id uint) (*models.User, error)
 	GetUserByName(ctx context.Context, username string) (*models.User, error)
+	GetUserByPhone(ctx context.Context, phoneNumber string) (*models.User, error)
 }
 
 type UserRepoWithCache interface {
@@ -84,7 +85,17 @@ func (uc *UserUsecase) ListUser(ctx context.Context) (*userv1.UserListResponse, 
 }
 
 func (uc *UserUsecase) Login(ctx context.Context, req *userv1.LoginRequest) (*userv1.AuthenticationResponse, error) {
-	userInfo, err := uc.repo.GetUserByName(ctx, req.Username)
+	if req.Username == "" || req.PhoneNumber == "" {
+		return nil, status.Error(codes.InvalidArgument, "用户名和手机号不能同时为空")
+	}
+
+	var userInfo *models.User
+	var err error
+	if req.Username != "" {
+		userInfo, err = uc.repo.GetUserByName(ctx, req.Username)
+	} else {
+		userInfo, err = uc.repo.GetUserByPhone(ctx, req.Username)
+	}
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "用户不存在")
 	}

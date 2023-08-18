@@ -4,6 +4,7 @@ package userv1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "validate/validate.proto";
 
 option go_package = "github.com/ydssx/morphix/api/user/v1;userv1";
 
@@ -97,7 +98,7 @@ message RegistrationRequest {
   // 密码
   string password = 2;
   // 邮箱
-  string email = 3;
+  string email = 3 [(validate.rules).string.email = true];
   // 手机号
   string phone = 4;
   // 短信验证码
@@ -107,6 +108,7 @@ message RegistrationRequest {
 message LoginRequest {
   string username = 1;
   string password = 2;
+  string phone_number = 3;
 }
 
 message LogoutRequest {

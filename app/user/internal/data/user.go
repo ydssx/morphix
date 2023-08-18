@@ -17,6 +17,15 @@ type userRepo struct {
 	log  *log.Helper
 }
 
+// GetUserByPhone implements biz.UserRepo.
+func (r *userRepo) GetUserByPhone(ctx context.Context, phoneNumber string) (*models.User, error) {
+	user, err := models.NewUserModel(r.data.db).SetPhoneNumber(phoneNumber).FirstOne()
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+	return &user, nil
+}
+
 // GetUserByName implements biz.UserRepo.
 func (r *userRepo) GetUserByName(ctx context.Context, username string) (*models.User, error) {
 	user, err := models.NewUserModel(r.data.db).SetUsername(username).FirstOne()
@@ -63,3 +72,4 @@ func (r *userRepo) ListUser(ctx context.Context) []models.User {
 	users, _, _ := models.NewUserModel(r.data.db).List(10, 0)
 	return users
 }
+

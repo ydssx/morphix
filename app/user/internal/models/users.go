@@ -28,6 +28,18 @@ func (u *userModel) SetUsername(username string) *userModel {
 	return u
 }
 
+func (u *userModel) SetPhoneNumber(phoneNumber string) *userModel {
+	u.db = u.db.Where("phone = ?", phoneNumber)
+	return u
+}
+
+func (u *userModel) Set(opts ...Options) *userModel {
+	for _, opt := range opts {
+		opt(u)
+	}
+	return u
+}
+
 func (u *userModel) Create(user User) (User, error) {
 	err := u.db.Create(&user).Error
 	return user, err
@@ -61,4 +73,18 @@ func (u *userModel) List(limit, offset int) (users []User, total int64, err erro
 	}
 	err = query.Limit(limit).Offset(offset).Find(&users).Error
 	return
+}
+
+type Options func(*userModel)
+
+func WithUserPhone(phoneNumber string) Options {
+	return func(um *userModel) {
+		um.SetPhoneNumber(phoneNumber)
+	}
+}
+
+func WithUserName(userName string) Options {
+	return func(um *userModel) {
+		um.SetUsername(userName)
+	}
 }

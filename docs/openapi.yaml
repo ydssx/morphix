@@ -716,6 +716,8 @@ components:
                     type: string
                 password:
                     type: string
+                phoneNumber:
+                    type: string
         userv1.LogoutRequest:
             type: object
             properties:
