@@ -3,6 +3,7 @@ package constants
 type SmsScene string
 
 const (
-	SmsSceneUserRegister SmsScene = "user.register"
-	SmsSceneUserLogin    SmsScene = "user.login"
+	SmsSceneUserRegister      SmsScene = "user.register"
+	SmsSceneUserLogin         SmsScene = "user.login"
+	SmsSceneUserResetPassword SmsScene = "user.resetPassword"
 )

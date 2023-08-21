@@ -124,3 +124,12 @@ func (uc *UserUsecase) GetUser(ctx context.Context, req *userv1.GetUserRequest) 
 		Phone:    user.Email,
 	}, nil
 }
+
+func (uc *UserUsecase) ResetPassword(ctx context.Context, req *userv1.ResetPasswordRequest) error {
+	user, err := uc.repo.GetUserByName(ctx, req.Username)
+	if err != nil {
+		return err
+	}
+
+	return uc.repo.UpdateUser(ctx, &models.User{BaseModel: models.BaseModel{ID: user.ID}, Password: util.MD5(req.NewPassword)})
+}

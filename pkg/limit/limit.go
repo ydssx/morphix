@@ -2,10 +2,12 @@ package limit
 
 import (
 	"context"
+	"errors"
 	"math"
 	"time"
 
 	"github.com/go-redis/redis_rate/v10"
+	"github.com/redis/go-redis/v9"
 )
 
 type LimiterType int
@@ -16,16 +18,35 @@ const (
 	LimiterTypeTokenBucket                      // 令牌桶限流
 )
 
+var (
+	defaultRatePerSecond = 10
+	defaultBurst         = 20
+)
+
 type Limiter interface {
 	Allow() bool
 }
 
-var redisLimiter = redis_rate.NewLimiter(nil)
+type RedisLimiter struct {
+	*redis_rate.Limiter
+}
 
-func Allow(ratePerSecond, burst int, key string) bool {
+func NewRedisLimiter(rdb *redis.Client) *RedisLimiter {
+	return &RedisLimiter{redis_rate.NewLimiter(rdb)}
+}
+
+func (l *RedisLimiter) Limit(ctx context.Context) error {
+	key := LimitKeyFromCtx(ctx).(string)
+	if l.Allow(defaultRatePerSecond, defaultBurst, key) {
+		return nil
+	}
+	return errors.New("rate limited.")
+}
+
+func (l *RedisLimiter) Allow(ratePerSecond, burst int, key string) bool {
 	burst = int(math.Max(float64(ratePerSecond), float64(burst)))
 
-	r, err := redisLimiter.Allow(context.Background(), key, perSecond(ratePerSecond, burst))
+	r, err := l.Limiter.Allow(context.Background(), key, perSecond(ratePerSecond, burst))
 	if err != nil {
 		panic(err)
 	}
@@ -33,8 +54,8 @@ func Allow(ratePerSecond, burst int, key string) bool {
 	return r.Allowed > 0
 }
 
-func Reset(key string) {
-	redisLimiter.Reset(context.Background(), key)
+func (l *RedisLimiter) Reset(key string) {
+	_ = l.Limiter.Reset(context.Background(), key)
 }
 
 func perSecond(rate, burst int) redis_rate.Limit {
@@ -43,4 +64,14 @@ func perSecond(rate, burst int) redis_rate.Limit {
 		Period: time.Second,
 		Burst:  burst,
 	}
+}
+
+type limitKey struct{}
+
+func LimitKeyFromCtx(ctx context.Context) any {
+	return ctx.Value(limitKey{})
+}
+
+func CtxWithLimitKey(ctx context.Context, value any) context.Context {
+	return context.WithValue(ctx, limitKey{}, value)
 }

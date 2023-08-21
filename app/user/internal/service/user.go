@@ -71,9 +71,18 @@ func (s *UserService) UpdateProfile(ctx context.Context, req *userv1.UpdateProfi
 
 // ResetPassword 实现重置密码接口
 func (s *UserService) ResetPassword(ctx context.Context, req *userv1.ResetPasswordRequest) (*emptypb.Empty, error) {
-	// 在这里实现重置密码逻辑
-	// 使用 s.userRepository 进行数据库操作
-	return nil, nil
+	checkResult, err := s.sms.CheckSMSStatus(ctx, &smsv1.QuerySMSStatusRequest{MobileNumber: "", SmsCode: req.VerificationCode, Scene: string(constants.SmsSceneUserResetPassword)})
+	if err != nil {
+		return nil, err
+	}
+	if !checkResult.Status {
+		return nil, errors.New(http.StatusBadRequest, "", "校验短信验证码失败")
+	}
+
+	if err = s.uc.ResetPassword(ctx, req); err != nil {
+		return nil, errors.BadRequest("", err.Error())
+	}
+	return &emptypb.Empty{}, nil
 }
 
 // Authenticate 实现用户身份认证接口
