@@ -46,7 +46,7 @@ type UserServiceClient interface {
 	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Authenticate(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AuthenticationResponse, error)
 	Authorize(ctx context.Context, in *AuthorizationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	GetUserList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UserListResponse, error)
+	GetUserList(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error)
 	ManageUserPermission(ctx context.Context, in *ManageUserPermissionRequest, opts ...grpc.CallOption) (*User, error)
 	LogActivity(ctx context.Context, in *LogEntry, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
@@ -123,7 +123,7 @@ func (c *userServiceClient) Authorize(ctx context.Context, in *AuthorizationRequ
 	return out, nil
 }
 
-func (c *userServiceClient) GetUserList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UserListResponse, error) {
+func (c *userServiceClient) GetUserList(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error) {
 	out := new(UserListResponse)
 	err := c.cc.Invoke(ctx, UserService_GetUserList_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -172,7 +172,7 @@ type UserServiceServer interface {
 	ResetPassword(context.Context, *ResetPasswordRequest) (*emptypb.Empty, error)
 	Authenticate(context.Context, *emptypb.Empty) (*AuthenticationResponse, error)
 	Authorize(context.Context, *AuthorizationRequest) (*emptypb.Empty, error)
-	GetUserList(context.Context, *emptypb.Empty) (*UserListResponse, error)
+	GetUserList(context.Context, *UserListRequest) (*UserListResponse, error)
 	ManageUserPermission(context.Context, *ManageUserPermissionRequest) (*User, error)
 	LogActivity(context.Context, *LogEntry) (*emptypb.Empty, error)
 	GetUser(context.Context, *GetUserRequest) (*User, error)
@@ -203,7 +203,7 @@ func (UnimplementedUserServiceServer) Authenticate(context.Context, *emptypb.Emp
 func (UnimplementedUserServiceServer) Authorize(context.Context, *AuthorizationRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Authorize not implemented")
 }
-func (UnimplementedUserServiceServer) GetUserList(context.Context, *emptypb.Empty) (*UserListResponse, error) {
+func (UnimplementedUserServiceServer) GetUserList(context.Context, *UserListRequest) (*UserListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserList not implemented")
 }
 func (UnimplementedUserServiceServer) ManageUserPermission(context.Context, *ManageUserPermissionRequest) (*User, error) {
@@ -354,7 +354,7 @@ func _UserService_Authorize_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _UserService_GetUserList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(UserListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -366,7 +366,7 @@ func _UserService_GetUserList_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: UserService_GetUserList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetUserList(ctx, req.(*emptypb.Empty))
+		return srv.(UserServiceServer).GetUserList(ctx, req.(*UserListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

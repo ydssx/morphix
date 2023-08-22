@@ -60,7 +60,7 @@ service UserService {
     };
   }
 
-  rpc GetUserList(google.protobuf.Empty) returns (UserListResponse) {
+  rpc GetUserList(UserListRequest) returns (UserListResponse) {
     option (google.api.http) = {get: "/api/users"};
   }
 
@@ -141,6 +141,11 @@ message AuthorizationRequest {
 
 message UserListResponse {
   repeated User users = 1;
+}
+
+message UserListRequest {
+  int64 page = 1;
+  int64 limit = 2;
 }
 
 message ManageUserPermissionRequest {
