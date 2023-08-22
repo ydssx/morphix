@@ -100,8 +100,8 @@ func (s *UserService) Authorize(ctx context.Context, req *userv1.AuthorizationRe
 }
 
 // GetUserList 实现获取用户列表接口
-func (s *UserService) GetUserList(ctx context.Context, req *emptypb.Empty) (*userv1.UserListResponse, error) {
-	return s.uc.ListUser(ctx)
+func (s *UserService) GetUserList(ctx context.Context, req *userv1.UserListRequest) (*userv1.UserListResponse, error) {
+	return s.uc.ListUser(ctx, req)
 }
 
 // ManageUserPermission 实现管理用户权限接口

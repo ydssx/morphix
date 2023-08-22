@@ -63,3 +63,26 @@ func GenerateCode(length int) string {
 	}
 	return code
 }
+
+func CalculateChecksum(request interface{}) string {
+	data := fmt.Sprintf("%v", request) // Convert request to a string
+	hash := md5.Sum([]byte(data))      // Calculate MD5 hash
+	return hex.EncodeToString(hash[:]) // Convert hash to a hex-encoded string
+}
+
+func CompareRequests(requests ...interface{}) bool {
+	if len(requests) <= 1 {
+		return true // No need to compare if there's only one request
+	}
+
+	firstChecksum := CalculateChecksum(requests[0])
+
+	for _, request := range requests[1:] {
+		checksum := CalculateChecksum(request)
+		if checksum != firstChecksum {
+			return false
+		}
+	}
+
+	return true
+}

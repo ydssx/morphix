@@ -5,10 +5,11 @@ import "gorm.io/gorm"
 // Users  用户表
 type User struct {
 	BaseModel
-	Username string `gorm:"column:username" json:"username"` //  用户名
-	Password string `gorm:"column:password" json:"password"` //  密码
-	Email    string `gorm:"column:email" json:"email"`       //  邮箱
-	Phone    string `gorm:"column:phone" json:"phone"`       //  电话
+	Username string  `gorm:"column:username" json:"username"` //  用户名
+	Password string  `gorm:"column:password" json:"password"` //  密码
+	Email    string  `gorm:"column:email" json:"email"`       //  邮箱
+	Phone    string  `gorm:"column:phone" json:"phone"`       //  电话
+	Amount   float64 `gorm:"column:amount" json:"amount"`     // 用户余额
 }
 
 type userModel DB
@@ -30,6 +31,11 @@ func (u *userModel) SetUsername(username string) *userModel {
 
 func (u *userModel) SetPhoneNumber(phoneNumber string) *userModel {
 	u.db = u.db.Where("phone = ?", phoneNumber)
+	return u
+}
+
+func (u *userModel) PhoneNumberLike(phoneNumber string) *userModel {
+	u.db = u.db.Where("phone like ?", "%"+phoneNumber+"%")
 	return u
 }
 

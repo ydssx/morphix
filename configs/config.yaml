@@ -1,6 +1,6 @@
 etcd:
   endpoints:
-    - etcd.default:2379
+    - 127.0.0.1:2379
   timeout: 5s
   username: root
   password: YV2AsfxOTo
@@ -9,10 +9,10 @@ jaeger:
   addr: http://jaeger:14268/api/traces
 
 otelcol:
-  addr: otelcol:4317
+  addr: 127.0.0.1:4317
 
 nats:
-  addr: nats://nats.default:4222
+  addr: nats://127.0.0.1:4222
   timeout: 5s
 
 redisCluster:
@@ -66,7 +66,7 @@ user:
       driver: mysql
       source: root:root@tcp(localhost:3306)/user?parseTime=true&loc=Local
     redis:
-      addr: redis-master.default:6379
+      addr: 127.0.0.1:6379
       username:
       password: 1GyY3AHsWg
       read_timeout: 2s
@@ -83,7 +83,7 @@ sms:
   data:
     database:
       driver: mysql
-      source: root:root@tcp(mysql.default:3306)/sms?parseTime=true&loc=Local
+      source: root:root@tcp(127.0.0.1:3306)/sms?parseTime=true&loc=Local
     redis:
       addr: localhost:6379
       username:
@@ -104,7 +104,7 @@ payment:
       driver: mysql
       source: root:root@tcp(mysql.default:3306)/payment?parseTime=true&loc=Local
     redis:
-      addr: redis-master.default:6379
+      addr: 127.0.0.1:6379
       username:
       password: 1GyY3AHsWg
       read_timeout: 2s
@@ -121,9 +121,9 @@ order:
   data:
     database:
       driver: mysql
-      source: root:root@tcp(mysql.default:3306)/order?parseTime=true&loc=Local
+      source: root:root@tcp(127.0.0.1:3306)/order?parseTime=true&loc=Local
     redis:
-      addr: redis-master.default:6379
+      addr: 127.0.0.1:6379
       username:
       password: 1GyY3AHsWg
       read_timeout: 2s

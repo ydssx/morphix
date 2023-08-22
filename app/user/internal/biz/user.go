@@ -20,11 +20,17 @@ type UserRepo interface {
 	CreateUser(ctx context.Context, user *models.User, tx ...*gorm.DB) (userId int, err error)
 	UpdateUser(ctx context.Context, user *models.User) error
 	DeleteUser(ctx context.Context, id uint) error
-	ListUser(ctx context.Context) []models.User
+	ListUser(ctx context.Context, cond *ListUserCond) []models.User
 	GetUsersByRole(ctx context.Context, roleID int) ([]models.User, error)
 	GetUserByID(ctx context.Context, id uint) (*models.User, error)
 	GetUserByName(ctx context.Context, username string) (*models.User, error)
 	GetUserByPhone(ctx context.Context, phoneNumber string) (*models.User, error)
+}
+
+type ListUserCond struct {
+	Page  int64
+	Limit int64
+	Phone string
 }
 
 type UserRepoWithCache interface {
@@ -68,8 +74,8 @@ func (uc *UserUsecase) RegisterUser(ctx context.Context, username, password, ema
 	return user, nil
 }
 
-func (uc *UserUsecase) ListUser(ctx context.Context) (*userv1.UserListResponse, error) {
-	users := uc.repo.ListUser(ctx)
+func (uc *UserUsecase) ListUser(ctx context.Context, req *userv1.UserListRequest) (*userv1.UserListResponse, error) {
+	users := uc.repo.ListUser(ctx, &ListUserCond{Page: req.Page, Limit: req.Limit})
 
 	resp := new(userv1.UserListResponse)
 	for _, user := range users {

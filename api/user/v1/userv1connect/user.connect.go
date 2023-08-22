@@ -73,7 +73,7 @@ type UserServiceClient interface {
 	ResetPassword(context.Context, *connect_go.Request[v1.ResetPasswordRequest]) (*connect_go.Response[emptypb.Empty], error)
 	Authenticate(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[v1.AuthenticationResponse], error)
 	Authorize(context.Context, *connect_go.Request[v1.AuthorizationRequest]) (*connect_go.Response[emptypb.Empty], error)
-	GetUserList(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[v1.UserListResponse], error)
+	GetUserList(context.Context, *connect_go.Request[v1.UserListRequest]) (*connect_go.Response[v1.UserListResponse], error)
 	ManageUserPermission(context.Context, *connect_go.Request[v1.ManageUserPermissionRequest]) (*connect_go.Response[v1.User], error)
 	LogActivity(context.Context, *connect_go.Request[v1.LogEntry]) (*connect_go.Response[emptypb.Empty], error)
 	GetUser(context.Context, *connect_go.Request[v1.GetUserRequest]) (*connect_go.Response[v1.User], error)
@@ -124,7 +124,7 @@ func NewUserServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts
 			baseURL+UserServiceAuthorizeProcedure,
 			opts...,
 		),
-		getUserList: connect_go.NewClient[emptypb.Empty, v1.UserListResponse](
+		getUserList: connect_go.NewClient[v1.UserListRequest, v1.UserListResponse](
 			httpClient,
 			baseURL+UserServiceGetUserListProcedure,
 			opts...,
@@ -156,7 +156,7 @@ type userServiceClient struct {
 	resetPassword        *connect_go.Client[v1.ResetPasswordRequest, emptypb.Empty]
 	authenticate         *connect_go.Client[emptypb.Empty, v1.AuthenticationResponse]
 	authorize            *connect_go.Client[v1.AuthorizationRequest, emptypb.Empty]
-	getUserList          *connect_go.Client[emptypb.Empty, v1.UserListResponse]
+	getUserList          *connect_go.Client[v1.UserListRequest, v1.UserListResponse]
 	manageUserPermission *connect_go.Client[v1.ManageUserPermissionRequest, v1.User]
 	logActivity          *connect_go.Client[v1.LogEntry, emptypb.Empty]
 	getUser              *connect_go.Client[v1.GetUserRequest, v1.User]
@@ -198,7 +198,7 @@ func (c *userServiceClient) Authorize(ctx context.Context, req *connect_go.Reque
 }
 
 // GetUserList calls userv1.UserService.GetUserList.
-func (c *userServiceClient) GetUserList(ctx context.Context, req *connect_go.Request[emptypb.Empty]) (*connect_go.Response[v1.UserListResponse], error) {
+func (c *userServiceClient) GetUserList(ctx context.Context, req *connect_go.Request[v1.UserListRequest]) (*connect_go.Response[v1.UserListResponse], error) {
 	return c.getUserList.CallUnary(ctx, req)
 }
 
@@ -228,7 +228,7 @@ type UserServiceHandler interface {
 	ResetPassword(context.Context, *connect_go.Request[v1.ResetPasswordRequest]) (*connect_go.Response[emptypb.Empty], error)
 	Authenticate(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[v1.AuthenticationResponse], error)
 	Authorize(context.Context, *connect_go.Request[v1.AuthorizationRequest]) (*connect_go.Response[emptypb.Empty], error)
-	GetUserList(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[v1.UserListResponse], error)
+	GetUserList(context.Context, *connect_go.Request[v1.UserListRequest]) (*connect_go.Response[v1.UserListResponse], error)
 	ManageUserPermission(context.Context, *connect_go.Request[v1.ManageUserPermissionRequest]) (*connect_go.Response[v1.User], error)
 	LogActivity(context.Context, *connect_go.Request[v1.LogEntry]) (*connect_go.Response[emptypb.Empty], error)
 	GetUser(context.Context, *connect_go.Request[v1.GetUserRequest]) (*connect_go.Response[v1.User], error)
@@ -356,7 +356,7 @@ func (UnimplementedUserServiceHandler) Authorize(context.Context, *connect_go.Re
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("userv1.UserService.Authorize is not implemented"))
 }
 
-func (UnimplementedUserServiceHandler) GetUserList(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[v1.UserListResponse], error) {
+func (UnimplementedUserServiceHandler) GetUserList(context.Context, *connect_go.Request[v1.UserListRequest]) (*connect_go.Response[v1.UserListResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("userv1.UserService.GetUserList is not implemented"))
 }
 

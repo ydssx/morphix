@@ -30,6 +30,13 @@ spec:
         prefix: /api
     route:
     - destination:
-        host: gateway-service.morphix
+        host: gateway-service
         port:
           number: 8000
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: morphix
+spec:
+  host: gateway-service
