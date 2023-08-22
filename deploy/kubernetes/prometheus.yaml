@@ -93,11 +93,6 @@ data:
         static_configs:
         - targets:
           - "otelcol:8888"
-      - job_name: redis
-        static_configs:
-          - targets:
-            - redis-master.default:9121
-            - redis-replicas.default:9121
       - honor_labels: true
         job_name: morphix
         kubernetes_sd_configs:
@@ -107,8 +102,8 @@ data:
         relabel_configs:
         - action: keep
           regex:  __meta_kubernetes_pod_label_(.+)
-          # source_labels:
-          # - __meta_kubernetes_pod_label_app
+          source_labels:
+          - __meta_kubernetes_pod_label_app
 
 ---
 apiVersion: v1
