@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"context"
+
+	"gorm.io/gorm"
+)
 
 // Users  用户表
 type User struct {
@@ -17,6 +21,11 @@ type userModel DB
 func NewUserModel(tx ...*gorm.DB) *userModel {
 	db := getDB(tx...).Table("users").Model(&User{})
 	return &userModel{db: db}
+}
+
+func (u *userModel) WithContext(ctx context.Context) *userModel {
+	u.db = u.db.WithContext(ctx)
+	return u
 }
 
 func (u *userModel) SetId(id uint) *userModel {

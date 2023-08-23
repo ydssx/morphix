@@ -69,7 +69,7 @@ func (*userRepo) CreateUser(ctx context.Context, user *models.User, tx ...*gorm.
 }
 
 func (r *userRepo) ListUser(ctx context.Context, cond *biz.ListUserCond) []models.User {
-	model := models.NewUserModel(r.data.db)
+	model := models.NewUserModel(r.data.db).WithContext(ctx)
 	if cond.Phone != "" {
 		model.PhoneNumberLike(cond.Phone)
 	}
@@ -81,6 +81,6 @@ func (r *userRepo) ListUser(ctx context.Context, cond *biz.ListUserCond) []model
 	}
 
 	users, _, _ := model.List(int(cond.Limit), (int(cond.Page)-1)*int(cond.Limit))
-	
+
 	return users
 }

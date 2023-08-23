@@ -22,7 +22,7 @@ func NewUserRepoCacheDecorator(repo *userRepo, cache cache.Cache) biz.UserRepoWi
 }
 
 func (u *UserRepoCacheDecorator) ListUser(ctx context.Context, cond *biz.ListUserCond) (data []models.User) {
-	key := fmt.Sprintf("userList:%v", util.CalculateChecksum(cond))
+	key := fmt.Sprintf("user.list:%v", util.CalculateChecksum(cond))
 	err := u.Get(key, &data)
 	if err == nil {
 		return
@@ -56,4 +56,15 @@ func (u *UserRepoCacheDecorator) GetUserByID(ctx context.Context, id uint) (data
 	}
 
 	return
+}
+
+func (u *UserRepoCacheDecorator) UpdateUser(ctx context.Context, user *models.User) error {
+	err := u.userRepo.UpdateUser(ctx, user)
+	if err != nil {
+		return err
+	}
+
+	key := fmt.Sprintf("user:%v", user.ID)
+	err = u.Delete(key)
+	return err
 }

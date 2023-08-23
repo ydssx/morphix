@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/axiaoxin-com/logging"
 	"go.uber.org/zap/zapcore"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -15,7 +14,7 @@ var DB *gorm.DB
 func NewDB(dsn string) *gorm.DB {
 	var err error
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger:      logging.NewGormLogger(zapcore.InfoLevel, zapcore.InfoLevel, time.Second*2),
+		Logger:      NewGormLogger(zapcore.InfoLevel, zapcore.InfoLevel, time.Millisecond*200),
 		PrepareStmt: true,
 	})
 	if err != nil {

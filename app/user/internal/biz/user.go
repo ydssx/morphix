@@ -9,6 +9,7 @@ import (
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/user/internal/models"
 	"github.com/ydssx/morphix/pkg/cache"
+	"github.com/ydssx/morphix/pkg/interceptors"
 	"github.com/ydssx/morphix/pkg/jwt"
 	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/grpc/codes"
@@ -127,7 +128,7 @@ func (uc *UserUsecase) GetUser(ctx context.Context, req *userv1.GetUserRequest) 
 		Id:       int64(user.ID),
 		Username: user.Username,
 		Email:    user.Email,
-		Phone:    user.Email,
+		Phone:    user.Phone,
 	}, nil
 }
 
@@ -138,4 +139,15 @@ func (uc *UserUsecase) ResetPassword(ctx context.Context, req *userv1.ResetPassw
 	}
 
 	return uc.repo.UpdateUser(ctx, &models.User{BaseModel: models.BaseModel{ID: user.ID}, Password: util.MD5(req.NewPassword)})
+}
+
+func (uc *UserUsecase) UpdateProfile(ctx context.Context, req *userv1.UpdateProfileRequest) (*userv1.User, error) {
+	claims, _ := interceptors.AuthFromContext(ctx)
+
+	err := uc.repo.UpdateUser(ctx, &models.User{BaseModel: models.BaseModel{ID: uint(claims.Uid)}, Email: req.Email, Phone: req.Phone})
+	if err != nil {
+		return nil, err
+	}
+
+	return uc.GetUser(ctx, &userv1.GetUserRequest{UserId: claims.Uid})
 }

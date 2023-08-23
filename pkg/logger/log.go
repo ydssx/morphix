@@ -9,10 +9,17 @@ import (
 )
 
 var logTraceID = func(ctx context.Context) []interface{} {
-	if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
-		return []interface{}{"traceID", span.TraceID().String()}
+	if traceID, ok := TraceIDFromContext(ctx); ok {
+		return []interface{}{"traceID", traceID}
 	}
 	return nil
+}
+
+func TraceIDFromContext(ctx context.Context) (string, bool) {
+	if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
+		return span.TraceID().String(), true
+	}
+	return "", false
 }
 
 func Info(ctx context.Context, msg ...interface{}) {

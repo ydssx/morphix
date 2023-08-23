@@ -297,7 +297,7 @@
         ]
       }
     },
-    "/api/users/profile/{userId}": {
+    "/api/users/profile/update": {
       "patch": {
         "operationId": "UserService_UpdateProfile",
         "responses": {
@@ -316,26 +316,11 @@
         },
         "parameters": [
           {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "type": "string"
-                },
-                "phone": {
-                  "type": "string",
-                  "description": "其他需要更新的个人信息字段..."
-                }
-              }
+              "$ref": "#/definitions/userv1UpdateProfileRequest"
             }
           }
         ],
@@ -1502,6 +1487,18 @@
         },
         "newPassword": {
           "type": "string"
+        }
+      }
+    },
+    "userv1UpdateProfileRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string",
+          "description": "其他需要更新的个人信息字段..."
         }
       }
     },

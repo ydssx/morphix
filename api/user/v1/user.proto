@@ -34,7 +34,7 @@ service UserService {
 
   rpc UpdateProfile(UpdateProfileRequest) returns (User) {
     option (google.api.http) = {
-      patch: "/api/users/profile/{user_id}"
+      patch: "/api/users/profile/update"
       body: "*"
     };
   }
@@ -116,9 +116,8 @@ message LogoutRequest {
 }
 
 message UpdateProfileRequest {
-  string user_id = 1;
-  string email = 2;
-  string phone = 3;
+  string email = 1 [(validate.rules).string.email = true];
+  string phone = 2;
   // 其他需要更新的个人信息字段...
 }
 

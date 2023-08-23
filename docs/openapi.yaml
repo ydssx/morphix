@@ -146,17 +146,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/userv1.User'
-    /api/users/profile/{userId}:
+    /api/users/profile/update:
         patch:
             tags:
                 - UserService
             operationId: UserService_UpdateProfile
-            parameters:
-                - name: userId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
             requestBody:
                 content:
                     application/json:
@@ -777,8 +771,6 @@ components:
         userv1.UpdateProfileRequest:
             type: object
             properties:
-                userId:
-                    type: string
                 email:
                     type: string
                 phone:
