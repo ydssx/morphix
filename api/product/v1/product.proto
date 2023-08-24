@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package productv1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/ydssx/morphix/api/product/v1;productv1";
+
+service ProductService {
+  // 创建产品
+  rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/products"
+      body: "*"
+    };
+  }
+
+  // 获取产品列表
+  rpc GetProducts(GetProductsRequest) returns (GetProductsResponse) {
+    option (google.api.http) = {get: "/api/v1/products"};
+  }
+
+  // 获取单个产品
+  rpc GetProduct(GetProductRequest) returns (Product) {
+    option (google.api.http) = {get: "/api/v1/products/{id}"};
+  }
+
+  // 更新产品信息
+  rpc UpdateProduct(UpdateProductRequest) returns (UpdateProductResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/products/{id}"
+      body: "*"
+    };
+  }
+
+  // 删除产品
+  rpc DeleteProduct(DeleteProductRequest) returns (DeleteProductResponse) {
+    option (google.api.http) = {delete: "/api/v1/products/{id}"};
+  }
+}
+
+// 产品信息
+message Product {
+  string id = 1; // 产品ID
+  string name = 2; // 产品名称
+  string description = 3; // 产品描述
+  float price = 4; // 产品价格
+  int32 stock = 5; // 库存数量
+}
+
+// 创建产品请求
+message CreateProductRequest {
+  string name = 1; // 产品名称
+  string description = 2; // 产品描述
+  float price = 3; // 产品价格
+  int32 stock = 4; // 库存数量
+}
+
+// 创建产品响应
+message CreateProductResponse {
+  string id = 1; // 新创建的产品ID
+}
+
+// 获取产品列表请求
+message GetProductsRequest {}
+
+// 获取产品列表响应
+message GetProductsResponse {
+  repeated Product products = 1; // 产品列表
+}
+
+// 获取单个产品请求
+message GetProductRequest {
+  string id = 1; // 产品ID
+}
+
+// 更新产品请求
+message UpdateProductRequest {
+  string id = 1; // 产品ID
+  string name = 2; // 产品名称
+  string description = 3; // 产品描述
+  float price = 4; // 产品价格
+  int32 stock = 5; // 库存数量
+}
+
+// 更新产品响应
+message UpdateProductResponse {}
+
+// 删除产品请求
+message DeleteProductRequest {
+  string id = 1; // 产品ID
+}
+
+// 删除产品响应
+message DeleteProductResponse {}

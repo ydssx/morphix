@@ -18,6 +18,15 @@
       "name": "PaymentService"
     },
     {
+      "name": "ProductService"
+    },
+    {
+      "name": "QuoteService"
+    },
+    {
+      "name": "CouponService"
+    },
+    {
       "name": "SMSService"
     },
     {
@@ -730,6 +739,181 @@
         ]
       }
     },
+    "/api/v1/products": {
+      "get": {
+        "summary": "获取产品列表",
+        "operationId": "ProductService_GetProducts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productv1GetProductsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ProductService"
+        ]
+      },
+      "post": {
+        "summary": "创建产品",
+        "operationId": "ProductService_CreateProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productv1CreateProductResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/productv1CreateProductRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      }
+    },
+    "/api/v1/products/{id}": {
+      "get": {
+        "summary": "获取单个产品",
+        "operationId": "ProductService_GetProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productv1Product"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "产品ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      },
+      "delete": {
+        "summary": "删除产品",
+        "operationId": "ProductService_DeleteProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productv1DeleteProductResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "产品ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      },
+      "put": {
+        "summary": "更新产品信息",
+        "operationId": "ProductService_UpdateProduct",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productv1UpdateProductResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "产品ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "title": "产品名称"
+                },
+                "description": {
+                  "type": "string",
+                  "title": "产品描述"
+                },
+                "price": {
+                  "type": "number",
+                  "format": "float",
+                  "title": "产品价格"
+                },
+                "stock": {
+                  "type": "integer",
+                  "format": "int32",
+                  "title": "库存数量"
+                }
+              },
+              "title": "更新产品请求"
+            }
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      }
+    },
     "/api/v1/sms/send": {
       "post": {
         "summary": "发送短信",
@@ -1214,6 +1398,90 @@
       },
       "title": "退款响应"
     },
+    "productv1CreateProductRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "产品名称"
+        },
+        "description": {
+          "type": "string",
+          "title": "产品描述"
+        },
+        "price": {
+          "type": "number",
+          "format": "float",
+          "title": "产品价格"
+        },
+        "stock": {
+          "type": "integer",
+          "format": "int32",
+          "title": "库存数量"
+        }
+      },
+      "title": "创建产品请求"
+    },
+    "productv1CreateProductResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "新创建的产品ID"
+        }
+      },
+      "title": "创建产品响应"
+    },
+    "productv1DeleteProductResponse": {
+      "type": "object",
+      "title": "删除产品响应"
+    },
+    "productv1GetProductsResponse": {
+      "type": "object",
+      "properties": {
+        "products": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/productv1Product"
+          },
+          "title": "产品列表"
+        }
+      },
+      "title": "获取产品列表响应"
+    },
+    "productv1Product": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "产品ID"
+        },
+        "name": {
+          "type": "string",
+          "title": "产品名称"
+        },
+        "description": {
+          "type": "string",
+          "title": "产品描述"
+        },
+        "price": {
+          "type": "number",
+          "format": "float",
+          "title": "产品价格"
+        },
+        "stock": {
+          "type": "integer",
+          "format": "int32",
+          "title": "库存数量"
+        }
+      },
+      "title": "产品信息"
+    },
+    "productv1UpdateProductResponse": {
+      "type": "object",
+      "title": "更新产品响应"
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -1222,6 +1490,123 @@
         }
       },
       "additionalProperties": {}
+    },
+    "quoteCreateQuoteResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "新创建的报价ID"
+        }
+      },
+      "title": "创建报价响应"
+    },
+    "quoteDiscountType": {
+      "type": "string",
+      "enum": [
+        "PERCENTAGE",
+        "FIXED_AMOUNT"
+      ],
+      "default": "PERCENTAGE",
+      "description": "- PERCENTAGE: 百分比折扣\n - FIXED_AMOUNT: 固定金额折扣",
+      "title": "折扣类型"
+    },
+    "quoteGetQuotesResponse": {
+      "type": "object",
+      "properties": {
+        "quotes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/quoteQuote"
+          },
+          "title": "报价列表"
+        }
+      },
+      "title": "获取报价列表响应"
+    },
+    "quoteGetUserCouponsResponse": {
+      "type": "object",
+      "properties": {
+        "userCoupons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/quoteUserCoupon"
+          },
+          "title": "用户拥有的优惠券列表"
+        }
+      }
+    },
+    "quoteQuote": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "报价ID"
+        },
+        "productId": {
+          "type": "string",
+          "title": "产品ID"
+        },
+        "basePrice": {
+          "type": "number",
+          "format": "float",
+          "title": "基础价格"
+        },
+        "finalPrice": {
+          "type": "number",
+          "format": "float",
+          "title": "最终价格，包括折扣和优惠券"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "title": "报价日期"
+        },
+        "customerInfo": {
+          "type": "string",
+          "title": "客户信息"
+        }
+      },
+      "title": "报价"
+    },
+    "quoteUseCouponResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "title": "是否成功使用优惠券"
+        }
+      }
+    },
+    "quoteUserCoupon": {
+      "type": "object",
+      "properties": {
+        "couponId": {
+          "type": "integer",
+          "format": "int32",
+          "title": "优惠券ID"
+        },
+        "discountType": {
+          "$ref": "#/definitions/quoteDiscountType",
+          "title": "折扣类型"
+        },
+        "discountValue": {
+          "type": "number",
+          "format": "float",
+          "title": "折扣值"
+        },
+        "used": {
+          "type": "boolean",
+          "title": "是否已使用"
+        },
+        "usedDate": {
+          "type": "string",
+          "format": "date-time",
+          "title": "使用日期"
+        }
+      }
     },
     "rpcStatus": {
       "type": "object",

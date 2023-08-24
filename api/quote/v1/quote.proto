@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package quote;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ydssx/morphix/api/quote/v1;quotev1";
+
+service QuoteService {
+  // 创建报价
+  rpc CreateQuote(CreateQuoteRequest) returns (CreateQuoteResponse);
+
+  // 获取报价列表
+  rpc GetQuotes(GetQuotesRequest) returns (GetQuotesResponse);
+
+  // 获取单个报价
+  rpc GetQuote(GetQuoteRequest) returns (Quote);
+}
+
+// 折扣类型
+enum DiscountType {
+  PERCENTAGE = 0; // 百分比折扣
+  FIXED_AMOUNT = 1; // 固定金额折扣
+}
+
+// 优惠券
+message Coupon {
+  string code = 1; // 优惠券代码
+  DiscountType discount_type = 2; // 折扣类型
+  float value = 3; // 折扣值，百分比或固定金额
+  google.protobuf.Timestamp expiration_date = 4;
+}
+
+// 报价
+message Quote {
+  string id = 1; // 报价ID
+  string product_id = 2; // 产品ID
+  float base_price = 3; // 基础价格
+  float final_price = 4; // 最终价格，包括折扣和优惠券
+  google.protobuf.Timestamp date = 5; // 报价日期
+  string customer_info = 6; // 客户信息
+}
+
+// 创建报价请求
+message CreateQuoteRequest {
+  string product_id = 1; // 产品ID
+  float base_price = 2; // 基础价格
+  string customer_info = 3; // 客户信息
+  string coupon_code = 4; // 优惠券代码，可选
+}
+
+// 创建报价响应
+message CreateQuoteResponse {
+  string id = 1; // 新创建的报价ID
+}
+
+// 获取报价列表请求
+message GetQuotesRequest {
+  // 可选的查询条件，例如产品ID、日期范围等
+  string product_id = 1;
+}
+
+// 获取报价列表响应
+message GetQuotesResponse {
+  repeated Quote quotes = 1; // 报价列表
+}
+
+// 获取单个报价请求
+message GetQuoteRequest {
+  string id = 1; // 报价ID
+}
+
+service CouponService {
+  // 获取用户拥有的优惠券列表
+  rpc GetUserCoupons(GetUserCouponsRequest) returns (GetUserCouponsResponse);
+
+  // 使用优惠券
+  rpc UseCoupon(UseCouponRequest) returns (UseCouponResponse);
+}
+
+message GetUserCouponsRequest {
+  int32 user_id = 1; // 用户ID
+}
+
+message GetUserCouponsResponse {
+  repeated UserCoupon user_coupons = 1; // 用户拥有的优惠券列表
+}
+
+message UserCoupon {
+  int32 coupon_id = 1; // 优惠券ID
+  DiscountType discount_type = 2; // 折扣类型
+  float discount_value = 3; // 折扣值
+  bool used = 4; // 是否已使用
+  google.protobuf.Timestamp used_date = 5; // 使用日期
+}
+
+message UseCouponRequest {
+  int32 user_id = 1; // 用户ID
+  int32 coupon_id = 2; // 优惠券ID
+}
+
+message UseCouponResponse {
+  bool success = 1; // 是否成功使用优惠券
+}
