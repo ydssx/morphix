@@ -3,7 +3,7 @@ module github.com/ydssx/morphix
 go 1.19
 
 require (
-	github.com/axiaoxin-com/logging v1.2.17
+	github.com/axiaoxin-com/goutils v1.0.37
 	github.com/bufbuild/connect-go v1.8.0
 	github.com/chenjiandongx/ginprom v0.0.0-20210617023641-6c809602c38a
 	github.com/dapr/go-sdk v1.8.0
@@ -23,7 +23,6 @@ require (
 
 require (
 	github.com/antlabs/strsim v0.0.3 // indirect
-	github.com/axiaoxin-com/goutils v1.0.37 // indirect
 	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
@@ -36,7 +35,6 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
-	github.com/getsentry/sentry-go v0.22.0 // indirect
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-chi/chi/v5 v5.0.8 // indirect
@@ -62,7 +60,6 @@ require (
 	github.com/mitchellh/mapstructure v1.5.1-0.20220423185008-bf980b35cac4 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/natefinch/lumberjack v2.0.0+incompatible // indirect
 	github.com/nats-io/jwt/v2 v2.4.1 // indirect
 	github.com/nats-io/nats-server/v2 v2.9.15 // indirect
 	github.com/nats-io/nkeys v0.4.4 // indirect
@@ -76,7 +73,6 @@ require (
 	github.com/prometheus/procfs v0.11.0 // indirect
 	github.com/rakyll/statik v0.1.7 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
-	github.com/rs/xid v1.5.0 // indirect
 	github.com/speps/go-hashids v2.0.0+incompatible // indirect
 	github.com/spf13/afero v1.9.5 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
