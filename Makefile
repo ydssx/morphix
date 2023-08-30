@@ -31,6 +31,7 @@ init:
 .PHONY: api
 # generate api proto
 api:
+	buf format -w
 	buf generate
 
 .PHONY: build
@@ -80,7 +81,7 @@ k8s:
 	make secret;
 	make gateway;
 	make cert;
-	
+
 
 .PHONY: all
 # generate all
