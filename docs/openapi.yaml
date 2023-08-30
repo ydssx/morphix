@@ -146,17 +146,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/userv1.User'
-    /api/users/profile/{userId}:
+    /api/users/profile/update:
         patch:
             tags:
                 - UserService
             operationId: UserService_UpdateProfile
-            parameters:
-                - name: userId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
             requestBody:
                 content:
                     application/json:
@@ -392,6 +386,98 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/paymentv1.RefundResponse'
+    /api/v1/products:
+        get:
+            tags:
+                - ProductService
+            description: 获取产品列表
+            operationId: ProductService_GetProducts
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/productv1.GetProductsResponse'
+        post:
+            tags:
+                - ProductService
+            description: 创建产品
+            operationId: ProductService_CreateProduct
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/productv1.CreateProductRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/productv1.CreateProductResponse'
+    /api/v1/products/{id}:
+        get:
+            tags:
+                - ProductService
+            description: 获取单个产品
+            operationId: ProductService_GetProduct
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/productv1.Product'
+        put:
+            tags:
+                - ProductService
+            description: 更新产品信息
+            operationId: ProductService_UpdateProduct
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/productv1.UpdateProductRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/productv1.UpdateProductResponse'
+        delete:
+            tags:
+                - ProductService
+            description: 删除产品
+            operationId: ProductService_DeleteProduct
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/productv1.DeleteProductResponse'
     /api/v1/sms/send:
         post:
             tags:
@@ -668,6 +754,74 @@ components:
                 status:
                     type: string
             description: 退款响应
+        productv1.CreateProductRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                price:
+                    type: number
+                    format: float
+                stock:
+                    type: integer
+                    format: int32
+            description: 创建产品请求
+        productv1.CreateProductResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+            description: 创建产品响应
+        productv1.DeleteProductResponse:
+            type: object
+            properties: {}
+            description: 删除产品响应
+        productv1.GetProductsResponse:
+            type: object
+            properties:
+                products:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/productv1.Product'
+            description: 获取产品列表响应
+        productv1.Product:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                price:
+                    type: number
+                    format: float
+                stock:
+                    type: integer
+                    format: int32
+            description: 产品信息
+        productv1.UpdateProductRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                price:
+                    type: number
+                    format: float
+                stock:
+                    type: integer
+                    format: int32
+            description: 更新产品请求
+        productv1.UpdateProductResponse:
+            type: object
+            properties: {}
+            description: 更新产品响应
         smsv1.SendSMSRequest:
             type: object
             properties:
@@ -777,8 +931,6 @@ components:
         userv1.UpdateProfileRequest:
             type: object
             properties:
-                userId:
-                    type: string
                 email:
                     type: string
                 phone:
@@ -810,6 +962,7 @@ tags:
       description: 订单管理服务接口
     - name: PaymentService
       description: 定义支付服务接口
+    - name: ProductService
     - name: SMSService
       description: 短信服务接口
     - name: UserService

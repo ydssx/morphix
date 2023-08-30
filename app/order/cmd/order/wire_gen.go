@@ -14,7 +14,6 @@ import (
 	"github.com/ydssx/morphix/app/order/internal/service"
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
-	"github.com/ydssx/morphix/pkg/mq"
 )
 
 import (
@@ -30,7 +29,7 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	if err != nil {
 		return nil, nil, err
 	}
-	cloudEvent := mq.NewCloudEvent(conn)
+	cloudEvent := common.NewCloudEvent(conn)
 	listenerServer := listener.NewListenerServer(cloudEvent)
 	app := newApp(grpcServer, listenerServer, bootstrap)
 	return app, func() {

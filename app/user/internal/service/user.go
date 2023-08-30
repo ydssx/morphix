@@ -64,9 +64,7 @@ func (s *UserService) Logout(ctx context.Context, req *userv1.LogoutRequest) (*e
 
 // UpdateProfile 实现更新用户信息接口
 func (s *UserService) UpdateProfile(ctx context.Context, req *userv1.UpdateProfileRequest) (*userv1.User, error) {
-	// 在这里实现更新用户信息逻辑
-	// 使用 s.userRepository 进行数据库操作
-	return nil, nil
+	return s.uc.UpdateProfile(ctx, req)
 }
 
 // ResetPassword 实现重置密码接口
@@ -82,6 +80,7 @@ func (s *UserService) ResetPassword(ctx context.Context, req *userv1.ResetPasswo
 	if err = s.uc.ResetPassword(ctx, req); err != nil {
 		return nil, errors.BadRequest("", err.Error())
 	}
+
 	return &emptypb.Empty{}, nil
 }
 

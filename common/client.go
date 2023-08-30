@@ -15,7 +15,6 @@ import (
 	"github.com/ydssx/morphix/pkg/mq"
 	"github.com/ydssx/morphix/pkg/redis"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
 )
 
 func NewSMSClient(c *conf.Bootstrap) smsv1.SMSServiceClient {
@@ -51,20 +50,6 @@ func CreateClientConn(rpcCliConf *conf.ClientConf, r *etcd.Registry) *grpc.Clien
 	if err != nil {
 		panic(err)
 	}
-	defer func() {
-		if err != nil {
-			if cerr := conn.Close(); cerr != nil {
-				grpclog.Infof("Failed to close conn to %s: %v", rpcCliConf.Addr, cerr)
-			}
-			return
-		}
-		go func() {
-			<-ctx.Done()
-			if cerr := conn.Close(); cerr != nil {
-				grpclog.Infof("Failed to close conn to %s: %v", rpcCliConf.Addr, cerr)
-			}
-		}()
-	}()
 
 	return conn
 }

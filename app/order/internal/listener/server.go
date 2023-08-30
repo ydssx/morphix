@@ -10,7 +10,7 @@ import (
 	"github.com/ydssx/morphix/pkg/mq"
 )
 
-var ProviderSet = wire.NewSet(NewListenerServer, common.NewNatsConn, mq.NewCloudEvent)
+var ProviderSet = wire.NewSet(NewListenerServer, common.NewNatsConn, common.NewCloudEvent)
 
 type ListenerServer struct {
 	ce *mq.CloudEvent
