@@ -72,6 +72,7 @@ func (c *CloudEvent) AddEventListenerAsync(subject string, handler EventHandler,
 	errChan := make(chan error, 1)
 
 	go func() {
+		defer close(errChan)
 		errChan <- c.AddEventListener(context.Background(), subject, handler, opts...)
 	}()
 
@@ -81,7 +82,6 @@ func (c *CloudEvent) AddEventListenerAsync(subject string, handler EventHandler,
 	case <-ctx.Done():
 		// err = ctx.Err()
 	}
-	close(errChan)
 
 	return err
 }
