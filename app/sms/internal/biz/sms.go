@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/redis/go-redis/v9"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	"github.com/ydssx/morphix/pkg/util"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -24,13 +25,16 @@ func NewSmsUseCase(rdb *redis.Client) *SmsUseCase {
 
 func (s *SmsUseCase) SendSMS(ctx context.Context, req *smsv1.SendSMSRequest) (resp *smsv1.SendSMSResponse, err error) {
 	code := util.GenerateCode(6)
-	log.Info("发送短信验证码:", code)
 	key := fmt.Sprintf("%s-%s", req.MobileNumber, req.Scene)
 	_, err = s.rdb.Set(ctx, key, code, time.Minute*10).Result()
 	if err != nil {
 		return nil, err
 	}
 
+	span := trace.SpanFromContext(ctx)
+	defer span.End()
+	span.AddEvent("sms code sended", trace.WithAttributes(attribute.String("scene", req.Scene), attribute.String("code", code)))
+	
 	return &smsv1.SendSMSResponse{Success: true}, nil
 }
 
