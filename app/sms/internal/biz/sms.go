@@ -24,17 +24,16 @@ func NewSmsUseCase(rdb *redis.Client) *SmsUseCase {
 }
 
 func (s *SmsUseCase) SendSMS(ctx context.Context, req *smsv1.SendSMSRequest) (resp *smsv1.SendSMSResponse, err error) {
+	span := trace.SpanFromContext(ctx)
+
 	code := util.GenerateCode(6)
 	key := fmt.Sprintf("%s-%s", req.MobileNumber, req.Scene)
 	_, err = s.rdb.Set(ctx, key, code, time.Minute*10).Result()
 	if err != nil {
 		return nil, err
 	}
-
-	span := trace.SpanFromContext(ctx)
-	defer span.End()
 	span.AddEvent("sms code sended", trace.WithAttributes(attribute.String("scene", req.Scene), attribute.String("code", code)))
-	
+
 	return &smsv1.SendSMSResponse{Success: true}, nil
 }
 
