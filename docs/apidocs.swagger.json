@@ -681,7 +681,8 @@
             "description": "其他字段...",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [

@@ -20,8 +20,14 @@ func NewPaymentService(eventSink PaymentEvents) *PaymentService {
 }
 
 // CancelPayment implements paymentv1.PaymentServiceServer.
-func (*PaymentService) CancelPayment(context.Context, *paymentv1.CancelPaymentRequest) (*paymentv1.CancelPaymentResponse, error) {
-	panic("unimplemented")
+func (p *PaymentService) CancelPayment(ctx context.Context, req *paymentv1.CancelPaymentRequest) (*paymentv1.CancelPaymentResponse, error) {
+	payload := event.PayloadCancelPayment{OrderId: req.OrderId}
+	err := p.eventSink.OnCancelPayment(ctx, &payload)
+	if err != nil {
+		return nil, err
+	}
+
+	return &paymentv1.CancelPaymentResponse{Status: "COMPLETED"}, nil
 }
 
 // GetPayment implements paymentv1.PaymentServiceServer.

@@ -13,6 +13,7 @@ import (
 
 var subjectHandlerMap = map[event.Subject]mq.EventHandler{
 	event.Subject_PaymentCompleted: updateOrderStatus,
+	event.Subject_CancelPayment:    updateOrderStatus,
 }
 
 var daprSubjectHandlerMap = map[event.Subject]common.TopicEventHandler{

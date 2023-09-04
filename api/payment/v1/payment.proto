@@ -38,7 +38,7 @@ message GetPaymentResponse {
 
 // 取消支付请求
 message CancelPaymentRequest {
-  string order_id = 1;
+  int64 order_id = 1;
   // 其他字段...
 }
 
