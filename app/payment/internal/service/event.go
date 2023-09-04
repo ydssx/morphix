@@ -21,7 +21,7 @@ type eventSender struct {
 }
 
 func NewEventSender(daprClient *dapr.DaprClient, ce *mq.CloudEvent) PaymentEvents {
-	return &eventSender{DaprClient: daprClient}
+	return &eventSender{DaprClient: daprClient, ce: ce}
 }
 
 // OnMakePayment implements PaymentEvents.
