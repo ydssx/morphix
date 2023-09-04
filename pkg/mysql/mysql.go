@@ -9,11 +9,11 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
+var db *gorm.DB
 
 func NewDB(dsn string) *gorm.DB {
 	var err error
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger:      NewGormLogger(zapcore.InfoLevel, zapcore.InfoLevel, time.Millisecond*200),
 		PrepareStmt: true,
 	})
@@ -26,10 +26,13 @@ func NewDB(dsn string) *gorm.DB {
 	}
 	sqlDB.SetMaxIdleConns(100)
 	sqlDB.SetMaxOpenConns(100)
-	DB = db
 	return db
 }
 
 func Transaction(fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error {
-	return DB.Transaction(fc, opts...)
+	return db.Transaction(fc, opts...)
+}
+
+func GlobalDB() *gorm.DB {
+	return db
 }

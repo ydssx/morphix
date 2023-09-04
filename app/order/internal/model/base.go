@@ -21,5 +21,5 @@ func getDB(tx ...*gorm.DB) *gorm.DB {
 	if len(tx) > 0 {
 		return tx[0]
 	}
-	return mysql.DB
+	return mysql.GlobalDB()
 }

@@ -52,7 +52,7 @@ func newGinHandler(ctx context.Context, c *conf.Bootstrap) *gin.Engine {
 	server.ContextWithFallback = true
 	rdb := common.NewRedisClient(c)
 	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), middleware.RateLimit(rdb), gin.Recovery())
-	
+
 	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	server.GET("/healthz", func(c *gin.Context) { c.String(http.StatusOK, "%s", "ok") })
 	server.Any("/api/*any", gin.WrapH(newGateway(ctx, c)))
