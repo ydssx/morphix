@@ -23,6 +23,7 @@ message Bootstrap {
   ClientConf payment_rpc_client = 12;
 
   RedisCluster redis_cluster = 14;
+  Redis redis = 15;
 }
 
 message Server {
@@ -44,14 +45,6 @@ message Data {
   message Database {
     string driver = 1;
     string source = 2;
-  }
-  message Redis {
-    string addr = 1;
-    string username = 2;
-    string password = 3;
-    google.protobuf.Duration read_timeout = 4;
-    google.protobuf.Duration write_timeout = 5;
-    google.protobuf.Duration dial_timeout = 6;
   }
   Database database = 1;
   Redis redis = 2;
@@ -93,6 +86,15 @@ message ServerConf {
 
 message RedisCluster {
   repeated string addr = 1;
+  string username = 2;
+  string password = 3;
+  google.protobuf.Duration read_timeout = 4;
+  google.protobuf.Duration write_timeout = 5;
+  google.protobuf.Duration dial_timeout = 6;
+}
+
+message Redis {
+  string addr = 1;
   string username = 2;
   string password = 3;
   google.protobuf.Duration read_timeout = 4;

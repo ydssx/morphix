@@ -463,6 +463,35 @@ func (m *Bootstrap) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetRedis()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BootstrapValidationError{
+					field:  "Redis",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BootstrapValidationError{
+					field:  "Redis",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRedis()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BootstrapValidationError{
+				field:  "Redis",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return BootstrapMultiError(errors)
 	}
@@ -1793,6 +1822,197 @@ var _ interface {
 	ErrorName() string
 } = RedisClusterValidationError{}
 
+// Validate checks the field values on Redis with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Redis) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Redis with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in RedisMultiError, or nil if none found.
+func (m *Redis) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Redis) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Addr
+
+	// no validation rules for Username
+
+	// no validation rules for Password
+
+	if all {
+		switch v := interface{}(m.GetReadTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RedisValidationError{
+					field:  "ReadTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RedisValidationError{
+					field:  "ReadTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetReadTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RedisValidationError{
+				field:  "ReadTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetWriteTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RedisValidationError{
+					field:  "WriteTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RedisValidationError{
+					field:  "WriteTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetWriteTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RedisValidationError{
+				field:  "WriteTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDialTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RedisValidationError{
+					field:  "DialTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RedisValidationError{
+					field:  "DialTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDialTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RedisValidationError{
+				field:  "DialTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return RedisMultiError(errors)
+	}
+
+	return nil
+}
+
+// RedisMultiError is an error wrapping multiple validation errors returned by
+// Redis.ValidateAll() if the designated constraints aren't met.
+type RedisMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RedisMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RedisMultiError) AllErrors() []error { return m }
+
+// RedisValidationError is the validation error returned by Redis.Validate if
+// the designated constraints aren't met.
+type RedisValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RedisValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RedisValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RedisValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RedisValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RedisValidationError) ErrorName() string { return "RedisValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RedisValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRedis.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RedisValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RedisValidationError{}
+
 // Validate checks the field values on Server_HTTP with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -2160,195 +2380,3 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = Data_DatabaseValidationError{}
-
-// Validate checks the field values on Data_Redis with the rules defined in the
-// proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *Data_Redis) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on Data_Redis with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in Data_RedisMultiError, or
-// nil if none found.
-func (m *Data_Redis) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *Data_Redis) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Addr
-
-	// no validation rules for Username
-
-	// no validation rules for Password
-
-	if all {
-		switch v := interface{}(m.GetReadTimeout()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, Data_RedisValidationError{
-					field:  "ReadTimeout",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, Data_RedisValidationError{
-					field:  "ReadTimeout",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetReadTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Data_RedisValidationError{
-				field:  "ReadTimeout",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetWriteTimeout()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, Data_RedisValidationError{
-					field:  "WriteTimeout",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, Data_RedisValidationError{
-					field:  "WriteTimeout",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetWriteTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Data_RedisValidationError{
-				field:  "WriteTimeout",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetDialTimeout()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, Data_RedisValidationError{
-					field:  "DialTimeout",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, Data_RedisValidationError{
-					field:  "DialTimeout",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetDialTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Data_RedisValidationError{
-				field:  "DialTimeout",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return Data_RedisMultiError(errors)
-	}
-
-	return nil
-}
-
-// Data_RedisMultiError is an error wrapping multiple validation errors
-// returned by Data_Redis.ValidateAll() if the designated constraints aren't met.
-type Data_RedisMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m Data_RedisMultiError) Error() string {
-	var msgs []string
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m Data_RedisMultiError) AllErrors() []error { return m }
-
-// Data_RedisValidationError is the validation error returned by
-// Data_Redis.Validate if the designated constraints aren't met.
-type Data_RedisValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e Data_RedisValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e Data_RedisValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e Data_RedisValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e Data_RedisValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e Data_RedisValidationError) ErrorName() string { return "Data_RedisValidationError" }
-
-// Error satisfies the builtin error interface
-func (e Data_RedisValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sData_Redis.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = Data_RedisValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = Data_RedisValidationError{}

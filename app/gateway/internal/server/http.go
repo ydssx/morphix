@@ -50,7 +50,9 @@ func NewHTTPServer(c *conf.Bootstrap) *khttp.Server {
 func newGinHandler(ctx context.Context, c *conf.Bootstrap) *gin.Engine {
 	server := gin.New()
 	server.ContextWithFallback = true
-	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), gin.Recovery())
+	rdb := common.NewRedisClient(c)
+	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), middleware.RateLimit(rdb), gin.Recovery())
+	
 	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	server.GET("/healthz", func(c *gin.Context) { c.String(http.StatusOK, "%s", "ok") })
 	server.Any("/api/*any", gin.WrapH(newGateway(ctx, c)))

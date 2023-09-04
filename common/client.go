@@ -66,6 +66,18 @@ func NewRedisCluster(c *conf.Bootstrap) *goredis.ClusterClient {
 	})
 }
 
+func NewRedisClient(c *conf.Bootstrap) *goredis.Client {
+	clientConf := c.Redis
+	return redis.NewRedis(&goredis.Options{
+		Addr:         clientConf.Addr,
+		Username:     clientConf.Username,
+		Password:     clientConf.Password,
+		ReadTimeout:  clientConf.ReadTimeout.AsDuration(),
+		DialTimeout:  clientConf.DialTimeout.AsDuration(),
+		WriteTimeout: clientConf.WriteTimeout.AsDuration(),
+	})
+}
+
 func NewNatsConn(c *conf.Bootstrap) (conn *nats.Conn, cleanup func(), err error) {
 	return mq.InitNats(c.Nats.Addr)
 }
