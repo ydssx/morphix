@@ -25,6 +25,14 @@ redisCluster:
   write_timeout: 2s
   dial_timeout: 5s
 
+redis:
+  addr: redis-master.default:6379
+  username:
+  password: 1GyY3AHsWg
+  read_timeout: 2s
+  write_timeout: 2s
+  dial_timeout: 5s
+
 
 userRpcClient:
   network: tcp

@@ -209,8 +209,6 @@ services:
       args:
         - TAG=${TAG:-latest}
     depends_on:
-      - etcd
-      - jaeger
       - sms
     networks:
       - morphix_net
@@ -225,9 +223,9 @@ services:
       dockerfile: ./app/sms/Dockerfile
       args:
         - TAG=${TAG:-latest}
-    depends_on:
-      - etcd
-      - jaeger
+    # depends_on:
+    #   - etcd
+    #   - jaeger
     networks:
       - morphix_net
   order:
