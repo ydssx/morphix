@@ -15,10 +15,10 @@ spec:
         app: gateway
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "false"
-        dapr.io/enabled: "true"
-        dapr.io/app-id: "gateway"
-        dapr.io/app-port: "8000"
-        dapr.io/app-protocol: "http"
+        # dapr.io/enabled: "false"
+        # dapr.io/app-id: "gateway"
+        # dapr.io/app-port: "8000"
+        # dapr.io/app-protocol: "http"
     spec:
       containers:
         - name: gateway
@@ -60,7 +60,7 @@ metadata:
 spec:
   selector:
     app: gateway
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - name: http
       port: 8000
