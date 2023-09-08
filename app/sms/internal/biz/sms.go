@@ -2,7 +2,6 @@ package biz
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -47,7 +46,7 @@ func (s *SmsUseCase) CheckSMSStatus(ctx context.Context, req *smsv1.QuerySMSStat
 		return nil, err
 	}
 	if code != req.SmsCode {
-		return nil, errors.New("验证码错误")
+		return nil, status.Error(codes.Aborted, "验证码错误")
 	}
 	return &smsv1.QuerySMSStatusResponse{Status: true}, nil
 }
