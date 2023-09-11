@@ -8,7 +8,6 @@ package main
 
 import (
 	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/ydssx/morphix/app/job/internal/server"
 	"github.com/ydssx/morphix/common/conf"
 )
@@ -19,7 +18,7 @@ import (
 
 // Injectors from wire.go:
 
-func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
+func wireApp(bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
 	cronJobServer := server.NewCronJobServer(bootstrap)
 	jobServer := server.NewJobServer(bootstrap)
 	app := newApp(cronJobServer, jobServer, bootstrap)

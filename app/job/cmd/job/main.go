@@ -9,7 +9,6 @@ import (
 	"github.com/ydssx/morphix/app/job/internal/server"
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
-	"github.com/ydssx/morphix/pkg/logger"
 	"github.com/ydssx/morphix/pkg/provider"
 	_ "go.uber.org/automaxprocs"
 )
@@ -26,7 +25,7 @@ func main() {
 	close := conf.MustLoad(&c, flagconf)
 	defer close()
 
-	app, cleanup, err := wireApp(&c, logger.DefaultLogger)
+	app, cleanup, err := wireApp(&c)
 	if err != nil {
 		panic(err)
 	}
