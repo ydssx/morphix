@@ -13,7 +13,7 @@ import (
 func NewZapLogger() *zap.Logger {
 	cfg := zap.NewProductionEncoderConfig()
 	cfg.EncodeTime = func(t time.Time, pae zapcore.PrimitiveArrayEncoder) {
-		pae.AppendString(t.Format("2006-01-02 15:03:04"))
+		pae.AppendString(t.Format("2006-01-02 15:04:05"))
 	}
 	cfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	l := zap.New(zapcore.NewCore(zapcore.NewJSONEncoder(cfg), zapcore.Lock(os.Stdout), zap.DebugLevel))
