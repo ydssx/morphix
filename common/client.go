@@ -32,11 +32,10 @@ func NewUserClient(c *conf.Bootstrap) userv1.UserServiceClient {
 func createConn(etcdConf *conf.Etcd, rpcCliConf *conf.ClientConf) *grpc.ClientConn {
 	r := NewEtcdRegistry(etcdConf)
 
-	return CreateClientConn(rpcCliConf, r)
+	return CreateClientConn(context.Background(), rpcCliConf, r)
 }
 
-func CreateClientConn(rpcCliConf *conf.ClientConf, r *etcd.Registry) *grpc.ClientConn {
-	ctx := context.Background()
+func CreateClientConn(ctx context.Context, rpcCliConf *conf.ClientConf, r *etcd.Registry) *grpc.ClientConn {
 	conn, err := kgrpc.DialInsecure(ctx,
 		kgrpc.WithEndpoint(rpcCliConf.Addr),
 		kgrpc.WithTimeout(rpcCliConf.Timeout.AsDuration()),

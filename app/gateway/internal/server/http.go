@@ -33,7 +33,7 @@ func registerRpcHandler(c *conf.Bootstrap) {
 	handlers[c.OrderRpcClient] = orderv1.RegisterOrderServiceHandler
 }
 
-func NewHTTPServer(c *conf.Bootstrap) *khttp.Server {
+func NewHTTPServer(ctx context.Context, c *conf.Bootstrap) *khttp.Server {
 	httpSrv := khttp.NewServer(
 		khttp.Address(c.Gateway.Server.Http.Addr),
 	)
@@ -41,7 +41,7 @@ func NewHTTPServer(c *conf.Bootstrap) *khttp.Server {
 	openAPIhandler := openapiv2.NewHandler()
 	httpSrv.HandlePrefix("/q/", openAPIhandler)
 
-	ginHandler := newGinHandler(context.Background(), c)
+	ginHandler := newGinHandler(ctx, c)
 	httpSrv.HandlePrefix("/", ginHandler)
 
 	return httpSrv
@@ -84,7 +84,7 @@ func newGateway(ctx context.Context, c *conf.Bootstrap) http.Handler {
 
 	mux := gwruntime.NewServeMux(opts...)
 	for cliConf, f := range handlers {
-		conn := common.CreateClientConn(cliConf, r)
+		conn := common.CreateClientConn(ctx, cliConf, r)
 		if err := f(ctx, mux, conn); err != nil {
 			panic(err)
 		}

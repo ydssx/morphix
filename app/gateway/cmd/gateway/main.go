@@ -19,7 +19,7 @@ func main() {
 	close := conf.MustLoad(&c, *configFile)
 	defer close()
 
-	app, cleanup, err := wireApp(&c)
+	app, cleanup, err := wireApp(context.Background(), &c)
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +40,6 @@ func newApp(hs *khttp.Server, c *conf.Bootstrap) *kratos.App {
 
 	app := kratos.New(
 		kratos.Name(c.Gateway.Name),
-		kratos.Context(context.Background()),
 		kratos.Server(hs),
 		kratos.AfterStop(tp.Shutdown),
 		kratos.AfterStop(mp.Shutdown),
