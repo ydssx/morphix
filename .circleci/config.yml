@@ -12,7 +12,7 @@ jobs:
           key: go-mod-{{ checksum "go.sum" }}
       - run:
           name: Download Go modules
-          command: go mod download
+          command: go mod tidy
       - save_cache:
           key: go-mod-{{ checksum "go.sum" }}
           paths:
