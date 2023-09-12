@@ -18,7 +18,8 @@ const (
 
 var (
 	cronJobMap = map[string]string{
-		"@every 30s": CronJobTest,
+		"@every 5s":  CronJobTest,
+		"*/1 * * * *": CronJobTest,
 	}
 
 	jobHandlerMap = map[string]handler{
@@ -46,4 +47,3 @@ func TestCronJobHandler(ctx context.Context, _ *asynq.Task) error {
 
 	return nil
 }
-

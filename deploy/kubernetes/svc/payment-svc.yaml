@@ -39,6 +39,11 @@ spec:
               port: 9002
             initialDelaySeconds: 10
             periodSeconds: 30
+          readinessProbe:
+            grpc:
+              port: 9002
+            initialDelaySeconds: 10
+            periodSeconds: 30
           env:
             - name: TZ
               value: "Asia/Shanghai"

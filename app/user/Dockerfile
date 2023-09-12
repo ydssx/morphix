@@ -17,7 +17,6 @@ RUN apk add --no-cache ca-certificates
 WORKDIR /usr/src/app/
 
 COPY --from=builder /bin ./
-COPY --from=builder /src/configs ./
 
 EXPOSE 9000
 

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: asynqmon
+  namespace: morphix
+spec:
+  selector:
+    matchLabels:
+      app: asynqmon
+  template:
+    metadata:
+      labels:
+        app: asynqmon
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+        - name: asynqmon
+          image: hibiken/asynqmon:latest
+          env:
+            - name: REDIS_PASSWORD
+              value: "1GyY3AHsWg"
+          args:
+            - "--redis-addr=redis-master.default:6379"
+            - "--redis-db=1"
+            - "--redis-password=$(REDIS_PASSWORD)"
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "100m"
+            limits:
+              memory: "32Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: asynqmon-service
+  namespace: morphix
+spec:
+  type: LoadBalancer
+  selector:
+    app: asynqmon
+  ports:
+    - port: 8082
+      targetPort: 8080

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"time"
 
 	"github.com/hibiken/asynq"
 	"github.com/ydssx/morphix/app/job/internal/handler"
@@ -24,12 +25,12 @@ func NewJobServer(c *conf.Bootstrap) *JobServer {
 		DB:       1,
 	}
 
-	server := asynq.NewServer(redisClientOpt, asynq.Config{Concurrency: 10, ErrorHandler: asynq.ErrorHandlerFunc(reportError)})
+	server := asynq.NewServer(redisClientOpt, asynq.Config{Concurrency: 2, ErrorHandler: asynq.ErrorHandlerFunc(reportError)})
 
 	mux := asynq.NewServeMux()
 	handler.RegisterJobHandler(mux)
-	NewClient(c)
-	return &JobServer{sr: server,mux: mux}
+	go NewClient(c)
+	return &JobServer{sr: server, mux: mux}
 }
 
 func (j *JobServer) Start(_ context.Context) error {
@@ -54,9 +55,12 @@ func NewClient(c *conf.Bootstrap) {
 		DB:       1,
 	}
 	cli := asynq.NewClient(redisClientOpt)
-	payload, _ := json.Marshal(handler.Payload{Msg: "test msg"})
-	_, err := cli.Enqueue(asynq.NewTask(handler.TestJob, payload))
-	if err != nil {
-		log.Print(err)
+	for {
+		payload, _ := json.Marshal(handler.Payload{Msg: "test msg"})
+		_, err := cli.Enqueue(asynq.NewTask(handler.TestJob, payload))
+		if err != nil {
+			log.Print(err)
+		}
+		time.Sleep(time.Millisecond*100)
 	}
 }
