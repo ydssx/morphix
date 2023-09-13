@@ -1695,7 +1695,7 @@
           "type": "string"
         },
         "scene": {
-          "type": "string"
+          "$ref": "#/definitions/smsv1SmsScene"
         }
       },
       "title": "发送短信请求"
@@ -1731,6 +1731,15 @@
         }
       },
       "title": "管理短信签名响应"
+    },
+    "smsv1SmsScene": {
+      "type": "string",
+      "enum": [
+        "USER_LOGIN",
+        "USER_REGISTER",
+        "USER_RESET_PASSWORD"
+      ],
+      "default": "USER_LOGIN"
     },
     "smsv1TemplateManagementResponse": {
       "type": "object",

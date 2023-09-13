@@ -838,7 +838,8 @@ components:
                 templateParameters:
                     type: string
                 scene:
-                    type: string
+                    type: integer
+                    format: enum
             description: 发送短信请求
         smsv1.SendSMSResponse:
             type: object

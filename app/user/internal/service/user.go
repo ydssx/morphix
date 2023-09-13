@@ -8,7 +8,6 @@ import (
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/user/internal/biz"
-	"github.com/ydssx/morphix/constants"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -27,7 +26,7 @@ func NewUserService(uc *biz.UserUsecase, sms smsv1.SMSServiceClient) *UserServic
 
 // Register 实现用户注册接口
 func (s *UserService) Register(ctx context.Context, req *userv1.RegistrationRequest) (*userv1.User, error) {
-	checkResult, err := s.sms.CheckSMSStatus(ctx, &smsv1.QuerySMSStatusRequest{MobileNumber: req.Phone, SmsCode: req.SmsCode, Scene: string(constants.SmsSceneUserRegister)})
+	checkResult, err := s.sms.CheckSMSStatus(ctx, &smsv1.QuerySMSStatusRequest{MobileNumber: req.Phone, SmsCode: req.SmsCode, Scene: smsv1.SmsScene_USER_REGISTER})
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +68,7 @@ func (s *UserService) UpdateProfile(ctx context.Context, req *userv1.UpdateProfi
 
 // ResetPassword 实现重置密码接口
 func (s *UserService) ResetPassword(ctx context.Context, req *userv1.ResetPasswordRequest) (*emptypb.Empty, error) {
-	checkResult, err := s.sms.CheckSMSStatus(ctx, &smsv1.QuerySMSStatusRequest{MobileNumber: "", SmsCode: req.VerificationCode, Scene: string(constants.SmsSceneUserResetPassword)})
+	checkResult, err := s.sms.CheckSMSStatus(ctx, &smsv1.QuerySMSStatusRequest{MobileNumber: "", SmsCode: req.VerificationCode, Scene: smsv1.SmsScene_USER_RESET_PASSWORD})
 	if err != nil {
 		return nil, err
 	}
