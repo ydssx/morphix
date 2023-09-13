@@ -9,6 +9,7 @@ resources:
   - user-svc.yaml
   - payment-svc.yaml
   - order-svc.yaml
+  - job-svc.yaml
 generatorOptions:
   disableNameSuffixHash: true
 namespace: morphix

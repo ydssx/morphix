@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: job
+  labels:
+    app: job
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: job
+  template:
+    metadata:
+      labels:
+        app: job
+        sidecar.istio.io/inject: "false"
+      annotations:
+        sidecar.istio.io/rewriteAppHTTPProbers: "false"
+    spec:
+      containers:
+        - name: job
+          image: registry.cn-shenzhen.aliyuncs.com/ydssx/job:1.0.3
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "32Mi"
+              cpu: "100m"
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/morphix
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+      imagePullSecrets:
+        - name: aliyun-registry-secret
+      volumes:
+        - name: config-volume
+          configMap:
+            name: morphix-config

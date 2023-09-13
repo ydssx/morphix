@@ -10,9 +10,9 @@ RUN go build -o /bin ./app/sms/cmd/sms
 
 FROM alpine
 
-ENV TZ=Asia/Shanghai
+RUN apk add --no-cache ca-certificates tzdata
 
-RUN apk add --no-cache ca-certificates
+ENV TZ=Asia/Shanghai
 
 WORKDIR /usr/src/app/
 

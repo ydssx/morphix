@@ -259,6 +259,19 @@ services:
     networks:
       - morphix_net
 
+  job:
+    image: registry.cn-shenzhen.aliyuncs.com/ydssx/job:${TAG:-latest}
+    container_name: job-service
+    volumes:
+      - ./configs/:/etc/morphix/:ro
+    build:
+      context: ./
+      dockerfile: ./app/job/Dockerfile
+      args:
+        - TAG=${TAG:-latest}
+    networks:
+      - morphix_net
+
   nginx:
     image: nginx
     container_name: nginx
