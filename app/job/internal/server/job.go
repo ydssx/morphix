@@ -22,10 +22,10 @@ type JobServer struct {
 func NewJobServer(c *conf.Bootstrap) *JobServer {
 	opt := common.InitRedisOpt(c)
 	server := asynq.NewServer(opt, asynq.Config{Concurrency: 10, ErrorHandler: asynq.ErrorHandlerFunc(reportError)})
-	
+
 	mux := asynq.NewServeMux()
 	handler.RegisterJobHandler(mux)
-	// go NewClient(opt)
+	go NewClient(opt)
 	return &JobServer{sr: server, mux: mux}
 }
 
