@@ -137,3 +137,19 @@ order:
       read_timeout: 2s
       write_timeout: 2s
       dial_timeout: 5s
+
+# job服务配置
+job:
+  name: job-rpc
+  server:
+    grpc:
+      addr: 0.0.0.0:9004
+      timeout: 2s
+  data:
+    redis:
+      addr: redis-master.default:6379
+      username:
+      password: 1GyY3AHsWg
+      read_timeout: 2s
+      write_timeout: 2s
+      dial_timeout: 5s

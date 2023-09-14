@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/hibiken/asynq"
+	"github.com/ydssx/morphix/app/job/internal/common"
 	"github.com/ydssx/morphix/app/job/internal/handler"
 	"github.com/ydssx/morphix/common/conf"
 )
@@ -14,14 +15,8 @@ type CronJobServer struct {
 }
 
 func NewCronJobServer(c *conf.Bootstrap) *CronJobServer {
-	redisConf := c.Redis
-	redisClientOpt := asynq.RedisClientOpt{
-		Addr:     redisConf.Addr,
-		Password: redisConf.Password,
-		DB:       1,
-	}
-
-	scheduler := asynq.NewScheduler(redisClientOpt, &asynq.SchedulerOpts{Location: time.Local})
+	opt := common.InitRedisOpt(c)
+	scheduler := asynq.NewScheduler(opt, &asynq.SchedulerOpts{Location: time.Local})
 	handler.RegisterCronJob(scheduler)
 
 	return &CronJobServer{sd: scheduler}

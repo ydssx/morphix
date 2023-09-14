@@ -8,7 +8,9 @@ package main
 
 import (
 	"github.com/go-kratos/kratos/v2"
+	"github.com/ydssx/morphix/app/job/internal/common"
 	"github.com/ydssx/morphix/app/job/internal/server"
+	"github.com/ydssx/morphix/app/job/internal/service"
 	"github.com/ydssx/morphix/common/conf"
 )
 
@@ -21,7 +23,10 @@ import (
 func wireApp(bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
 	cronJobServer := server.NewCronJobServer(bootstrap)
 	jobServer := server.NewJobServer(bootstrap)
-	app := newApp(cronJobServer, jobServer, bootstrap)
+	client := common.NewAsynqClient(bootstrap)
+	jobService := service.NewJobService(client)
+	grpcServer := server.NewGRPCServer(bootstrap, jobService)
+	app := newApp(cronJobServer, jobServer, grpcServer, bootstrap)
 	return app, func() {
 	}, nil
 }

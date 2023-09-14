@@ -16,6 +16,7 @@ message Bootstrap {
   ServerConf sms = 6;
   ServerConf payment = 7;
   ServerConf order = 8;
+  ServerConf job = 16;
 
   ClientConf sms_rpc_client = 9;
   ClientConf user_rpc_client = 10;

@@ -6,38 +6,30 @@ import (
 	"fmt"
 
 	"github.com/hibiken/asynq"
+	jobv1 "github.com/ydssx/morphix/api/job/v1"
 	"github.com/ydssx/morphix/pkg/logger"
 )
 
 type handler func(ctx context.Context, t *asynq.Task) error
 
-const (
-	TestJob     = "job.test"
-	CronJobTest = "cronjob.test"
-)
-
 var (
-	cronJobMap = map[string]string{
-		"@every 5s":  CronJobTest,
-		"*/1 * * * *": CronJobTest,
+	cronJobMap = map[string]jobv1.JobType{
+		"@every 5s":   jobv1.JobType_TEST_CRON_JOB,
+		"*/1 * * * *": jobv1.JobType_TEST_CRON_JOB,
 	}
 
-	jobHandlerMap = map[string]handler{
-		TestJob:     TestJobHandler,
-		CronJobTest: TestCronJobHandler,
+	jobHandlerMap = map[jobv1.JobType]handler{
+		jobv1.JobType_TEST_JOB:      TestJobHandler,
+		jobv1.JobType_TEST_CRON_JOB: TestCronJobHandler,
 	}
 )
-
-type Payload struct {
-	Msg string
-}
 
 func TestJobHandler(ctx context.Context, t *asynq.Task) error {
-	var p Payload
+	var p jobv1.PayLoadTest
 	if err := json.Unmarshal(t.Payload(), &p); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
-	logger.Infof(ctx, "测试job, payload: %v", p)
+	logger.Infof(ctx, "测试job, payload: %v", string(t.Payload()))
 
 	return nil
 }

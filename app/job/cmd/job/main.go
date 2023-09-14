@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/ydssx/morphix/app/job/internal/server"
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
@@ -38,7 +39,7 @@ func main() {
 
 }
 
-func newApp(gs *server.CronJobServer, ls *server.JobServer, c *conf.Bootstrap) *kratos.App {
+func newApp(cs *server.CronJobServer, ls *server.JobServer, gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
 	r := common.NewEtcdRegistry(c.Etcd)
 
 	tp, _ := provider.InitTraceProvider(c.Otelcol.Addr, "morphix-job")
@@ -46,7 +47,7 @@ func newApp(gs *server.CronJobServer, ls *server.JobServer, c *conf.Bootstrap) *
 	return kratos.New(
 		kratos.Name("morphix-job"),
 		kratos.Metadata(map[string]string{}),
-		kratos.Server(gs, ls),
+		kratos.Server(cs, gs, ls),
 		kratos.Registrar(r),
 		kratos.BeforeStart(func(_ context.Context) error {
 			log.Infow("app.version", "1.0.0")

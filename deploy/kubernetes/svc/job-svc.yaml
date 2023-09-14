@@ -28,6 +28,8 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /etc/morphix
+          ports:
+            - containerPort: 9004
           env:
             - name: TZ
               value: Asia/Shanghai
@@ -37,3 +39,16 @@ spec:
         - name: config-volume
           configMap:
             name: morphix-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: job-service
+spec:
+  selector:
+    app: job
+  type: ClusterIP
+  ports:
+    - port: 9004
+      targetPort: 9004
