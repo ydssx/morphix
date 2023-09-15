@@ -21,8 +21,17 @@ func NewJobService(cli *asynq.Client) *JobService {
 }
 
 func (j *JobService) Enqueue(ctx context.Context, req *jobv1.EnqueueRequest) (*emptypb.Empty, error) {
-	opts := []asynq.Option{asynq.MaxRetry(1)}
-	_, err := j.cli.EnqueueContext(ctx, asynq.NewTask(jobv1.JobType_name[int32(req.JobType)], req.Payload), opts...)
+	opts := []asynq.Option{asynq.MaxRetry(0)}
+	if req.RetryTime > 0 {
+		opts = append(opts, asynq.MaxRetry(int(req.RetryTime)))
+	}
+	if req.ProcessAt.IsValid() {
+		opts = append(opts, asynq.ProcessAt(req.ProcessAt.AsTime()))
+	}
+	if req.ProcessIn.IsValid() {
+		opts = append(opts, asynq.ProcessIn(req.ProcessIn.AsDuration()))
+	}
+	_, err := j.cli.EnqueueContext(ctx, asynq.NewTask(req.JobType.String(), req.Payload), opts...)
 	if err != nil {
 		return nil, status.Errorf(codes.Unknown, "发送任务失败,err: %v", err)
 	}

@@ -31,7 +31,7 @@ func (s *SmsUseCase) SendSMS(ctx context.Context, req *smsv1.SendSMSRequest) (re
 	if err != nil {
 		return nil, err
 	}
-	span.AddEvent("sms code sended", trace.WithAttributes(attribute.String("scene", smsv1.SmsScene_name[int32(req.Scene)]), attribute.String("code", code)))
+	span.AddEvent("sms code sended", trace.WithAttributes(attribute.String("scene", req.Scene.String()), attribute.String("code", code)))
 
 	return &smsv1.SendSMSResponse{Success: true}, nil
 }

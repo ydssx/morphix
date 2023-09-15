@@ -3,7 +3,9 @@ syntax = "proto3";
 package job.v1;
 
 import "google/api/annotations.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ydssx/morphix/api/job/v1;jobv1";
 
@@ -12,8 +14,12 @@ service JobService {
 }
 
 message EnqueueRequest {
-  JobType jobType = 1;
+  JobType job_type = 1;
   bytes payload = 2;
+  int64 retry_time = 3;
+  google.protobuf.Timestamp process_at = 4;
+  google.protobuf.Duration process_in = 5;
+  google.protobuf.Timestamp deadline = 6;
 }
 
 enum JobType {

@@ -26,10 +26,10 @@ func NewEventSender(daprClient *dapr.DaprClient, ce *mq.CloudEvent) PaymentEvent
 
 // OnMakePayment implements PaymentEvents.
 func (e *eventSender) OnMakePayment(ctx context.Context, payload *event.PayloadPaymentCompleted) error {
-	return e.PublishEvent(ctx, event.Subject_name[int32(event.Subject_PaymentCompleted)], payload)
+	return e.PublishEvent(ctx, event.Subject_PaymentCompleted.String(), payload)
 }
 
 // OnCancelPayment implements PaymentEvents.
 func (e *eventSender) OnCancelPayment(ctx context.Context, payload *event.PayloadCancelPayment) error {
-	return e.ce.PublishEvent(ctx, event.Subject_name[int32(event.Subject_CancelPayment)], payload)
+	return e.ce.PublishEvent(ctx, event.Subject_CancelPayment.String(), payload)
 }

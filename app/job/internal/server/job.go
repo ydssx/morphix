@@ -47,7 +47,7 @@ func NewClient(redisClientOpt asynq.RedisClientOpt) {
 	cli := asynq.NewClient(redisClientOpt)
 	for {
 		payload, _ := json.Marshal(jobv1.PayLoadTest{Msg: "test msg"})
-		_, err := cli.Enqueue(asynq.NewTask(jobv1.JobType_name[int32(jobv1.JobType_TEST_JOB)], payload))
+		_, err := cli.Enqueue(asynq.NewTask(jobv1.JobType_TEST_JOB.String(), payload))
 		if err != nil {
 			log.Print(err)
 		}
