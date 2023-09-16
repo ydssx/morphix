@@ -12,7 +12,7 @@ import (
 
 func NewGRPCServer(c *conf.Bootstrap, svc *service.OrderService) *grpc.Server {
 
-	srv := common.NewGRPCServer(c.Order.Server)
+	srv := common.NewGRPCServer(c.ServiceSet.Order.Server)
 
 	orderv1.RegisterOrderServiceServer(srv, svc)
 

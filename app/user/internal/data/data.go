@@ -29,7 +29,7 @@ func NewData(logger log.Logger, rdb *goredis.Client, db *gorm.DB) (*Data, func()
 }
 
 func NewRedisCLient(c *conf.Bootstrap) *goredis.Client {
-	redisConf := c.User.Data.Redis
+	redisConf := c.ServiceSet.User.Data.Redis
 	return redis.NewRedis(&goredis.Options{
 		Addr:         redisConf.Addr,
 		Password:     redisConf.Password,
@@ -41,7 +41,7 @@ func NewRedisCLient(c *conf.Bootstrap) *goredis.Client {
 }
 
 func NewMysqlDB(c *conf.Bootstrap) *gorm.DB {
-	return mysql.NewDB(c.User.Data.Database.Source)
+	return mysql.NewDB(c.ServiceSet.User.Data.Database.Source)
 }
 
 func NewRedisCache(client *goredis.Client) cache.Cache {

@@ -20,6 +20,8 @@ message EnqueueRequest {
   google.protobuf.Timestamp process_at = 4;
   google.protobuf.Duration process_in = 5;
   google.protobuf.Timestamp deadline = 6;
+  // 任务完成后保留时间
+  google.protobuf.Duration retention = 7;
 }
 
 enum JobType {

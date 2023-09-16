@@ -10,21 +10,28 @@ message Bootstrap {
   Etcd etcd = 2;
   Jaeger jaeger = 3;
   Nats nats = 4;
+  RedisCluster redis_cluster = 5;
+  Redis redis = 6;
 
-  ServerConf gateway = 13;
-  ServerConf user = 5;
-  ServerConf sms = 6;
-  ServerConf payment = 7;
-  ServerConf order = 8;
-  ServerConf job = 16;
+  ServiceSet service_set = 7;
+  ClientSet client_set = 8;
+}
 
-  ClientConf sms_rpc_client = 9;
-  ClientConf user_rpc_client = 10;
-  ClientConf order_rpc_client = 11;
-  ClientConf payment_rpc_client = 12;
+message ServiceSet {
+  ServerConf gateway = 1;
+  ServerConf user = 2;
+  ServerConf sms = 3;
+  ServerConf payment = 4;
+  ServerConf order = 5;
+  ServerConf job = 6;
+}
 
-  RedisCluster redis_cluster = 14;
-  Redis redis = 15;
+message ClientSet {
+  ClientConf sms_rpc_client = 1;
+  ClientConf user_rpc_client = 2;
+  ClientConf order_rpc_client = 3;
+  ClientConf payment_rpc_client = 4;
+  ClientConf job_rpc_client = 5;
 }
 
 message Server {

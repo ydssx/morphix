@@ -30,13 +30,13 @@ func NewServiceClientSet(c *conf.Bootstrap) *ServiceClientSet {
 }
 
 func NewSMSClient(c *conf.Bootstrap) smsv1.SMSServiceClient {
-	conn := createConn(c.Etcd, c.SmsRpcClient)
+	conn := createConn(c.Etcd, c.ClientSet.SmsRpcClient)
 
 	return smsv1.NewSMSServiceClient(conn)
 }
 
 func NewUserClient(c *conf.Bootstrap) userv1.UserServiceClient {
-	conn := createConn(c.Etcd, c.UserRpcClient)
+	conn := createConn(c.Etcd, c.ClientSet.UserRpcClient)
 
 	return userv1.NewUserServiceClient(conn)
 }

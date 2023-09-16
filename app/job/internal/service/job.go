@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"time"
 
 	"github.com/hibiken/asynq"
 	jobv1 "github.com/ydssx/morphix/api/job/v1"
@@ -22,7 +21,7 @@ func NewJobService(cli *asynq.Client) *JobService {
 }
 
 func (j *JobService) Enqueue(ctx context.Context, req *jobv1.EnqueueRequest) (*emptypb.Empty, error) {
-	opts := []asynq.Option{asynq.MaxRetry(0), asynq.Retention(time.Hour)}
+	opts := []asynq.Option{asynq.MaxRetry(0)}
 	if req.RetryTime > 0 {
 		opts = append(opts, asynq.MaxRetry(int(req.RetryTime)))
 	}
@@ -31,6 +30,9 @@ func (j *JobService) Enqueue(ctx context.Context, req *jobv1.EnqueueRequest) (*e
 	}
 	if req.ProcessIn.IsValid() {
 		opts = append(opts, asynq.ProcessIn(req.ProcessIn.AsDuration()))
+	}
+	if req.Retention.IsValid() {
+		opts = append(opts, asynq.Retention(req.Retention.AsDuration()))
 	}
 	_, err := j.cli.EnqueueContext(ctx, asynq.NewTask(req.JobType.String(), req.Payload), opts...)
 	if err != nil {

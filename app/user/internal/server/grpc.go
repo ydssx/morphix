@@ -11,7 +11,7 @@ import (
 
 func NewGRPCServer(c *conf.Bootstrap, userSvc *service.UserService) *grpc.Server {
 
-	srv := common.NewGRPCServer(c.User.Server)
+	srv := common.NewGRPCServer(c.ServiceSet.User.Server)
 
 	userv1.RegisterUserServiceServer(srv, userSvc)
 

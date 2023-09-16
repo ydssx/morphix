@@ -10,8 +10,10 @@ import (
 	jobv1 "github.com/ydssx/morphix/api/job/v1"
 	"github.com/ydssx/morphix/app/job/internal/common"
 	"github.com/ydssx/morphix/app/job/internal/handler"
+	"github.com/ydssx/morphix/app/job/internal/service"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/logger"
+	"github.com/ydssx/morphix/pkg/util"
 )
 
 type JobServer struct {
@@ -45,12 +47,13 @@ func reportError(ctx context.Context, task *asynq.Task, err error) {
 
 func NewClient(redisClientOpt asynq.RedisClientOpt) {
 	cli := asynq.NewClient(redisClientOpt)
+	srv := service.NewJobService(cli)
 	for {
-		payload, _ := json.Marshal(jobv1.PayLoadTest{Msg: "test msg"})
-		_, err := cli.Enqueue(asynq.NewTask(jobv1.JobType_TEST_JOB.String(), payload))
+		payload, _ := json.Marshal(jobv1.PayLoadTest{Msg: "test msg:" + util.GenerateCode(6)})
+		_, err := srv.Enqueue(context.Background(), &jobv1.EnqueueRequest{JobType: jobv1.JobType_TEST_JOB, Payload: payload})
 		if err != nil {
 			log.Print(err)
 		}
-		time.Sleep(time.Millisecond * 100)
+		time.Sleep(time.Millisecond * 500)
 	}
 }

@@ -33,123 +33,129 @@ redis:
   write_timeout: 2s
   dial_timeout: 5s
 
+clientSet:
+  userRpcClient:
+    network: tcp
+    addr: discovery:///user-rpc
+    timeout: 2s
 
-userRpcClient:
-  network: tcp
-  addr: discovery:///user-rpc
-  timeout: 2s
+  smsRpcClient:
+    network: tcp
+    addr: discovery:///sms-rpc
+    timeout: 2s
 
-smsRpcClient:
-  network: tcp
-  addr: discovery:///sms-rpc
-  timeout: 2s
+  paymentRpcClient:
+    network: tcp
+    addr: discovery:///payment-rpc
+    timeout: 2s
 
-paymentRpcClient:
-  network: tcp
-  addr: discovery:///payment-rpc
-  timeout: 2s
+  orderRpcClient:
+    network: tcp
+    addr: discovery:///order-rpc
+    timeout: 2s
 
-orderRpcClient:
-  network: tcp
-  addr: discovery:///order-rpc
-  timeout: 2s
+  jobRpcClient:
+    network: tcp
+    addr: discovery:///job-rpc
+    timeout: 2s
 
-# gateway配置
-gateway:
-  name: gateway
-  server:
-    http:
-      addr: 0.0.0.0:8000
-      timeout: 2s
+serviceSet:
+  # gateway配置
+  gateway:
+    name: gateway
+    server:
+      http:
+        addr: 0.0.0.0:8000
+        timeout: 2s
 
-# user服务配置
-user:
-  name: user-rpc
-  server:
-    grpc:
-      addr: 0.0.0.0:9000
-      timeout: 2s
-  data:
-    database:
-      driver: mysql
-      source: root:root@tcp(mysql.default:3306)/user?parseTime=true&loc=Local
-    redis:
-      addr: redis-master.default:6379
-      username:
-      password: 1GyY3AHsWg
-      read_timeout: 2s
-      write_timeout: 2s
-      dial_timeout: 5s
+  # user服务配置
+  user:
+    name: user-rpc
+    server:
+      grpc:
+        addr: 0.0.0.0:9000
+        timeout: 2s
+    data:
+      database:
+        driver: mysql
+        source: root:root@tcp(mysql.default:3306)/user?parseTime=true&loc=Local
+      redis:
+        addr: redis-master.default:6379
+        username:
+        password: 1GyY3AHsWg
+        read_timeout: 2s
+        write_timeout: 2s
+        dial_timeout: 5s
 
-# sms服务配置
-sms:
-  name: sms-rpc
-  server:
-    grpc:
-      addr: 0.0.0.0:9001
-      timeout: 2s
-  data:
-    database:
-      driver: mysql
-      source: root:root@tcp(mysql.default:3306)/sms?parseTime=true&loc=Local
-    redis:
-      addr: redis-master.default:6379
-      username:
-      password: 1GyY3AHsWg
-      read_timeout: 2s
-      write_timeout: 2s
-      dial_timeout: 5s
+  # sms服务配置
+  sms:
+    name: sms-rpc
+    server:
+      grpc:
+        addr: 0.0.0.0:9001
+        timeout: 2s
+    data:
+      database:
+        driver: mysql
+        source: root:root@tcp(mysql.default:3306)/sms?parseTime=true&loc=Local
+      redis:
+        addr: redis-master.default:6379
+        username:
+        password: 1GyY3AHsWg
+        read_timeout: 2s
+        write_timeout: 2s
+        dial_timeout: 5s
 
-# payment服务配置
-payment:
-  name: payment-rpc
-  server:
-    grpc:
-      addr: 0.0.0.0:9002
-      timeout: 2s
-  data:
-    database:
-      driver: mysql
-      source: root:root@tcp(mysql.default:3306)/payment?parseTime=true&loc=Local
-    redis:
-      addr: redis-master.default:6379
-      username:
-      password: 1GyY3AHsWg
-      read_timeout: 2s
-      write_timeout: 2s
-      dial_timeout: 5s
+  # payment服务配置
+  payment:
+    name: payment-rpc
+    server:
+      grpc:
+        addr: 0.0.0.0:9002
+        timeout: 2s
+    data:
+      database:
+        driver: mysql
+        source: root:root@tcp(mysql.default:3306)/payment?parseTime=true&loc=Local
+      redis:
+        addr: redis-master.default:6379
+        username:
+        password: 1GyY3AHsWg
+        read_timeout: 2s
+        write_timeout: 2s
+        dial_timeout: 5s
 
-# order服务配置
-order:
-  name: order-rpc
-  server:
-    grpc:
-      addr: 0.0.0.0:9003
-      timeout: 2s
-  data:
-    database:
-      driver: mysql
-      source: root:root@tcp(mysql.default:3306)/order?parseTime=true&loc=Local
-    redis:
-      addr: redis-master.default:6379
-      username:
-      password: 1GyY3AHsWg
-      read_timeout: 2s
-      write_timeout: 2s
-      dial_timeout: 5s
+  # order服务配置
+  order:
+    name: order-rpc
+    server:
+      grpc:
+        addr: 0.0.0.0:9003
+        timeout: 2s
+    data:
+      database:
+        driver: mysql
+        source: root:root@tcp(mysql.default:3306)/order?parseTime=true&loc=Local
+      redis:
+        addr: redis-master.default:6379
+        username:
+        password: 1GyY3AHsWg
+        read_timeout: 2s
+        write_timeout: 2s
+        dial_timeout: 5s
 
-# job服务配置
-job:
-  name: job-rpc
-  server:
-    grpc:
-      addr: 0.0.0.0:9004
-      timeout: 2s
-  data:
-    redis:
-      addr: redis-master.default:6379
-      username:
-      password: 1GyY3AHsWg
-      read_timeout: 2s
-      write_timeout: 2s
-      dial_timeout: 5s
+  # job服务配置
+  job:
+    name: job-rpc
+    server:
+      grpc:
+        addr: 0.0.0.0:9004
+        timeout: 2s
+    data:
+      redis:
+        addr: redis-master.default:6379
+        username:
+        password: 1GyY3AHsWg
+        read_timeout: 2s
+        write_timeout: 2s
+        dial_timeout: 5s

@@ -19,9 +19,9 @@ func NewListenerServer(ce *mq.CloudEvent) *ListenerServer {
 	return &ListenerServer{ce: ce}
 }
 
-func (l *ListenerServer) Start(context.Context) error {
+func (l *ListenerServer) Start(ctx context.Context) error {
 	for subject, handler := range subjectHandlerMap {
-		err := l.ce.AddEventListenerAsync(subject.String(), handler)
+		err := l.ce.AddEventListenerAsync(ctx, subject.String(), handler)
 		if err != nil {
 			return err
 		}

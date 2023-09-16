@@ -27,15 +27,16 @@ type registerFn func(ctx context.Context, mux *gwruntime.ServeMux, conn *grpc.Cl
 var handlers = make(map[*conf.ClientConf]registerFn)
 
 func registerRpcHandler(c *conf.Bootstrap) {
-	handlers[c.UserRpcClient] = userv1.RegisterUserServiceHandler
-	handlers[c.SmsRpcClient] = smsv1.RegisterSMSServiceHandler
-	handlers[c.PaymentRpcClient] = paymentv1.RegisterPaymentServiceHandler
-	handlers[c.OrderRpcClient] = orderv1.RegisterOrderServiceHandler
+	clientSet := c.ClientSet
+	handlers[clientSet.UserRpcClient] = userv1.RegisterUserServiceHandler
+	handlers[clientSet.SmsRpcClient] = smsv1.RegisterSMSServiceHandler
+	handlers[clientSet.PaymentRpcClient] = paymentv1.RegisterPaymentServiceHandler
+	handlers[clientSet.OrderRpcClient] = orderv1.RegisterOrderServiceHandler
 }
 
 func NewHTTPServer(ctx context.Context, c *conf.Bootstrap) *khttp.Server {
 	httpSrv := khttp.NewServer(
-		khttp.Address(c.Gateway.Server.Http.Addr),
+		khttp.Address(c.ServiceSet.Gateway.Server.Http.Addr),
 	)
 
 	openAPIhandler := openapiv2.NewHandler()

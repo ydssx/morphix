@@ -8,6 +8,7 @@ import (
 	"github.com/hibiken/asynq"
 	jobv1 "github.com/ydssx/morphix/api/job/v1"
 	"github.com/ydssx/morphix/pkg/logger"
+	"github.com/ydssx/morphix/pkg/util"
 )
 
 type handler func(ctx context.Context, t *asynq.Task) error
@@ -35,7 +36,7 @@ func TestJobHandler(ctx context.Context, t *asynq.Task) error {
 }
 
 func TestCronJobHandler(ctx context.Context, _ *asynq.Task) error {
-	logger.Info(ctx, "测试cronjob")
+	logger.Info(ctx, "测试cronjob:"+util.GenerateCode(6))
 
 	return nil
 }

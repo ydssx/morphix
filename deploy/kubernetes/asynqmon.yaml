@@ -23,6 +23,8 @@ spec:
             - "--redis-addr=redis-master.default:6379"
             - "--redis-db=1"
             - "--redis-password=$(REDIS_PASSWORD)"
+            - "--enable-metrics-exporter=true"
+            - "--prometheus-addr=http://prometheus.morphix:9090"
           resources:
             requests:
               memory: "32Mi"

@@ -12,7 +12,7 @@ import (
 var ProviderSet = wire.NewSet(NewSmsUseCase, NewSmsRedisClient)
 
 func NewSmsRedisClient(c *conf.Bootstrap) *goredis.Client {
-	redisConf := c.Sms.Data.Redis
+	redisConf := c.ServiceSet.Sms.Data.Redis
 	return redis.NewRedis(&goredis.Options{
 		Addr:         redisConf.Addr,
 		Password:     redisConf.Password,

@@ -42,12 +42,12 @@ func main() {
 func newApp(gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
 	r := common.NewEtcdRegistry(c.Etcd)
 
-	tp, _ := provider.InitTraceProvider(c.Otelcol.Addr, c.Sms.Name)
+	tp, _ := provider.InitTraceProvider(c.Otelcol.Addr, c.ServiceSet.Sms.Name)
 
 	mp := provider.InitMeterProvider(c.Otelcol.Addr)
 
 	return kratos.New(
-		kratos.Name(c.Sms.Name),
+		kratos.Name(c.ServiceSet.Sms.Name),
 		kratos.Metadata(map[string]string{}),
 		kratos.Server(gs),
 		kratos.Registrar(r),

@@ -81,6 +81,12 @@ data:
       - job_name: etcd
         static_configs:
           - targets: ["etcd.default:2379"]
+      - job_name: nats
+        static_configs:
+          - targets: ["nats.default:7777"]
+      - job_name: asynqmon
+        static_configs:
+          - targets: ["asynqmon-service:8082"]
       - job_name: gateway-service
         static_configs:
           - targets: ["gateway-service:8000"]

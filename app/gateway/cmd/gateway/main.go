@@ -32,14 +32,14 @@ func main() {
 
 func newApp(hs *khttp.Server, c *conf.Bootstrap) *kratos.App {
 
-	tp, err := provider.InitTraceProvider(c.Otelcol.Addr, c.Gateway.Name)
+	tp, err := provider.InitTraceProvider(c.Otelcol.Addr, c.ServiceSet.Gateway.Name)
 	if err != nil {
 		panic(err)
 	}
 	mp := provider.InitMeterProvider(c.Otelcol.Addr)
 
 	app := kratos.New(
-		kratos.Name(c.Gateway.Name),
+		kratos.Name(c.ServiceSet.Gateway.Name),
 		kratos.Server(hs),
 		kratos.AfterStop(tp.Shutdown),
 		kratos.AfterStop(mp.Shutdown),

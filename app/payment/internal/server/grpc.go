@@ -11,7 +11,7 @@ import (
 
 func NewGRPCServer(c *conf.Bootstrap, svc *service.PaymentService, logger log.Logger) *grpc.Server {
 
-	srv := common.NewGRPCServer(c.Payment.Server)
+	srv := common.NewGRPCServer(c.ServiceSet.Payment.Server)
 	
 	paymentv1.RegisterPaymentServiceServer(srv, svc)
 

@@ -174,296 +174,6 @@ func (m *Bootstrap) validate(all bool) error {
 	}
 
 	if all {
-		switch v := interface{}(m.GetGateway()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "Gateway",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "Gateway",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetGateway()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return BootstrapValidationError{
-				field:  "Gateway",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetUser()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "User",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "User",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetUser()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return BootstrapValidationError{
-				field:  "User",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetSms()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "Sms",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "Sms",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetSms()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return BootstrapValidationError{
-				field:  "Sms",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetPayment()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "Payment",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "Payment",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetPayment()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return BootstrapValidationError{
-				field:  "Payment",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetOrder()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "Order",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "Order",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetOrder()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return BootstrapValidationError{
-				field:  "Order",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetJob()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "Job",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "Job",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetJob()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return BootstrapValidationError{
-				field:  "Job",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetSmsRpcClient()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "SmsRpcClient",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "SmsRpcClient",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetSmsRpcClient()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return BootstrapValidationError{
-				field:  "SmsRpcClient",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetUserRpcClient()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "UserRpcClient",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "UserRpcClient",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetUserRpcClient()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return BootstrapValidationError{
-				field:  "UserRpcClient",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetOrderRpcClient()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "OrderRpcClient",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "OrderRpcClient",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetOrderRpcClient()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return BootstrapValidationError{
-				field:  "OrderRpcClient",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetPaymentRpcClient()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "PaymentRpcClient",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, BootstrapValidationError{
-					field:  "PaymentRpcClient",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetPaymentRpcClient()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return BootstrapValidationError{
-				field:  "PaymentRpcClient",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
 		switch v := interface{}(m.GetRedisCluster()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
@@ -515,6 +225,64 @@ func (m *Bootstrap) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
 				field:  "Redis",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetServiceSet()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BootstrapValidationError{
+					field:  "ServiceSet",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BootstrapValidationError{
+					field:  "ServiceSet",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetServiceSet()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BootstrapValidationError{
+				field:  "ServiceSet",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetClientSet()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BootstrapValidationError{
+					field:  "ClientSet",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BootstrapValidationError{
+					field:  "ClientSet",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetClientSet()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BootstrapValidationError{
+				field:  "ClientSet",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -597,6 +365,523 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = BootstrapValidationError{}
+
+// Validate checks the field values on ServiceSet with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ServiceSet) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ServiceSet with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ServiceSetMultiError, or
+// nil if none found.
+func (m *ServiceSet) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ServiceSet) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetGateway()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Gateway",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Gateway",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetGateway()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ServiceSetValidationError{
+				field:  "Gateway",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetUser()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "User",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "User",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUser()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ServiceSetValidationError{
+				field:  "User",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetSms()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Sms",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Sms",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSms()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ServiceSetValidationError{
+				field:  "Sms",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetPayment()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Payment",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Payment",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPayment()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ServiceSetValidationError{
+				field:  "Payment",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOrder()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Order",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Order",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOrder()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ServiceSetValidationError{
+				field:  "Order",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetJob()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Job",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Job",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetJob()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ServiceSetValidationError{
+				field:  "Job",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ServiceSetMultiError(errors)
+	}
+
+	return nil
+}
+
+// ServiceSetMultiError is an error wrapping multiple validation errors
+// returned by ServiceSet.ValidateAll() if the designated constraints aren't met.
+type ServiceSetMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ServiceSetMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ServiceSetMultiError) AllErrors() []error { return m }
+
+// ServiceSetValidationError is the validation error returned by
+// ServiceSet.Validate if the designated constraints aren't met.
+type ServiceSetValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ServiceSetValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ServiceSetValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ServiceSetValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ServiceSetValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ServiceSetValidationError) ErrorName() string { return "ServiceSetValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ServiceSetValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sServiceSet.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ServiceSetValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ServiceSetValidationError{}
+
+// Validate checks the field values on ClientSet with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ClientSet) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ClientSet with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ClientSetMultiError, or nil
+// if none found.
+func (m *ClientSet) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ClientSet) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetSmsRpcClient()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClientSetValidationError{
+					field:  "SmsRpcClient",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClientSetValidationError{
+					field:  "SmsRpcClient",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSmsRpcClient()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClientSetValidationError{
+				field:  "SmsRpcClient",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetUserRpcClient()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClientSetValidationError{
+					field:  "UserRpcClient",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClientSetValidationError{
+					field:  "UserRpcClient",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUserRpcClient()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClientSetValidationError{
+				field:  "UserRpcClient",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetOrderRpcClient()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClientSetValidationError{
+					field:  "OrderRpcClient",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClientSetValidationError{
+					field:  "OrderRpcClient",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetOrderRpcClient()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClientSetValidationError{
+				field:  "OrderRpcClient",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetPaymentRpcClient()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClientSetValidationError{
+					field:  "PaymentRpcClient",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClientSetValidationError{
+					field:  "PaymentRpcClient",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPaymentRpcClient()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClientSetValidationError{
+				field:  "PaymentRpcClient",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetJobRpcClient()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClientSetValidationError{
+					field:  "JobRpcClient",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClientSetValidationError{
+					field:  "JobRpcClient",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetJobRpcClient()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClientSetValidationError{
+				field:  "JobRpcClient",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ClientSetMultiError(errors)
+	}
+
+	return nil
+}
+
+// ClientSetMultiError is an error wrapping multiple validation errors returned
+// by ClientSet.ValidateAll() if the designated constraints aren't met.
+type ClientSetMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ClientSetMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ClientSetMultiError) AllErrors() []error { return m }
+
+// ClientSetValidationError is the validation error returned by
+// ClientSet.Validate if the designated constraints aren't met.
+type ClientSetValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ClientSetValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ClientSetValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ClientSetValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ClientSetValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ClientSetValidationError) ErrorName() string { return "ClientSetValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ClientSetValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sClientSet.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ClientSetValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ClientSetValidationError{}
 
 // Validate checks the field values on Server with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
