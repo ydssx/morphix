@@ -16,5 +16,16 @@ namespace: morphix
 commonLabels:
   project: morphix
 
-# images:
-#   - newTag: 1.0.2
+images:
+  - name: registry.cn-shenzhen.aliyuncs.com/ydssx/gateway
+    newTag: 1.0.4
+  - name: registry.cn-shenzhen.aliyuncs.com/ydssx/job
+    newTag: 1.0.4
+  - name: registry.cn-shenzhen.aliyuncs.com/ydssx/order
+    newTag: 1.0.4
+  - name: registry.cn-shenzhen.aliyuncs.com/ydssx/payment
+    newTag: 1.0.4
+  - name: registry.cn-shenzhen.aliyuncs.com/ydssx/sms
+    newTag: 1.0.4
+  - name: registry.cn-shenzhen.aliyuncs.com/ydssx/user
+    newTag: 1.0.4
