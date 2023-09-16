@@ -2,6 +2,8 @@
 
 set -eo pipefail
 
+# source ./.env
+
 # 阿里云容器镜像服务相关信息
 REGISTRY_URL="registry.cn-shenzhen.aliyuncs.com"
 REGISTRY_NAMESPACE="ydssx"
@@ -9,13 +11,13 @@ registry_username="$REGISTRY_USERNAME"
 registry_password="$REGISTRY_PASSWORD"
 
 # 定义版本号
-version="1.0.3"
+version="1.0.4"
 
 # 登录镜像仓库
 echo "$registry_password" | docker login --username "$registry_username" --password-stdin $REGISTRY_URL
 
 # 定义要构建的微服务列表
-services=("gateway" "user" "sms" "order" "payment")
+services=("gateway" "user" "sms" "order" "payment" "job")
 
 # 构建和推送指定的微服务镜像
 build_and_push() {
