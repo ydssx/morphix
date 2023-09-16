@@ -54,7 +54,6 @@ if [ $# -gt 0 ]; then
     wait
 else
     # 否则，构建和推送所有微服务镜像
-    services=("gateway" "user" "sms" "order" "payment")
     for service in "${services[@]}"; do
         build_and_push "$service" &
 
