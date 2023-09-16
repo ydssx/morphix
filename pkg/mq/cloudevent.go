@@ -65,15 +65,15 @@ func (c *CloudEvent) AddEventListener(ctx context.Context, subject string, handl
 	return
 }
 
-func (c *CloudEvent) AddEventListenerAsync(subject string, handler EventHandler, opts ...cenats.ConsumerOption) (err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+func (c *CloudEvent) AddEventListenerAsync(ctx context.Context, subject string, handler EventHandler, opts ...cenats.ConsumerOption) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 	defer cancel()
 
 	errChan := make(chan error, 1)
 
 	go func() {
 		defer close(errChan)
-		errChan <- c.AddEventListener(context.Background(), subject, handler, opts...)
+		errChan <- c.AddEventListener(ctx, subject, handler, opts...)
 	}()
 
 	select {
