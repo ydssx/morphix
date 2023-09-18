@@ -17,6 +17,7 @@ import (
 	"github.com/ydssx/morphix/app/gateway/internal/middleware"
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
+	"github.com/ydssx/morphix/docs"
 	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -56,6 +57,7 @@ func newGinHandler(ctx context.Context, c *conf.Bootstrap) *gin.Engine {
 
 	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	server.GET("/healthz", func(c *gin.Context) { c.String(http.StatusOK, "%s", "ok") })
+	server.GET("/docs", func(ctx *gin.Context) { ctx.Writer.Write(docs.ApiDocs) })
 	server.Any("/api/*any", gin.WrapH(newGateway(ctx, c)))
 
 	server.Use(middleware.Auth())
