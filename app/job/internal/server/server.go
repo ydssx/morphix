@@ -4,4 +4,4 @@ import (
 	"github.com/google/wire"
 )
 
-var ProviderSet = wire.NewSet(NewJobServer, NewCronJobServer, NewGRPCServer)
+var ProviderSet = wire.NewSet(NewJobServer, NewGRPCServer)

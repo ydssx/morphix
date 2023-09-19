@@ -7,6 +7,8 @@ import (
 
 	"github.com/hibiken/asynq"
 	jobv1 "github.com/ydssx/morphix/api/job/v1"
+	smsv1 "github.com/ydssx/morphix/api/sms/v1"
+	"github.com/ydssx/morphix/app/job/internal/common"
 	"github.com/ydssx/morphix/pkg/logger"
 	"github.com/ydssx/morphix/pkg/util"
 )
@@ -37,6 +39,11 @@ func TestJobHandler(ctx context.Context, t *asynq.Task) error {
 
 func TestCronJobHandler(ctx context.Context, _ *asynq.Task) error {
 	logger.Info(ctx, "测试cronjob:"+util.GenerateCode(6))
-
+	res, err := common.ClientSetFromContext(ctx).SendSMS(ctx, &smsv1.SendSMSRequest{Scene: smsv1.SmsScene_USER_LOGIN, MobileNumber: "123456"})
+	if err != nil {
+		logger.Error(ctx, err.Error())
+		return err
+	}
+	logger.Infof(ctx, "测试测试：%v", res.String())
 	return nil
 }

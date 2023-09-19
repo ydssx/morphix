@@ -21,12 +21,11 @@ import (
 // Injectors from wire.go:
 
 func wireApp(bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
-	cronJobServer := server.NewCronJobServer(bootstrap)
 	jobServer := server.NewJobServer(bootstrap)
 	client := common.NewAsynqClient(bootstrap)
 	jobService := service.NewJobService(client)
 	grpcServer := server.NewGRPCServer(bootstrap, jobService)
-	app := newApp(cronJobServer, jobServer, grpcServer, bootstrap)
+	app := newApp(jobServer, grpcServer, bootstrap)
 	return app, func() {
 	}, nil
 }

@@ -15,19 +15,8 @@ import (
 	"github.com/ydssx/morphix/pkg/mq"
 	"github.com/ydssx/morphix/pkg/redis"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 )
-
-type ServiceClientSet struct {
-	smsv1.SMSServiceClient
-	userv1.UserServiceClient
-}
-
-func NewServiceClientSet(c *conf.Bootstrap) *ServiceClientSet {
-	return &ServiceClientSet{
-		NewSMSClient(c),
-		NewUserClient(c),
-	}
-}
 
 func NewSMSClient(c *conf.Bootstrap) smsv1.SMSServiceClient {
 	conn := createConn(c.Etcd, c.ClientSet.SmsRpcClient)
@@ -57,6 +46,7 @@ func CreateClientConn(ctx context.Context, rpcCliConf *conf.ClientConf, r *etcd.
 			interceptors.LoggingClient(logger.DefaultLogger),
 			interceptors.MetricClient(),
 		),
+		kgrpc.WithOptions(grpc.WithKeepaliveParams(keepalive.ClientParameters{})),
 	)
 	if err != nil {
 		panic(err)

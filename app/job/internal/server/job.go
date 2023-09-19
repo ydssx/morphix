@@ -14,30 +14,47 @@ import (
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/logger"
 	"github.com/ydssx/morphix/pkg/util"
+	"golang.org/x/sync/errgroup"
 )
 
 type JobServer struct {
 	sr  *asynq.Server
+	sd  *asynq.Scheduler
 	mux *asynq.ServeMux
 }
 
 func NewJobServer(c *conf.Bootstrap) *JobServer {
 	opt := common.InitRedisOpt(c)
-	server := asynq.NewServer(opt, asynq.Config{Concurrency: 10, ErrorHandler: asynq.ErrorHandlerFunc(reportError)})
 
+	clientSet := common.NewServiceClientSet(c)
+
+	server := asynq.NewServer(opt, asynq.Config{
+		Concurrency:  10,
+		ErrorHandler: asynq.ErrorHandlerFunc(reportError),
+		BaseContext: func() context.Context {
+			return common.NewContextWithServiceClientSet(context.Background(), clientSet)
+		},
+	})
 	mux := asynq.NewServeMux()
 	handler.RegisterJobHandler(mux)
-	go NewClient(opt)
-	return &JobServer{sr: server, mux: mux}
+
+	scheduler := asynq.NewScheduler(opt, &asynq.SchedulerOpts{Location: time.Local})
+	handler.RegisterCronJob(scheduler)
+
+	return &JobServer{sr: server, mux: mux, sd: scheduler}
 }
 
-func (j *JobServer) Start(_ context.Context) error {
-	return j.sr.Start(j.mux)
+func (j *JobServer) Start(ctx context.Context) error {
+	eg, _ := errgroup.WithContext(ctx)
+	eg.Go(j.sd.Start)
+	eg.Go(func() error { return j.sr.Start(j.mux) })
+	return eg.Wait()
 }
 
 func (j *JobServer) Stop(_ context.Context) error {
 	j.sr.Stop()
 	j.sr.Shutdown()
+	j.sd.Shutdown()
 	return nil
 }
 

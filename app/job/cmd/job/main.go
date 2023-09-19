@@ -39,7 +39,7 @@ func main() {
 
 }
 
-func newApp(cs *server.CronJobServer, ls *server.JobServer, gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
+func newApp(ls *server.JobServer, gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
 	r := common.NewEtcdRegistry(c.Etcd)
 
 	tp, _ := provider.InitTraceProvider(c.Otelcol.Addr, "morphix-job")
@@ -47,7 +47,7 @@ func newApp(cs *server.CronJobServer, ls *server.JobServer, gs *grpc.Server, c *
 	return kratos.New(
 		kratos.Name("morphix-job"),
 		kratos.Metadata(map[string]string{}),
-		kratos.Server(cs, gs, ls),
+		kratos.Server(gs, ls),
 		kratos.Registrar(r),
 		kratos.BeforeStart(func(_ context.Context) error {
 			log.Infow("app.version", "1.0.0")
