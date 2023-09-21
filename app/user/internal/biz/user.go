@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
+	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/user/internal/models"
 	"github.com/ydssx/morphix/pkg/cache"
@@ -42,28 +43,37 @@ type UserRepoWithCache interface {
 type UserUsecase struct {
 	repo UserRepoWithCache
 	log  *log.Helper
+	sms  smsv1.SMSServiceClient
 }
 
-func NewUserUsecase(repo UserRepoWithCache, logger log.Logger) *UserUsecase {
-	return &UserUsecase{repo: repo, log: log.NewHelper(logger)}
+func NewUserUsecase(repo UserRepoWithCache, logger log.Logger, sms smsv1.SMSServiceClient) *UserUsecase {
+	return &UserUsecase{repo: repo, log: log.NewHelper(logger), sms: sms}
 }
 
-// RegisterUser 用户注册逻辑
-func (uc *UserUsecase) RegisterUser(ctx context.Context, username, password, email, phone string) (*models.User, error) {
-	if username == "" || password == "" {
+// Register 用户注册逻辑
+func (uc *UserUsecase) Register(ctx context.Context, req *userv1.RegistrationRequest) (*userv1.User, error) {
+	checkResult, err := uc.sms.CheckSMSStatus(ctx, &smsv1.QuerySMSStatusRequest{MobileNumber: req.Phone, SmsCode: req.SmsCode, Scene: smsv1.SmsScene_USER_REGISTER})
+	if err != nil {
+		return nil, err
+	}
+	if !checkResult.Status {
+		return nil, errors.New("校验短信验证码失败")
+	}
+
+	if req.Username == "" || req.Password == "" {
 		return nil, errors.New("用户名和密码不能为空")
 	}
 
-	if !util.IsPhoneNumber(phone) {
+	if !util.IsPhoneNumber(req.Phone) {
 		return nil, errors.New("手机号格式不正确")
 	}
 
 	// 创建用户对象
 	user := &models.User{
-		Username: username,
-		Password: util.MD5(password),
-		Email:    email,
-		Phone:    phone,
+		Username: req.Username,
+		Password: util.MD5(req.Password),
+		Email:    req.Email,
+		Phone:    req.Phone,
 	}
 
 	userId, err := uc.repo.CreateUser(ctx, user)
@@ -72,7 +82,14 @@ func (uc *UserUsecase) RegisterUser(ctx context.Context, username, password, ema
 	}
 	user.ID = uint(userId)
 
-	return user, nil
+	response := &userv1.User{
+		Id:       int64(user.ID),
+		Username: user.Username,
+		Email:    user.Email,
+		Phone:    user.Phone,
+	}
+
+	return response, nil
 }
 
 func (uc *UserUsecase) ListUser(ctx context.Context, req *userv1.UserListRequest) (*userv1.UserListResponse, error) {
@@ -133,6 +150,14 @@ func (uc *UserUsecase) GetUser(ctx context.Context, req *userv1.GetUserRequest) 
 }
 
 func (uc *UserUsecase) ResetPassword(ctx context.Context, req *userv1.ResetPasswordRequest) error {
+	checkResult, err := uc.sms.CheckSMSStatus(ctx, &smsv1.QuerySMSStatusRequest{MobileNumber: "", SmsCode: req.VerificationCode, Scene: smsv1.SmsScene_USER_RESET_PASSWORD})
+	if err != nil {
+		return err
+	}
+	if !checkResult.Status {
+		return errors.New("校验短信验证码失败")
+	}
+
 	user, err := uc.repo.GetUserByName(ctx, req.Username)
 	if err != nil {
 		return err
