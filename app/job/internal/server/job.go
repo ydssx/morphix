@@ -35,6 +35,7 @@ func NewJobServer(c *conf.Bootstrap) *JobServer {
 			return common.NewContextWithServiceClientSet(context.Background(), clientSet)
 		},
 	})
+
 	mux := asynq.NewServeMux()
 	handler.RegisterJobHandler(mux)
 
@@ -64,7 +65,7 @@ func reportError(ctx context.Context, task *asynq.Task, err error) {
 
 func NewClient(redisClientOpt asynq.RedisClientOpt) {
 	cli := asynq.NewClient(redisClientOpt)
-	srv := service.NewJobService(cli)
+	srv := service.NewJobService(cli,nil)
 	for {
 		payload, _ := json.Marshal(jobv1.PayLoadTest{Msg: "test msg:" + util.GenerateCode(6)})
 		_, err := srv.Enqueue(context.Background(), &jobv1.EnqueueRequest{JobType: jobv1.JobType_TEST_JOB, Payload: payload})

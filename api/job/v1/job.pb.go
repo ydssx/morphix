@@ -11,7 +11,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	_ "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -166,6 +166,147 @@ func (x *EnqueueRequest) GetRetention() *durationpb.Duration {
 	return nil
 }
 
+type EnqueueResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TaskId string `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+}
+
+func (x *EnqueueResponse) Reset() {
+	*x = EnqueueResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_job_v1_job_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *EnqueueResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnqueueResponse) ProtoMessage() {}
+
+func (x *EnqueueResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_job_v1_job_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnqueueResponse.ProtoReflect.Descriptor instead.
+func (*EnqueueResponse) Descriptor() ([]byte, []int) {
+	return file_api_job_v1_job_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *EnqueueResponse) GetTaskId() string {
+	if x != nil {
+		return x.TaskId
+	}
+	return ""
+}
+
+type QueryTasksRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TaskIds []string `protobuf:"bytes,1,rep,name=task_ids,json=taskIds,proto3" json:"task_ids,omitempty"`
+}
+
+func (x *QueryTasksRequest) Reset() {
+	*x = QueryTasksRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_job_v1_job_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QueryTasksRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryTasksRequest) ProtoMessage() {}
+
+func (x *QueryTasksRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_job_v1_job_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QueryTasksRequest.ProtoReflect.Descriptor instead.
+func (*QueryTasksRequest) Descriptor() ([]byte, []int) {
+	return file_api_job_v1_job_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *QueryTasksRequest) GetTaskIds() []string {
+	if x != nil {
+		return x.TaskIds
+	}
+	return nil
+}
+
+type QueryTasksResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Tasks []*QueryTasksResponse_TaskInfo `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"`
+}
+
+func (x *QueryTasksResponse) Reset() {
+	*x = QueryTasksResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_job_v1_job_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QueryTasksResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryTasksResponse) ProtoMessage() {}
+
+func (x *QueryTasksResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_job_v1_job_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QueryTasksResponse.ProtoReflect.Descriptor instead.
+func (*QueryTasksResponse) Descriptor() ([]byte, []int) {
+	return file_api_job_v1_job_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *QueryTasksResponse) GetTasks() []*QueryTasksResponse_TaskInfo {
+	if x != nil {
+		return x.Tasks
+	}
+	return nil
+}
+
 type PayLoadTest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -177,7 +318,7 @@ type PayLoadTest struct {
 func (x *PayLoadTest) Reset() {
 	*x = PayLoadTest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_job_v1_job_proto_msgTypes[1]
+		mi := &file_api_job_v1_job_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -190,7 +331,7 @@ func (x *PayLoadTest) String() string {
 func (*PayLoadTest) ProtoMessage() {}
 
 func (x *PayLoadTest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_job_v1_job_proto_msgTypes[1]
+	mi := &file_api_job_v1_job_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -203,12 +344,75 @@ func (x *PayLoadTest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PayLoadTest.ProtoReflect.Descriptor instead.
 func (*PayLoadTest) Descriptor() ([]byte, []int) {
-	return file_api_job_v1_job_proto_rawDescGZIP(), []int{1}
+	return file_api_job_v1_job_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *PayLoadTest) GetMsg() string {
 	if x != nil {
 		return x.Msg
+	}
+	return ""
+}
+
+type QueryTasksResponse_TaskInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TaskId string `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	Result []byte `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"`
+	Status string `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+}
+
+func (x *QueryTasksResponse_TaskInfo) Reset() {
+	*x = QueryTasksResponse_TaskInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_job_v1_job_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QueryTasksResponse_TaskInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryTasksResponse_TaskInfo) ProtoMessage() {}
+
+func (x *QueryTasksResponse_TaskInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_api_job_v1_job_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QueryTasksResponse_TaskInfo.ProtoReflect.Descriptor instead.
+func (*QueryTasksResponse_TaskInfo) Descriptor() ([]byte, []int) {
+	return file_api_job_v1_job_proto_rawDescGZIP(), []int{3, 0}
+}
+
+func (x *QueryTasksResponse_TaskInfo) GetTaskId() string {
+	if x != nil {
+		return x.TaskId
+	}
+	return ""
+}
+
+func (x *QueryTasksResponse_TaskInfo) GetResult() []byte {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+func (x *QueryTasksResponse_TaskInfo) GetStatus() string {
+	if x != nil {
+		return x.Status
 	}
 	return ""
 }
@@ -247,20 +451,42 @@ var file_api_job_v1_job_proto_rawDesc = []byte{
 	0x37, 0x0a, 0x09, 0x72, 0x65, 0x74, 0x65, 0x6e, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x07, 0x20, 0x01,
 	0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x09, 0x72,
-	0x65, 0x74, 0x65, 0x6e, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x1f, 0x0a, 0x0b, 0x50, 0x61, 0x79, 0x4c,
-	0x6f, 0x61, 0x64, 0x54, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x2a, 0x2a, 0x0a, 0x07, 0x4a, 0x6f, 0x62,
-	0x54, 0x79, 0x70, 0x65, 0x12, 0x0c, 0x0a, 0x08, 0x54, 0x45, 0x53, 0x54, 0x5f, 0x4a, 0x4f, 0x42,
-	0x10, 0x00, 0x12, 0x11, 0x0a, 0x0d, 0x54, 0x45, 0x53, 0x54, 0x5f, 0x43, 0x52, 0x4f, 0x4e, 0x5f,
-	0x4a, 0x4f, 0x42, 0x10, 0x01, 0x32, 0x47, 0x0a, 0x0a, 0x4a, 0x6f, 0x62, 0x53, 0x65, 0x72, 0x76,
-	0x69, 0x63, 0x65, 0x12, 0x39, 0x0a, 0x07, 0x45, 0x6e, 0x71, 0x75, 0x65, 0x75, 0x65, 0x12, 0x16,
-	0x2e, 0x6a, 0x6f, 0x62, 0x2e, 0x76, 0x31, 0x2e, 0x45, 0x6e, 0x71, 0x75, 0x65, 0x75, 0x65, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x42, 0x2b,
-	0x5a, 0x29, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x79, 0x64, 0x73,
-	0x73, 0x78, 0x2f, 0x6d, 0x6f, 0x72, 0x70, 0x68, 0x69, 0x78, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x6a,
-	0x6f, 0x62, 0x2f, 0x76, 0x31, 0x3b, 0x6a, 0x6f, 0x62, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x65, 0x74, 0x65, 0x6e, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x2a, 0x0a, 0x0f, 0x45, 0x6e, 0x71, 0x75,
+	0x65, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x74,
+	0x61, 0x73, 0x6b, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x74, 0x61,
+	0x73, 0x6b, 0x49, 0x64, 0x22, 0x2e, 0x0a, 0x11, 0x51, 0x75, 0x65, 0x72, 0x79, 0x54, 0x61, 0x73,
+	0x6b, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x19, 0x0a, 0x08, 0x74, 0x61, 0x73,
+	0x6b, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x07, 0x74, 0x61, 0x73,
+	0x6b, 0x49, 0x64, 0x73, 0x22, 0xa4, 0x01, 0x0a, 0x12, 0x51, 0x75, 0x65, 0x72, 0x79, 0x54, 0x61,
+	0x73, 0x6b, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x39, 0x0a, 0x05, 0x74,
+	0x61, 0x73, 0x6b, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x6a, 0x6f, 0x62,
+	0x2e, 0x76, 0x31, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x54, 0x61, 0x73, 0x6b, 0x73, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0x49, 0x6e, 0x66, 0x6f, 0x52,
+	0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x1a, 0x53, 0x0a, 0x08, 0x54, 0x61, 0x73, 0x6b, 0x49, 0x6e,
+	0x66, 0x6f, 0x12, 0x17, 0x0a, 0x07, 0x74, 0x61, 0x73, 0x6b, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x74, 0x61, 0x73, 0x6b, 0x49, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x72,
+	0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x06, 0x72, 0x65, 0x73,
+	0x75, 0x6c, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x1f, 0x0a, 0x0b, 0x50,
+	0x61, 0x79, 0x4c, 0x6f, 0x61, 0x64, 0x54, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73,
+	0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x2a, 0x2a, 0x0a, 0x07,
+	0x4a, 0x6f, 0x62, 0x54, 0x79, 0x70, 0x65, 0x12, 0x0c, 0x0a, 0x08, 0x54, 0x45, 0x53, 0x54, 0x5f,
+	0x4a, 0x4f, 0x42, 0x10, 0x00, 0x12, 0x11, 0x0a, 0x0d, 0x54, 0x45, 0x53, 0x54, 0x5f, 0x43, 0x52,
+	0x4f, 0x4e, 0x5f, 0x4a, 0x4f, 0x42, 0x10, 0x01, 0x32, 0xa7, 0x01, 0x0a, 0x0a, 0x4a, 0x6f, 0x62,
+	0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x3a, 0x0a, 0x07, 0x45, 0x6e, 0x71, 0x75, 0x65,
+	0x75, 0x65, 0x12, 0x16, 0x2e, 0x6a, 0x6f, 0x62, 0x2e, 0x76, 0x31, 0x2e, 0x45, 0x6e, 0x71, 0x75,
+	0x65, 0x75, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x6a, 0x6f, 0x62,
+	0x2e, 0x76, 0x31, 0x2e, 0x45, 0x6e, 0x71, 0x75, 0x65, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x5d, 0x0a, 0x0a, 0x51, 0x75, 0x65, 0x72, 0x79, 0x54, 0x61, 0x73, 0x6b,
+	0x73, 0x12, 0x19, 0x2e, 0x6a, 0x6f, 0x62, 0x2e, 0x76, 0x31, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79,
+	0x54, 0x61, 0x73, 0x6b, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x6a,
+	0x6f, 0x62, 0x2e, 0x76, 0x31, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x54, 0x61, 0x73, 0x6b, 0x73,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x18, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x12,
+	0x12, 0x10, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x2f, 0x71, 0x75, 0x65,
+	0x72, 0x79, 0x42, 0x2b, 0x5a, 0x29, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
+	0x2f, 0x79, 0x64, 0x73, 0x73, 0x78, 0x2f, 0x6d, 0x6f, 0x72, 0x70, 0x68, 0x69, 0x78, 0x2f, 0x61,
+	0x70, 0x69, 0x2f, 0x6a, 0x6f, 0x62, 0x2f, 0x76, 0x31, 0x3b, 0x6a, 0x6f, 0x62, 0x76, 0x31, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -276,28 +502,34 @@ func file_api_job_v1_job_proto_rawDescGZIP() []byte {
 }
 
 var file_api_job_v1_job_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_api_job_v1_job_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_api_job_v1_job_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_api_job_v1_job_proto_goTypes = []interface{}{
-	(JobType)(0),                  // 0: job.v1.JobType
-	(*EnqueueRequest)(nil),        // 1: job.v1.EnqueueRequest
-	(*PayLoadTest)(nil),           // 2: job.v1.PayLoadTest
-	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),   // 4: google.protobuf.Duration
-	(*emptypb.Empty)(nil),         // 5: google.protobuf.Empty
+	(JobType)(0),                        // 0: job.v1.JobType
+	(*EnqueueRequest)(nil),              // 1: job.v1.EnqueueRequest
+	(*EnqueueResponse)(nil),             // 2: job.v1.EnqueueResponse
+	(*QueryTasksRequest)(nil),           // 3: job.v1.QueryTasksRequest
+	(*QueryTasksResponse)(nil),          // 4: job.v1.QueryTasksResponse
+	(*PayLoadTest)(nil),                 // 5: job.v1.PayLoadTest
+	(*QueryTasksResponse_TaskInfo)(nil), // 6: job.v1.QueryTasksResponse.TaskInfo
+	(*timestamppb.Timestamp)(nil),       // 7: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),         // 8: google.protobuf.Duration
 }
 var file_api_job_v1_job_proto_depIdxs = []int32{
 	0, // 0: job.v1.EnqueueRequest.job_type:type_name -> job.v1.JobType
-	3, // 1: job.v1.EnqueueRequest.process_at:type_name -> google.protobuf.Timestamp
-	4, // 2: job.v1.EnqueueRequest.process_in:type_name -> google.protobuf.Duration
-	3, // 3: job.v1.EnqueueRequest.deadline:type_name -> google.protobuf.Timestamp
-	4, // 4: job.v1.EnqueueRequest.retention:type_name -> google.protobuf.Duration
-	1, // 5: job.v1.JobService.Enqueue:input_type -> job.v1.EnqueueRequest
-	5, // 6: job.v1.JobService.Enqueue:output_type -> google.protobuf.Empty
-	6, // [6:7] is the sub-list for method output_type
-	5, // [5:6] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	7, // 1: job.v1.EnqueueRequest.process_at:type_name -> google.protobuf.Timestamp
+	8, // 2: job.v1.EnqueueRequest.process_in:type_name -> google.protobuf.Duration
+	7, // 3: job.v1.EnqueueRequest.deadline:type_name -> google.protobuf.Timestamp
+	8, // 4: job.v1.EnqueueRequest.retention:type_name -> google.protobuf.Duration
+	6, // 5: job.v1.QueryTasksResponse.tasks:type_name -> job.v1.QueryTasksResponse.TaskInfo
+	1, // 6: job.v1.JobService.Enqueue:input_type -> job.v1.EnqueueRequest
+	3, // 7: job.v1.JobService.QueryTasks:input_type -> job.v1.QueryTasksRequest
+	2, // 8: job.v1.JobService.Enqueue:output_type -> job.v1.EnqueueResponse
+	4, // 9: job.v1.JobService.QueryTasks:output_type -> job.v1.QueryTasksResponse
+	8, // [8:10] is the sub-list for method output_type
+	6, // [6:8] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_api_job_v1_job_proto_init() }
@@ -319,7 +551,55 @@ func file_api_job_v1_job_proto_init() {
 			}
 		}
 		file_api_job_v1_job_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*EnqueueResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_job_v1_job_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*QueryTasksRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_job_v1_job_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*QueryTasksResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_job_v1_job_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PayLoadTest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_job_v1_job_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*QueryTasksResponse_TaskInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -337,7 +617,7 @@ func file_api_job_v1_job_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_api_job_v1_job_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   2,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

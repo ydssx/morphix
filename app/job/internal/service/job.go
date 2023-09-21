@@ -7,20 +7,20 @@ import (
 	jobv1 "github.com/ydssx/morphix/api/job/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type JobService struct {
 	cli *asynq.Client
+	ipt *asynq.Inspector
 
 	jobv1.UnimplementedJobServiceServer
 }
 
-func NewJobService(cli *asynq.Client) *JobService {
-	return &JobService{cli: cli}
+func NewJobService(cli *asynq.Client, ipt *asynq.Inspector) *JobService {
+	return &JobService{cli: cli, ipt: ipt}
 }
 
-func (j *JobService) Enqueue(ctx context.Context, req *jobv1.EnqueueRequest) (*emptypb.Empty, error) {
+func (j *JobService) Enqueue(ctx context.Context, req *jobv1.EnqueueRequest) (*jobv1.EnqueueResponse, error) {
 	opts := []asynq.Option{asynq.MaxRetry(0)}
 	if req.RetryTime > 0 {
 		opts = append(opts, asynq.MaxRetry(int(req.RetryTime)))
@@ -34,10 +34,27 @@ func (j *JobService) Enqueue(ctx context.Context, req *jobv1.EnqueueRequest) (*e
 	if req.Retention.IsValid() {
 		opts = append(opts, asynq.Retention(req.Retention.AsDuration()))
 	}
-	_, err := j.cli.EnqueueContext(ctx, asynq.NewTask(req.JobType.String(), req.Payload), opts...)
+	taskInfo, err := j.cli.EnqueueContext(ctx, asynq.NewTask(req.JobType.String(), req.Payload), opts...)
 	if err != nil {
 		return nil, status.Errorf(codes.Unknown, "发送任务失败,err: %v", err)
 	}
 
-	return &emptypb.Empty{}, nil
+	return &jobv1.EnqueueResponse{TaskId: taskInfo.ID}, nil
+}
+
+func (j *JobService) QueryTasks(ctx context.Context, req *jobv1.QueryTasksRequest) (resp *jobv1.QueryTasksResponse, err error) {
+	resp = new(jobv1.QueryTasksResponse)
+	for _, taskId := range req.TaskIds {
+		taskInfo, err := j.ipt.GetTaskInfo("default", taskId)
+		if err != nil {
+			return nil, err
+		}
+		resp.Tasks = append(resp.Tasks, &jobv1.QueryTasksResponse_TaskInfo{
+			TaskId: taskId,
+			Result: taskInfo.Result,
+			Status: taskInfo.State.String(),
+		})
+	}
+
+	return
 }

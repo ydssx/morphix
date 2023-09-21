@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -20,14 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	JobService_Enqueue_FullMethodName = "/job.v1.JobService/Enqueue"
+	JobService_Enqueue_FullMethodName    = "/job.v1.JobService/Enqueue"
+	JobService_QueryTasks_FullMethodName = "/job.v1.JobService/QueryTasks"
 )
 
 // JobServiceClient is the client API for JobService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type JobServiceClient interface {
-	Enqueue(ctx context.Context, in *EnqueueRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Enqueue(ctx context.Context, in *EnqueueRequest, opts ...grpc.CallOption) (*EnqueueResponse, error)
+	QueryTasks(ctx context.Context, in *QueryTasksRequest, opts ...grpc.CallOption) (*QueryTasksResponse, error)
 }
 
 type jobServiceClient struct {
@@ -38,9 +39,18 @@ func NewJobServiceClient(cc grpc.ClientConnInterface) JobServiceClient {
 	return &jobServiceClient{cc}
 }
 
-func (c *jobServiceClient) Enqueue(ctx context.Context, in *EnqueueRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *jobServiceClient) Enqueue(ctx context.Context, in *EnqueueRequest, opts ...grpc.CallOption) (*EnqueueResponse, error) {
+	out := new(EnqueueResponse)
 	err := c.cc.Invoke(ctx, JobService_Enqueue_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *jobServiceClient) QueryTasks(ctx context.Context, in *QueryTasksRequest, opts ...grpc.CallOption) (*QueryTasksResponse, error) {
+	out := new(QueryTasksResponse)
+	err := c.cc.Invoke(ctx, JobService_QueryTasks_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,15 +61,19 @@ func (c *jobServiceClient) Enqueue(ctx context.Context, in *EnqueueRequest, opts
 // All implementations should embed UnimplementedJobServiceServer
 // for forward compatibility
 type JobServiceServer interface {
-	Enqueue(context.Context, *EnqueueRequest) (*emptypb.Empty, error)
+	Enqueue(context.Context, *EnqueueRequest) (*EnqueueResponse, error)
+	QueryTasks(context.Context, *QueryTasksRequest) (*QueryTasksResponse, error)
 }
 
 // UnimplementedJobServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedJobServiceServer struct {
 }
 
-func (UnimplementedJobServiceServer) Enqueue(context.Context, *EnqueueRequest) (*emptypb.Empty, error) {
+func (UnimplementedJobServiceServer) Enqueue(context.Context, *EnqueueRequest) (*EnqueueResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Enqueue not implemented")
+}
+func (UnimplementedJobServiceServer) QueryTasks(context.Context, *QueryTasksRequest) (*QueryTasksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QueryTasks not implemented")
 }
 
 // UnsafeJobServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -91,6 +105,24 @@ func _JobService_Enqueue_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _JobService_QueryTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryTasksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(JobServiceServer).QueryTasks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: JobService_QueryTasks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(JobServiceServer).QueryTasks(ctx, req.(*QueryTasksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // JobService_ServiceDesc is the grpc.ServiceDesc for JobService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -101,6 +133,10 @@ var JobService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Enqueue",
 			Handler:    _JobService_Enqueue_Handler,
+		},
+		{
+			MethodName: "QueryTasks",
+			Handler:    _JobService_QueryTasks_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

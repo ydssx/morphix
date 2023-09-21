@@ -12,10 +12,10 @@ var _ paymentv1.PaymentServiceServer = (*PaymentService)(nil)
 type PaymentService struct {
 	paymentv1.UnimplementedPaymentServiceServer
 
-	eventSink PaymentEvents
+	eventSink PaymentEventSinker
 }
 
-func NewPaymentService(eventSink PaymentEvents) *PaymentService {
+func NewPaymentService(eventSink PaymentEventSinker) *PaymentService {
 	return &PaymentService{eventSink: eventSink}
 }
 

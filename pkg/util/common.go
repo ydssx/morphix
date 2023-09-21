@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"math/rand"
 	"regexp"
-	"time"
 )
 
 func IsPhoneNumber(phoneNumber string) bool {
@@ -56,7 +55,6 @@ func Reduce(nums []int, f func(int, int) int, init int) int {
 
 // 生成指定长度的随机数字字符串
 func GenerateCode(length int) string {
-	rand.Seed(time.Now().UnixNano())
 	code := ""
 	for i := 0; i < length; i++ {
 		code += fmt.Sprintf("%d", rand.Intn(10))
@@ -85,4 +83,12 @@ func CompareRequests(requests ...interface{}) bool {
 	}
 
 	return true
+}
+
+// GenerateRandomNumber 生成指定范围内的随机整数
+func GenerateRandomNumber(min, max int) int {
+	if min >= max {
+		panic("min must be less than max")
+	}
+	return rand.Intn(max-min+1) + min
 }

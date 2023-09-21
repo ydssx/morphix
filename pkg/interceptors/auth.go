@@ -3,7 +3,6 @@ package interceptors
 import (
 	"context"
 
-	"github.com/dapr/go-sdk/dapr/proto/runtime/v1"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/selector"
@@ -36,7 +35,6 @@ func AuthServer() grpc.UnaryServerInterceptor {
 	authMatcher := func(_ context.Context, callMeta interceptors.CallMeta) bool {
 		srvNames := []string{
 			healthpb.Health_ServiceDesc.ServiceName,
-			runtime.AppCallbackAlpha_ServiceDesc.ServiceName,
 		}
 		methNames := []string{
 			userv1.UserService_Login_FullMethodName,

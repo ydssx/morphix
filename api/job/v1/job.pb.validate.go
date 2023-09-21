@@ -257,6 +257,346 @@ var _ interface {
 	ErrorName() string
 } = EnqueueRequestValidationError{}
 
+// Validate checks the field values on EnqueueResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *EnqueueResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on EnqueueResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// EnqueueResponseMultiError, or nil if none found.
+func (m *EnqueueResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *EnqueueResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for TaskId
+
+	if len(errors) > 0 {
+		return EnqueueResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// EnqueueResponseMultiError is an error wrapping multiple validation errors
+// returned by EnqueueResponse.ValidateAll() if the designated constraints
+// aren't met.
+type EnqueueResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m EnqueueResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m EnqueueResponseMultiError) AllErrors() []error { return m }
+
+// EnqueueResponseValidationError is the validation error returned by
+// EnqueueResponse.Validate if the designated constraints aren't met.
+type EnqueueResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EnqueueResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EnqueueResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EnqueueResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EnqueueResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EnqueueResponseValidationError) ErrorName() string { return "EnqueueResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e EnqueueResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEnqueueResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EnqueueResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EnqueueResponseValidationError{}
+
+// Validate checks the field values on QueryTasksRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *QueryTasksRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on QueryTasksRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// QueryTasksRequestMultiError, or nil if none found.
+func (m *QueryTasksRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *QueryTasksRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return QueryTasksRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// QueryTasksRequestMultiError is an error wrapping multiple validation errors
+// returned by QueryTasksRequest.ValidateAll() if the designated constraints
+// aren't met.
+type QueryTasksRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m QueryTasksRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m QueryTasksRequestMultiError) AllErrors() []error { return m }
+
+// QueryTasksRequestValidationError is the validation error returned by
+// QueryTasksRequest.Validate if the designated constraints aren't met.
+type QueryTasksRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e QueryTasksRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e QueryTasksRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e QueryTasksRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e QueryTasksRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e QueryTasksRequestValidationError) ErrorName() string {
+	return "QueryTasksRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e QueryTasksRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sQueryTasksRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = QueryTasksRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = QueryTasksRequestValidationError{}
+
+// Validate checks the field values on QueryTasksResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *QueryTasksResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on QueryTasksResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// QueryTasksResponseMultiError, or nil if none found.
+func (m *QueryTasksResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *QueryTasksResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetTasks() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, QueryTasksResponseValidationError{
+						field:  fmt.Sprintf("Tasks[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, QueryTasksResponseValidationError{
+						field:  fmt.Sprintf("Tasks[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return QueryTasksResponseValidationError{
+					field:  fmt.Sprintf("Tasks[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return QueryTasksResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// QueryTasksResponseMultiError is an error wrapping multiple validation errors
+// returned by QueryTasksResponse.ValidateAll() if the designated constraints
+// aren't met.
+type QueryTasksResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m QueryTasksResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m QueryTasksResponseMultiError) AllErrors() []error { return m }
+
+// QueryTasksResponseValidationError is the validation error returned by
+// QueryTasksResponse.Validate if the designated constraints aren't met.
+type QueryTasksResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e QueryTasksResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e QueryTasksResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e QueryTasksResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e QueryTasksResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e QueryTasksResponseValidationError) ErrorName() string {
+	return "QueryTasksResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e QueryTasksResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sQueryTasksResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = QueryTasksResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = QueryTasksResponseValidationError{}
+
 // Validate checks the field values on PayLoadTest with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -357,3 +697,112 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = PayLoadTestValidationError{}
+
+// Validate checks the field values on QueryTasksResponse_TaskInfo with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *QueryTasksResponse_TaskInfo) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on QueryTasksResponse_TaskInfo with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// QueryTasksResponse_TaskInfoMultiError, or nil if none found.
+func (m *QueryTasksResponse_TaskInfo) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *QueryTasksResponse_TaskInfo) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for TaskId
+
+	// no validation rules for Result
+
+	// no validation rules for Status
+
+	if len(errors) > 0 {
+		return QueryTasksResponse_TaskInfoMultiError(errors)
+	}
+
+	return nil
+}
+
+// QueryTasksResponse_TaskInfoMultiError is an error wrapping multiple
+// validation errors returned by QueryTasksResponse_TaskInfo.ValidateAll() if
+// the designated constraints aren't met.
+type QueryTasksResponse_TaskInfoMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m QueryTasksResponse_TaskInfoMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m QueryTasksResponse_TaskInfoMultiError) AllErrors() []error { return m }
+
+// QueryTasksResponse_TaskInfoValidationError is the validation error returned
+// by QueryTasksResponse_TaskInfo.Validate if the designated constraints
+// aren't met.
+type QueryTasksResponse_TaskInfoValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e QueryTasksResponse_TaskInfoValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e QueryTasksResponse_TaskInfoValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e QueryTasksResponse_TaskInfoValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e QueryTasksResponse_TaskInfoValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e QueryTasksResponse_TaskInfoValidationError) ErrorName() string {
+	return "QueryTasksResponse_TaskInfoValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e QueryTasksResponse_TaskInfoValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sQueryTasksResponse_TaskInfo.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = QueryTasksResponse_TaskInfoValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = QueryTasksResponse_TaskInfoValidationError{}

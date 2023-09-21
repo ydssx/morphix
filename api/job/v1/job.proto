@@ -10,7 +10,11 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/ydssx/morphix/api/job/v1;jobv1";
 
 service JobService {
-  rpc Enqueue(EnqueueRequest) returns (google.protobuf.Empty);
+  rpc Enqueue(EnqueueRequest) returns (EnqueueResponse);
+
+  rpc QueryTasks(QueryTasksRequest) returns (QueryTasksResponse) {
+    option (google.api.http) = {get: "/api/tasks/query"};
+  }
 }
 
 message EnqueueRequest {
@@ -22,6 +26,23 @@ message EnqueueRequest {
   google.protobuf.Timestamp deadline = 6;
   // 任务完成后保留时间
   google.protobuf.Duration retention = 7;
+}
+
+message EnqueueResponse {
+  string task_id = 1;
+}
+
+message QueryTasksRequest {
+  repeated string task_ids = 1;
+}
+
+message QueryTasksResponse {
+  message TaskInfo {
+    string task_id = 1;
+    bytes result = 2;
+    string status = 3;
+  }
+  repeated TaskInfo tasks = 1;
 }
 
 enum JobType {

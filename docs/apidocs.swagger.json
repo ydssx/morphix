@@ -9,6 +9,9 @@
       "name": "ArtService"
     },
     {
+      "name": "JobService"
+    },
+    {
       "name": "MediaService"
     },
     {
@@ -40,6 +43,40 @@
     "application/json"
   ],
   "paths": {
+    "/api/tasks/query": {
+      "get": {
+        "operationId": "JobService_QueryTasks",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1QueryTasksResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "taskIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "JobService"
+        ]
+      }
+    },
     "/api/user/{userId}": {
       "get": {
         "operationId": "UserService_GetUser",
@@ -1045,6 +1082,21 @@
     }
   },
   "definitions": {
+    "QueryTasksResponseTaskInfo": {
+      "type": "object",
+      "properties": {
+        "taskId": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string",
+          "format": "byte"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
     "aiartv1GenerateImageRequest": {
       "type": "object",
       "properties": {
@@ -1927,6 +1979,34 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/userv1User"
+          }
+        }
+      }
+    },
+    "v1EnqueueResponse": {
+      "type": "object",
+      "properties": {
+        "taskId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1JobType": {
+      "type": "string",
+      "enum": [
+        "TEST_JOB",
+        "TEST_CRON_JOB"
+      ],
+      "default": "TEST_JOB"
+    },
+    "v1QueryTasksResponse": {
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/QueryTasksResponseTaskInfo"
           }
         }
       }

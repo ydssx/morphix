@@ -6,6 +6,25 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/tasks/query:
+        get:
+            tags:
+                - JobService
+            operationId: JobService_QueryTasks
+            parameters:
+                - name: taskIds
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/job.v1.QueryTasksResponse'
     /api/user/{userId}:
         get:
             tags:
@@ -612,6 +631,23 @@ components:
                     type: string
                     format: bytes
             description: 获取生成图像响应
+        job.v1.QueryTasksResponse:
+            type: object
+            properties:
+                tasks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/job.v1.QueryTasksResponse_TaskInfo'
+        job.v1.QueryTasksResponse_TaskInfo:
+            type: object
+            properties:
+                taskId:
+                    type: string
+                result:
+                    type: string
+                    format: bytes
+                status:
+                    type: string
         orderv1.CreateOrderRequest:
             type: object
             properties:
@@ -960,6 +996,7 @@ components:
                         $ref: '#/components/schemas/userv1.User'
 tags:
     - name: ArtService
+    - name: JobService
     - name: OrderService
       description: 订单管理服务接口
     - name: PaymentService

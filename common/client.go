@@ -7,6 +7,7 @@ import (
 	kgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/nats-io/nats.go"
 	goredis "github.com/redis/go-redis/v9"
+	jobv1 "github.com/ydssx/morphix/api/job/v1"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/common/conf"
@@ -28,6 +29,12 @@ func NewUserClient(c *conf.Bootstrap) userv1.UserServiceClient {
 	conn := createConn(c.Etcd, c.ClientSet.UserRpcClient)
 
 	return userv1.NewUserServiceClient(conn)
+}
+
+func NewJobClient(c *conf.Bootstrap) jobv1.JobServiceClient {
+	conn := createConn(c.Etcd, c.ClientSet.JobRpcClient)
+
+	return jobv1.NewJobServiceClient(conn)
 }
 
 func createConn(etcdConf *conf.Etcd, rpcCliConf *conf.ClientConf) *grpc.ClientConn {

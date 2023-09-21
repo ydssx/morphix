@@ -9,7 +9,6 @@ import (
 	errors "errors"
 	connect_go "github.com/bufbuild/connect-go"
 	v1 "github.com/ydssx/morphix/api/job/v1"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	http "net/http"
 	strings "strings"
 )
@@ -36,11 +35,14 @@ const (
 const (
 	// JobServiceEnqueueProcedure is the fully-qualified name of the JobService's Enqueue RPC.
 	JobServiceEnqueueProcedure = "/job.v1.JobService/Enqueue"
+	// JobServiceQueryTasksProcedure is the fully-qualified name of the JobService's QueryTasks RPC.
+	JobServiceQueryTasksProcedure = "/job.v1.JobService/QueryTasks"
 )
 
 // JobServiceClient is a client for the job.v1.JobService service.
 type JobServiceClient interface {
-	Enqueue(context.Context, *connect_go.Request[v1.EnqueueRequest]) (*connect_go.Response[emptypb.Empty], error)
+	Enqueue(context.Context, *connect_go.Request[v1.EnqueueRequest]) (*connect_go.Response[v1.EnqueueResponse], error)
+	QueryTasks(context.Context, *connect_go.Request[v1.QueryTasksRequest]) (*connect_go.Response[v1.QueryTasksResponse], error)
 }
 
 // NewJobServiceClient constructs a client for the job.v1.JobService service. By default, it uses
@@ -53,9 +55,14 @@ type JobServiceClient interface {
 func NewJobServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts ...connect_go.ClientOption) JobServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &jobServiceClient{
-		enqueue: connect_go.NewClient[v1.EnqueueRequest, emptypb.Empty](
+		enqueue: connect_go.NewClient[v1.EnqueueRequest, v1.EnqueueResponse](
 			httpClient,
 			baseURL+JobServiceEnqueueProcedure,
+			opts...,
+		),
+		queryTasks: connect_go.NewClient[v1.QueryTasksRequest, v1.QueryTasksResponse](
+			httpClient,
+			baseURL+JobServiceQueryTasksProcedure,
 			opts...,
 		),
 	}
@@ -63,17 +70,24 @@ func NewJobServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts 
 
 // jobServiceClient implements JobServiceClient.
 type jobServiceClient struct {
-	enqueue *connect_go.Client[v1.EnqueueRequest, emptypb.Empty]
+	enqueue    *connect_go.Client[v1.EnqueueRequest, v1.EnqueueResponse]
+	queryTasks *connect_go.Client[v1.QueryTasksRequest, v1.QueryTasksResponse]
 }
 
 // Enqueue calls job.v1.JobService.Enqueue.
-func (c *jobServiceClient) Enqueue(ctx context.Context, req *connect_go.Request[v1.EnqueueRequest]) (*connect_go.Response[emptypb.Empty], error) {
+func (c *jobServiceClient) Enqueue(ctx context.Context, req *connect_go.Request[v1.EnqueueRequest]) (*connect_go.Response[v1.EnqueueResponse], error) {
 	return c.enqueue.CallUnary(ctx, req)
+}
+
+// QueryTasks calls job.v1.JobService.QueryTasks.
+func (c *jobServiceClient) QueryTasks(ctx context.Context, req *connect_go.Request[v1.QueryTasksRequest]) (*connect_go.Response[v1.QueryTasksResponse], error) {
+	return c.queryTasks.CallUnary(ctx, req)
 }
 
 // JobServiceHandler is an implementation of the job.v1.JobService service.
 type JobServiceHandler interface {
-	Enqueue(context.Context, *connect_go.Request[v1.EnqueueRequest]) (*connect_go.Response[emptypb.Empty], error)
+	Enqueue(context.Context, *connect_go.Request[v1.EnqueueRequest]) (*connect_go.Response[v1.EnqueueResponse], error)
+	QueryTasks(context.Context, *connect_go.Request[v1.QueryTasksRequest]) (*connect_go.Response[v1.QueryTasksResponse], error)
 }
 
 // NewJobServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -87,10 +101,17 @@ func NewJobServiceHandler(svc JobServiceHandler, opts ...connect_go.HandlerOptio
 		svc.Enqueue,
 		opts...,
 	)
+	jobServiceQueryTasksHandler := connect_go.NewUnaryHandler(
+		JobServiceQueryTasksProcedure,
+		svc.QueryTasks,
+		opts...,
+	)
 	return "/job.v1.JobService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case JobServiceEnqueueProcedure:
 			jobServiceEnqueueHandler.ServeHTTP(w, r)
+		case JobServiceQueryTasksProcedure:
+			jobServiceQueryTasksHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -100,6 +121,10 @@ func NewJobServiceHandler(svc JobServiceHandler, opts ...connect_go.HandlerOptio
 // UnimplementedJobServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedJobServiceHandler struct{}
 
-func (UnimplementedJobServiceHandler) Enqueue(context.Context, *connect_go.Request[v1.EnqueueRequest]) (*connect_go.Response[emptypb.Empty], error) {
+func (UnimplementedJobServiceHandler) Enqueue(context.Context, *connect_go.Request[v1.EnqueueRequest]) (*connect_go.Response[v1.EnqueueResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("job.v1.JobService.Enqueue is not implemented"))
+}
+
+func (UnimplementedJobServiceHandler) QueryTasks(context.Context, *connect_go.Request[v1.QueryTasksRequest]) (*connect_go.Response[v1.QueryTasksResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("job.v1.JobService.QueryTasks is not implemented"))
 }

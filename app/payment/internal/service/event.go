@@ -8,19 +8,19 @@ import (
 	"github.com/ydssx/morphix/pkg/mq"
 )
 
-type PaymentEvents interface {
+type PaymentEventSinker interface {
 	OnMakePayment(ctx context.Context, payload *event.PayloadPaymentCompleted) error
 	OnCancelPayment(ctx context.Context, payload *event.PayloadCancelPayment) error
 }
 
-var _ PaymentEvents = (*eventSender)(nil)
+var _ PaymentEventSinker = (*eventSender)(nil)
 
 type eventSender struct {
 	*dapr.DaprClient
 	ce *mq.CloudEvent
 }
 
-func NewEventSender(daprClient *dapr.DaprClient, ce *mq.CloudEvent) PaymentEvents {
+func NewEventSender(daprClient *dapr.DaprClient, ce *mq.CloudEvent) PaymentEventSinker {
 	return &eventSender{DaprClient: daprClient, ce: ce}
 }
 

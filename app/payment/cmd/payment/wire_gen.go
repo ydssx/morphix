@@ -33,8 +33,8 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		return nil, nil, err
 	}
 	cloudEvent := common.NewCloudEvent(conn)
-	paymentEvents := service.NewEventSender(daprClient, cloudEvent)
-	paymentService := service.NewPaymentService(paymentEvents)
+	paymentEventSinker := service.NewEventSender(daprClient, cloudEvent)
+	paymentService := service.NewPaymentService(paymentEventSinker)
 	grpcServer := server.NewGRPCServer(bootstrap, paymentService, logger)
 	app := newApp(grpcServer, bootstrap)
 	return app, func() {

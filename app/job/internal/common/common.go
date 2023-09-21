@@ -30,6 +30,10 @@ func NewAsynqClient(c *conf.Bootstrap) *asynq.Client {
 	return asynq.NewClient(InitRedisOpt(c))
 }
 
+func NewAsynqInspector(c *conf.Bootstrap) *asynq.Inspector {
+	return asynq.NewInspector(InitRedisOpt(c))
+}
+
 type ServiceClientSet struct {
 	smsv1.SMSServiceClient
 	userv1.UserServiceClient

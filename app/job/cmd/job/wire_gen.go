@@ -23,7 +23,8 @@ import (
 func wireApp(bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
 	jobServer := server.NewJobServer(bootstrap)
 	client := common.NewAsynqClient(bootstrap)
-	jobService := service.NewJobService(client)
+	inspector := common.NewAsynqInspector(bootstrap)
+	jobService := service.NewJobService(client, inspector)
 	grpcServer := server.NewGRPCServer(bootstrap, jobService)
 	app := newApp(jobServer, grpcServer, bootstrap)
 	return app, func() {
