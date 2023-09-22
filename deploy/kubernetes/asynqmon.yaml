@@ -18,7 +18,10 @@ spec:
           image: hibiken/asynqmon:latest
           env:
             - name: REDIS_PASSWORD
-              value: "1GyY3AHsWg"
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_PASSWORD
+                  name: test-secret
           args:
             - "--redis-addr=redis-master.default:6379"
             - "--redis-db=1"
