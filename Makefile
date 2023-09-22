@@ -56,7 +56,6 @@ ingress:
 	
 .PHONY: generate
 generate:
-	go get github.com/google/wire/cmd/wire@latest
 	go generate ./...
 
 .PHONY: dev

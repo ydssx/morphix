@@ -12,7 +12,7 @@ func RateLimit(rdb *redis.Client) gin.HandlerFunc {
 	limiter := limit.NewRedisLimiter(rdb)
 	return func(ctx *gin.Context) {
 		limitKey := ctx.Request.URL.Path + ":" + ctx.Request.Method
-		if !limiter.Allow(10, 20, limitKey) {
+		if !limiter.Allow(limitKey, limit.WithRatePerSecond(10), limit.WithBurst(20)) {
 			ctx.AbortWithStatusJSON(http.StatusTooManyRequests, map[string]interface{}{"code": -1, "msg": "操作频繁,请稍后重试."})
 			return
 		}

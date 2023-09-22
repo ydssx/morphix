@@ -13,19 +13,24 @@ import (
 	"github.com/ydssx/morphix/pkg/util"
 )
 
-type handler func(ctx context.Context, t *asynq.Task) error
+type jobHandler func(ctx context.Context, t *asynq.Task) error
 
 var (
+	// 定时任务注册
 	cronJobMap = map[string]jobv1.JobType{
 		"@every 5s":   jobv1.JobType_TEST_CRON_JOB,
 		"*/1 * * * *": jobv1.JobType_TEST_CRON_JOB,
 	}
 
-	jobHandlerMap = map[jobv1.JobType]handler{
+	// 任务处理函数注册
+	jobHandlerMap = map[jobv1.JobType]jobHandler{
 		jobv1.JobType_TEST_JOB:      TestJobHandler,
 		jobv1.JobType_TEST_CRON_JOB: TestCronJobHandler,
 	}
 )
+
+// =======================================================
+// =======================================================
 
 func TestJobHandler(ctx context.Context, t *asynq.Task) error {
 	var p jobv1.PayLoadTest

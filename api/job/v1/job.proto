@@ -45,6 +45,10 @@ message QueryTasksResponse {
   repeated TaskInfo tasks = 1;
 }
 
+// ========================================
+// ========================================
+
+// 任务类型定义
 enum JobType {
   TEST_JOB = 0;
   TEST_CRON_JOB = 1;

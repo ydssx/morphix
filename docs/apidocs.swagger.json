@@ -1997,7 +1997,8 @@
         "TEST_JOB",
         "TEST_CRON_JOB"
       ],
-      "default": "TEST_JOB"
+      "default": "TEST_JOB",
+      "title": "任务类型定义"
     },
     "v1QueryTasksResponse": {
       "type": "object",
