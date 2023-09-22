@@ -75,6 +75,21 @@ secret:
 	kubectl -n morphix create secret docker-registry aliyun-registry-secret --docker-server=registry.cn-shenzhen.aliyuncs.com \
 			--docker-username=$(registry_username) --docker-password=$(registry_password)
 
+.PHONY: fetchcert
+fetchcert:
+	kubeseal \
+		--controller-name=sealed-secrets-controller \
+		--controller-namespace=kube-system \
+		--fetch-cert > mycert.pem
+		
+.PHONY: sealsecret
+sealsecret:
+	kubectl create -f secret.yaml --dry-run=client -o yaml | \
+	kubeseal \
+		--controller-name=sealed-secrets-controller \
+		--controller-namespace=kube-system \
+		--format yaml > deploy/kubernetes/svc/secret.yaml
+
 .PHONY: k8s
 k8s:
 	make secret;
@@ -107,3 +122,4 @@ help:
 	{ lastLine = $$0 }' $(MAKEFILE_LIST)
 
 .DEFAULT_GOAL := help
+

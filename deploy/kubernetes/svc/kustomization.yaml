@@ -10,6 +10,7 @@ resources:
   - payment-svc.yaml
   - order-svc.yaml
   - job-svc.yaml
+  - secret.yaml
 generatorOptions:
   disableNameSuffixHash: true
 namespace: morphix
