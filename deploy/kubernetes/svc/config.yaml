@@ -3,7 +3,7 @@ etcd:
     - etcd.default:2379
   timeout: 5s
   username: root
-  password: YV2AsfxOTo
+  password: ${ETCD_PASSWORD}
 
 jaeger:
   addr: http://jaeger:14268/api/traces
@@ -20,7 +20,7 @@ redisCluster:
     - redis-master.default:6379
     # - redis-replicas.default:6379
   username:
-  password: 1GyY3AHsWg
+  password: ${REDIS_PASSWORD}
   read_timeout: 2s
   write_timeout: 2s
   dial_timeout: 5s
@@ -28,7 +28,7 @@ redisCluster:
 redis:
   addr: redis-master.default:6379
   username:
-  password: 1GyY3AHsWg
+  password: ${REDIS_PASSWORD}
   read_timeout: 2s
   write_timeout: 2s
   dial_timeout: 5s
@@ -78,11 +78,11 @@ serviceSet:
     data:
       database:
         driver: mysql
-        source: root:root@tcp(mysql.default:3306)/user?parseTime=true&loc=Local
+        source: root:${MYSQL_PASSWORD}@tcp(mysql.default:3306)/user?parseTime=true&loc=Local
       redis:
         addr: redis-master.default:6379
         username:
-        password: 1GyY3AHsWg
+        password: ${REDIS_PASSWORD}
         read_timeout: 2s
         write_timeout: 2s
         dial_timeout: 5s
@@ -97,11 +97,11 @@ serviceSet:
     data:
       database:
         driver: mysql
-        source: root:root@tcp(mysql.default:3306)/sms?parseTime=true&loc=Local
+        source: root:${MYSQL_PASSWORD}@tcp(mysql.default:3306)/sms?parseTime=true&loc=Local
       redis:
         addr: redis-master.default:6379
         username:
-        password: 1GyY3AHsWg
+        password: ${REDIS_PASSWORD}
         read_timeout: 2s
         write_timeout: 2s
         dial_timeout: 5s
@@ -116,11 +116,11 @@ serviceSet:
     data:
       database:
         driver: mysql
-        source: root:root@tcp(mysql.default:3306)/payment?parseTime=true&loc=Local
+        source: root:${MYSQL_PASSWORD}@tcp(mysql.default:3306)/payment?parseTime=true&loc=Local
       redis:
         addr: redis-master.default:6379
         username:
-        password: 1GyY3AHsWg
+        password: ${REDIS_PASSWORD}
         read_timeout: 2s
         write_timeout: 2s
         dial_timeout: 5s
@@ -135,11 +135,11 @@ serviceSet:
     data:
       database:
         driver: mysql
-        source: root:root@tcp(mysql.default:3306)/order?parseTime=true&loc=Local
+        source: root:${MYSQL_PASSWORD}@tcp(mysql.default:3306)/order?parseTime=true&loc=Local
       redis:
         addr: redis-master.default:6379
         username:
-        password: 1GyY3AHsWg
+        password: ${REDIS_PASSWORD}
         read_timeout: 2s
         write_timeout: 2s
         dial_timeout: 5s
@@ -155,7 +155,7 @@ serviceSet:
       redis:
         addr: redis-master.default:6379
         username:
-        password: 1GyY3AHsWg
+        password: ${REDIS_PASSWORD}
         read_timeout: 2s
         write_timeout: 2s
         dial_timeout: 5s

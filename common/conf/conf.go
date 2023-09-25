@@ -2,11 +2,12 @@ package conf
 
 import (
 	"github.com/go-kratos/kratos/v2/config"
+	"github.com/go-kratos/kratos/v2/config/env"
 	"github.com/go-kratos/kratos/v2/config/file"
 )
 
 func MustLoad(out *Bootstrap, path string) func() error {
-	c := config.New(config.WithSource(file.NewSource(path)))
+	c := config.New(config.WithSource(file.NewSource(path), env.NewSource()))
 
 	if err := c.Load(); err != nil {
 		panic(err)

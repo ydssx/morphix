@@ -33,6 +33,9 @@ spec:
           env:
             - name: TZ
               value: Asia/Shanghai
+          envFrom:
+            - secretRef:
+                name: test-secret          
       imagePullSecrets:
         - name: aliyun-registry-secret
       volumes:
