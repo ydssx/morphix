@@ -2,18 +2,13 @@ package server
 
 import (
 	"context"
-	"encoding/json"
-	"log"
 	"time"
 
 	"github.com/hibiken/asynq"
-	jobv1 "github.com/ydssx/morphix/api/job/v1"
 	"github.com/ydssx/morphix/app/job/internal/common"
 	"github.com/ydssx/morphix/app/job/internal/handler"
-	"github.com/ydssx/morphix/app/job/internal/service"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/logger"
-	"github.com/ydssx/morphix/pkg/util"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -61,17 +56,4 @@ func (j *JobServer) Stop(_ context.Context) error {
 
 func reportError(ctx context.Context, task *asynq.Task, err error) {
 	logger.Errorf(ctx, "执行任务失败,task_type:%s ,err: %v", task.Type(), err)
-}
-
-func NewClient(redisClientOpt asynq.RedisClientOpt) {
-	cli := asynq.NewClient(redisClientOpt)
-	srv := service.NewJobService(cli,nil)
-	for {
-		payload, _ := json.Marshal(jobv1.PayLoadTest{Msg: "test msg:" + util.GenerateCode(6)})
-		_, err := srv.Enqueue(context.Background(), &jobv1.EnqueueRequest{JobType: jobv1.JobType_TEST_JOB, Payload: payload})
-		if err != nil {
-			log.Print(err)
-		}
-		time.Sleep(time.Millisecond * 500)
-	}
 }
