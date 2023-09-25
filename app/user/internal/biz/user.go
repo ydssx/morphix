@@ -15,11 +15,10 @@ import (
 	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"gorm.io/gorm"
 )
 
 type UserRepo interface {
-	CreateUser(ctx context.Context, user *models.User, tx ...*gorm.DB) (userId int, err error)
+	CreateUser(ctx context.Context, user *models.User) (userId int, err error)
 	UpdateUser(ctx context.Context, user *models.User) error
 	DeleteUser(ctx context.Context, id uint) error
 	ListUser(ctx context.Context, cond *ListUserCond) []models.User
@@ -27,6 +26,10 @@ type UserRepo interface {
 	GetUserByID(ctx context.Context, id uint) (*models.User, error)
 	GetUserByName(ctx context.Context, username string) (*models.User, error)
 	GetUserByPhone(ctx context.Context, phoneNumber string) (*models.User, error)
+}
+
+type Transaction interface {
+	InTx(context.Context, func(ctx context.Context) error) error
 }
 
 type ListUserCond struct {
@@ -44,10 +47,11 @@ type UserUsecase struct {
 	repo UserRepoWithCache
 	log  *log.Helper
 	sms  smsv1.SMSServiceClient
+	tm   Transaction
 }
 
-func NewUserUsecase(repo UserRepoWithCache, logger log.Logger, sms smsv1.SMSServiceClient) *UserUsecase {
-	return &UserUsecase{repo: repo, log: log.NewHelper(logger), sms: sms}
+func NewUserUsecase(repo UserRepoWithCache, logger log.Logger, sms smsv1.SMSServiceClient, tm Transaction) *UserUsecase {
+	return &UserUsecase{repo: repo, log: log.NewHelper(logger), sms: sms, tm: tm}
 }
 
 // Register 用户注册逻辑
