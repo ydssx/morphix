@@ -10,6 +10,7 @@ import (
 	"github.com/go-kratos/swagger-api/openapiv2"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	jobv1 "github.com/ydssx/morphix/api/job/v1"
 	orderv1 "github.com/ydssx/morphix/api/order/v1"
 	paymentv1 "github.com/ydssx/morphix/api/payment/v1"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
@@ -27,12 +28,14 @@ type registerFn func(ctx context.Context, mux *gwruntime.ServeMux, conn *grpc.Cl
 
 var handlers = make(map[*conf.ClientConf]registerFn)
 
+// 注册rpc服务
 func registerRpcHandler(c *conf.Bootstrap) {
 	clientSet := c.ClientSet
 	handlers[clientSet.UserRpcClient] = userv1.RegisterUserServiceHandler
 	handlers[clientSet.SmsRpcClient] = smsv1.RegisterSMSServiceHandler
 	handlers[clientSet.PaymentRpcClient] = paymentv1.RegisterPaymentServiceHandler
 	handlers[clientSet.OrderRpcClient] = orderv1.RegisterOrderServiceHandler
+	handlers[clientSet.JobRpcClient] = jobv1.RegisterJobServiceHandler
 }
 
 func NewHTTPServer(ctx context.Context, c *conf.Bootstrap) *khttp.Server {

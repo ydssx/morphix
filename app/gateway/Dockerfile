@@ -12,9 +12,9 @@ FROM alpine
 
 WORKDIR /usr/src/app/
 
-ENV TZ=Asia/Shanghai
+RUN apk add --no-cache ca-certificates tzdata
 
-RUN apk add --no-cache ca-certificates
+ENV TZ=Asia/Shanghai
 
 COPY --from=builder /bin ./
 COPY --from=builder /src/configs ./
