@@ -8,8 +8,8 @@ import (
 	"github.com/ydssx/morphix/app/job/internal/common"
 	"github.com/ydssx/morphix/app/job/internal/handler"
 	"github.com/ydssx/morphix/common/conf"
+	"github.com/ydssx/morphix/pkg/concurrent"
 	"github.com/ydssx/morphix/pkg/logger"
-	"golang.org/x/sync/errgroup"
 )
 
 type JobServer struct {
@@ -41,10 +41,7 @@ func NewJobServer(c *conf.Bootstrap) *JobServer {
 }
 
 func (j *JobServer) Start(ctx context.Context) error {
-	eg, _ := errgroup.WithContext(ctx)
-	eg.Go(j.sd.Start)
-	eg.Go(func() error { return j.sr.Start(j.mux) })
-	return eg.Wait()
+	return concurrent.NewGroup(ctx, concurrent.WithFastFail(true)).Run(j.sd.Start, func() error { return j.sr.Start(j.mux) })
 }
 
 func (j *JobServer) Stop(_ context.Context) error {

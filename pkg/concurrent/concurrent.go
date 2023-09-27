@@ -1,4 +1,4 @@
-package main
+package concurrent
 
 import (
 	"context"
@@ -21,7 +21,7 @@ func WithSemaphore(semaphore int) Opt {
 	return func(g *Group) { g.limit = semaphore }
 }
 
-// WithFastFail if set true,Run will returned when first err return by function passed to Run, else Run will blocking util all functions finished.
+// WithFastFail if set true, Run will returned when first err return by function passed to Run, else Run will blocking util all functions finished.
 func WithFastFail(fastFail bool) Opt {
 	return func(g *Group) { g.fastFail = fastFail }
 }
@@ -58,6 +58,5 @@ func (g *Group) Run(fs ...func() error) (err error) {
 		return g.ctx.Err()
 	case <-g.errChan:
 	}
-
 	return
 }
