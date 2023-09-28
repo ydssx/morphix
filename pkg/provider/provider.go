@@ -5,7 +5,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-logr/logr"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
@@ -78,8 +77,4 @@ func InitMeterProvider(endpoint string) *sdkmetric.MeterProvider {
 	)
 	otel.SetMeterProvider(provider)
 	return provider
-}
-
-func InitLoggerProvider() {
-	otel.SetLogger(logr.FromContextOrDiscard(context.Background()))
 }

@@ -18,6 +18,7 @@ func NewGRPCServer(server *conf.Server) *grpc.Server {
 			interceptors.MetricServer(),
 			interceptors.RecoveryServer(),
 		),
+		grpc.StreamInterceptor(interceptors.TraceStreamServer()),
 	}
 	if server.Grpc.Addr != "" {
 		opts = append(opts, grpc.Address(server.Grpc.Addr))
@@ -26,6 +27,6 @@ func NewGRPCServer(server *conf.Server) *grpc.Server {
 		opts = append(opts, grpc.Timeout(server.Grpc.Timeout.AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
-	
+
 	return srv
 }

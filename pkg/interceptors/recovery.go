@@ -6,5 +6,5 @@ import (
 )
 
 func RecoveryServer() grpc.UnaryServerInterceptor {
-	return recovery.UnaryServerInterceptor(recovery.WithRecoveryHandler(grpcPanicRecoveryHandler))
+	return recovery.UnaryServerInterceptor(recovery.WithRecoveryHandlerContext(grpcPanicRecoveryHandler))
 }

@@ -6,6 +6,7 @@ import (
 	grpcprom "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/ydssx/morphix/pkg/logger"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -27,11 +28,16 @@ var (
 		Help: "Total number of gRPC requests recovered from internal panic.",
 	})
 
-	grpcPanicRecoveryHandler = func(p any) (err error) {
+	grpcPanicRecoveryHandler = func(ctx context.Context, p any) (err error) {
 		panicsTotal.Inc()
+		reportPanic(ctx, p)
 		return status.Errorf(codes.Internal, "%s", p)
 	}
 )
+
+func reportPanic(ctx context.Context, p any) {
+	logger.Error(ctx, p)
+}
 
 func MetricServer() grpc.UnaryServerInterceptor {
 	clMetrics := grpcprom.NewServerMetrics(
