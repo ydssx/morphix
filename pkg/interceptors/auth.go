@@ -17,6 +17,18 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// 需要跳过鉴权的服务(api集合)和api
+var (
+	srvNames = []string{
+		healthpb.Health_ServiceDesc.ServiceName,
+	}
+	methNames = []string{
+		userv1.UserService_Login_FullMethodName,
+		userv1.UserService_Register_FullMethodName,
+		smsv1.SMSService_SendSMS_FullMethodName,
+	}
+)
+
 func AuthServer() grpc.UnaryServerInterceptor {
 	authFn := func(ctx context.Context) (context.Context, error) {
 		md := metadata.ExtractIncoming(ctx)
@@ -33,17 +45,7 @@ func AuthServer() grpc.UnaryServerInterceptor {
 
 	// Setup auth matcher.
 	authMatcher := func(_ context.Context, callMeta interceptors.CallMeta) bool {
-		srvNames := []string{
-			healthpb.Health_ServiceDesc.ServiceName,
-		}
-		methNames := []string{
-			userv1.UserService_Login_FullMethodName,
-			userv1.UserService_Register_FullMethodName,
-			smsv1.SMSService_SendSMS_FullMethodName,
-		}
-
 		result := !(util.SliceContain(srvNames, callMeta.Service) || util.SliceContain(methNames, callMeta.FullMethod()))
-
 		return result
 	}
 

@@ -41,7 +41,10 @@ func NewJobServer(c *conf.Bootstrap) *JobServer {
 }
 
 func (j *JobServer) Start(ctx context.Context) error {
-	return concurrent.NewGroup(ctx, concurrent.WithFastFail(true)).Run(j.sd.Start, func() error { return j.sr.Start(j.mux) })
+	return concurrent.NewGroup(ctx, concurrent.WithFastFail(true)).Run(
+		j.sd.Start,
+		func() error { return j.sr.Start(j.mux) },
+	)
 }
 
 func (j *JobServer) Stop(_ context.Context) error {

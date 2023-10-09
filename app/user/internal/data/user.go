@@ -68,6 +68,9 @@ func (r *userRepo) CreateUser(ctx context.Context, user *models.User) (userId in
 }
 
 func (r *userRepo) ListUser(ctx context.Context, cond *biz.ListUserCond) []models.User {
+	if cond == nil {
+		cond = new(biz.ListUserCond)
+	}
 	model := models.NewUserModel(r.data.DB(ctx)).WithContext(ctx)
 	if cond.Phone != "" {
 		model.PhoneNumberLike(cond.Phone)

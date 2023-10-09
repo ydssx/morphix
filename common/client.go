@@ -3,6 +3,7 @@ package common
 import (
 	"context"
 
+	_ "github.com/dtm-labs/driver-kratos"
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	kgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/nats-io/nats.go"
