@@ -63,7 +63,7 @@ func gen(appName string) {
 			log.Fatal(err)
 		}
 	}
-	return
+	
 	serviceInfo := parseProto("api/aiart/v1/aiart.proto", appName)
 	data := map[string]interface{}{
 		"port":        9005,

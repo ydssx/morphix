@@ -107,7 +107,7 @@ func IsZeroStruct(s any) bool {
 	return true
 }
 
-// SetDefaults set default value for struct field with `default` tag if the field is zero value, will panic if data is not a struct.
+// SetDefaults set default value for struct field with `default` tag if the field is zero value, will panic if data is not a pointer struct.
 func SetDefaults(data interface{}) {
 	value := reflect.ValueOf(data).Elem()
 	typ := value.Type()

@@ -57,3 +57,28 @@ func TestCompareRequests(t *testing.T) {
 		})
 	}
 }
+
+func TestSetDefaults(t *testing.T) {
+	type args struct {
+		data interface{}
+	}
+	type MyStruct struct {
+		Name    string `default:"John"`
+		Age     int    `default:"30"`
+		Enabled bool   `default:"true"`
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		// TODO: Add test cases.
+		{"", args{&MyStruct{}}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			SetDefaults(tt.args.data)
+			t.Logf("%#+v", tt.args.data)
+
+		})
+	}
+}
