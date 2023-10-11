@@ -15,41 +15,41 @@ import (
 	"github.com/ydssx/morphix/pkg/util"
 )
 
-//go:embed dockerfile.tpl
+//go:embed template/dockerfile.tpl
 var Dockerfile string
 
-//go:embed main.tpl
+//go:embed template/cmd/main.tpl
 var mainFile string
 
-//go:embed wire.tpl
+//go:embed template/cmd/wire.tpl
 var wireFile string
 
-//go:embed server.tpl
+//go:embed template/server/server.tpl
 var serverFile string
 
-//go:embed grpc.tpl
+//go:embed template/server/grpc.tpl
 var grpcFile string
 
-//go:embed service.tpl
+//go:embed template/service/service.tpl
 var serviceFile string
 
-//go:embed service_set.tpl
+//go:embed template/service/service_set.tpl
 var serviceSetFile string
 
-//go:embed biz.tpl
+//go:embed template/biz/biz.tpl
 var bizFile string
 
-//go:embed biz_set.tpl
+//go:embed template/biz/biz_set.tpl
 var bizSetFile string
 
 func main() {
-	mkDir("aiart")
+	gen("aiart")
 }
 
 type Generator struct {
 }
 
-func mkDir(appName string) {
+func gen(appName string) {
 	baseDir := "app/" + appName
 	cmdDir := baseDir + "/cmd/" + appName
 	internalDir := baseDir + "/internal"
@@ -63,7 +63,7 @@ func mkDir(appName string) {
 			log.Fatal(err)
 		}
 	}
-
+	return
 	serviceInfo := parseProto("api/aiart/v1/aiart.proto", appName)
 	data := map[string]interface{}{
 		"port":        9005,
