@@ -24,6 +24,7 @@ message ServiceSet {
   ServerConf payment = 4;
   ServerConf order = 5;
   ServerConf job = 6;
+  ServerConf aiart = 7;
 }
 
 message ClientSet {

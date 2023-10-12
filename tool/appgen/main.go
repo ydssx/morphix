@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	_ "embed"
+	"flag"
 	"fmt"
 	"go/format"
 	"log"
@@ -15,41 +16,52 @@ import (
 	"github.com/ydssx/morphix/pkg/util"
 )
 
-//go:embed template/dockerfile.tpl
-var Dockerfile string
+var (
+	//go:embed template/dockerfile.tpl
+	Dockerfile string
 
-//go:embed template/cmd/main.tpl
-var mainFile string
+	//go:embed template/cmd/main.tpl
+	mainFile string
 
-//go:embed template/cmd/wire.tpl
-var wireFile string
+	//go:embed template/cmd/wire.tpl
+	wireFile string
 
-//go:embed template/server/server.tpl
-var serverFile string
+	//go:embed template/server/server.tpl
+	serverFile string
 
-//go:embed template/server/grpc.tpl
-var grpcFile string
+	//go:embed template/server/grpc.tpl
+	grpcFile string
 
-//go:embed template/service/service.tpl
-var serviceFile string
+	//go:embed template/service/service.tpl
+	serviceFile string
 
-//go:embed template/service/service_set.tpl
-var serviceSetFile string
+	//go:embed template/service/service_set.tpl
+	serviceSetFile string
 
-//go:embed template/biz/biz.tpl
-var bizFile string
+	//go:embed template/biz/biz.tpl
+	bizFile string
 
-//go:embed template/biz/biz_set.tpl
-var bizSetFile string
+	//go:embed template/biz/biz_set.tpl
+	bizSetFile string
+)
+
+var (
+	appName   = flag.String("app", "", "")
+	protoFile = flag.String("proto", "", "proto file")
+)
 
 func main() {
-	gen("aiart")
+	flag.Parse()
+	if *appName == "" || *protoFile == "" {
+		log.Fatal("app and proto must be set.")
+	}
+	gen(*appName, *protoFile)
 }
 
 type Generator struct {
 }
 
-func gen(appName string) {
+func gen(appName, protoFile string) {
 	baseDir := "app/" + appName
 	cmdDir := baseDir + "/cmd/" + appName
 	internalDir := baseDir + "/internal"
@@ -63,8 +75,8 @@ func gen(appName string) {
 			log.Fatal(err)
 		}
 	}
-	
-	serviceInfo := parseProto("api/aiart/v1/aiart.proto", appName)
+
+	serviceInfo := parseProto(protoFile, appName)
 	data := map[string]interface{}{
 		"port":        9005,
 		"appName":     appName,
@@ -83,12 +95,11 @@ func gen(appName string) {
 	mkFile(data, bizDir+"/biz.go", bizSetFile)
 	mkFile(data, bizDir+"/"+appName+".go", bizFile)
 
-	cmd := exec.Command("sh", "-c", fmt.Sprintf("cd app/%s/cmd/%s/ && wire", appName, appName))
+	cmd := exec.Command("sh", "-c", fmt.Sprintf("make api && cd app/%s/cmd/%s/ && wire", appName, appName))
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("命令输出:")
 	fmt.Println(string(output))
 }
 
