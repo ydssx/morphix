@@ -46,8 +46,8 @@ var (
 )
 
 var (
-	appName   = flag.String("app", "", "")
-	protoFile = flag.String("proto", "", "proto file")
+	appName   = flag.String("app", "gpt", "")
+	protoFile = flag.String("proto", "../../api/gpt/gpt.proto", "proto file")
 )
 
 func main() {
@@ -83,6 +83,8 @@ func gen(appName, protoFile string) {
 		"serviceName": serviceInfo.Name,
 		"RpcMeths":    serviceInfo.RpcMeths,
 		"Imports":     serviceInfo.pkgs,
+		"PkgPath":     serviceInfo.PkgPath,
+		"PkgName":     serviceInfo.PkgName,
 	}
 
 	mkFile(data, baseDir+"/Dockerfile", Dockerfile)
@@ -130,6 +132,8 @@ type ServiceInfo struct {
 	Name     string
 	pkgs     []string
 	RpcMeths []MethInfo
+	PkgPath  string
+	PkgName  string
 }
 
 type MethInfo struct {
@@ -139,6 +143,7 @@ type MethInfo struct {
 	Comment     string
 	ServiceName string
 	AppName     string
+	PkgName     string
 }
 
 func parseProto(protoFile, appName string) (info ServiceInfo) {
@@ -153,30 +158,43 @@ func parseProto(protoFile, appName string) (info ServiceInfo) {
 		log.Fatal(err)
 	}
 	proto.Walk(definition,
+		proto.WithPackage(func(p *proto.Package) { info.PkgName = p.Name }),
 		proto.WithService(func(s *proto.Service) { info.Name = s.Name }),
 		proto.WithRPC(func(r *proto.RPC) {
-			req, pkg := convertRequest(r.RequestType)
-			info.RpcMeths = append(info.RpcMeths, MethInfo{
+			req, pkg := convertRequest(info.PkgName, r.RequestType)
+			x := MethInfo{
 				MethName:    r.Name,
 				Param:       req,
 				Return:      r.ReturnsType,
-				Comment:     r.Comment.Message(),
 				ServiceName: info.Name,
 				AppName:     appName,
-			})
+				PkgName:     info.PkgName,
+			}
+			if r.Comment != nil {
+				x.Comment = r.Comment.Message()
+			}
+			info.RpcMeths = append(info.RpcMeths, x)
 			if !util.SliceContain(info.pkgs, pkg) && pkg != "" {
 				info.pkgs = append(info.pkgs, pkg)
+			}
+		}),
+		proto.WithOption(func(o *proto.Option) {
+			x := strings.Split(o.Constant.Source, ";")
+			if len(x) > 0 {
+				info.PkgPath = x[0]
+			} else {
+				info.PkgPath = o.Constant.Source
 			}
 		}),
 	)
 	return
 }
 
-func convertRequest(reqType string) (string, string) {
+func convertRequest(pkgName, reqType string) (string, string) {
 	switch reqType {
 	case "google.protobuf.Empty":
 		return "emptypb.Empty", "google.golang.org/protobuf/types/known/emptypb"
 	default:
-		return "pb." + reqType, ""
+		return pkgName + "." + reqType, ""
 	}
 }

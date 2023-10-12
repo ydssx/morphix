@@ -3,7 +3,7 @@ package biz
 import (
 	"context"
 
-	pb "github.com/ydssx/morphix/api/{{.appName}}/v1"
+	{{.PkgName}} "{{.PkgPath}}"
     {{range .Imports}}"{{.}}"
 	{{end }}
 )
@@ -15,9 +15,9 @@ func New{{.appName | Title}}UseCase() *{{.appName | Title}}UseCase {
 	return &{{.appName | Title}}UseCase{}
 }
 {{range $m := .RpcMeths}}
-//{{$m.Comment}}
-func (*{{$m.AppName | Title}}UseCase) {{$m.MethName}}(ctx context.Context, req *{{$m.Param}}) (res *pb.{{$m.Return}}, err error) {
-	res = new(pb.{{$m.Return}})
+{{if .Comment}}//{{$m.Comment}}{{end}}
+func (*{{$m.AppName | Title}}UseCase) {{$m.MethName}}(ctx context.Context, req *{{$m.Param}}) (res *{{.PkgName}}.{{$m.Return}}, err error) {
+	res = new({{.PkgName}}.{{$m.Return}})
 
 	// TODO:ADD logic here and delete this line.
 
