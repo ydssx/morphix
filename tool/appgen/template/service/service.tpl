@@ -20,7 +20,7 @@ func New{{.serviceName | Title}}(uc *biz.{{.appName | Title}}UseCase) *{{.servic
 }
 {{range .RpcMeths}}
 {{if .Comment}}//{{.Comment}}{{end}}
-func (s *{{.ServiceName}}) {{.MethName}}(ctx context.Context,req *{{.Param}}) (res *{{.PkgName}}.{{.Return}}, err error) {
+func (s *{{.ServiceName}}) {{.MethName}}(ctx context.Context,req *{{.Param}}) (res *{{.Return}}, err error) {
 	return s.uc.{{.MethName}}(ctx, req)
 }
 {{end -}}

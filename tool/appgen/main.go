@@ -13,6 +13,8 @@ import (
 	"text/template"
 
 	"github.com/emicklei/proto"
+	"github.com/fatih/color"
+	apigen "github.com/ydssx/api-gen/gen"
 	"github.com/ydssx/morphix/pkg/util"
 )
 
@@ -46,8 +48,9 @@ var (
 )
 
 var (
-	appName   = flag.String("app", "gpt", "")
-	protoFile = flag.String("proto", "../../api/gpt/gpt.proto", "proto file")
+	appName   = flag.String("app", "aiart", "app name")
+	protoFile = flag.String("proto", "../../api/aiart/v1/aiart.proto", "proto file")
+	port      = flag.Int("port", 0, "app service port")
 )
 
 func main() {
@@ -55,13 +58,16 @@ func main() {
 	if *appName == "" || *protoFile == "" {
 		log.Fatal("app and proto must be set.")
 	}
-	gen(*appName, *protoFile)
+	if *port == 0 {
+		*port = util.GenerateRandomNumber(9000, 10000)
+	}
+	gen(*appName, *protoFile, *port)
 }
 
 type Generator struct {
 }
 
-func gen(appName, protoFile string) {
+func gen(appName, protoFile string, port int) {
 	baseDir := "app/" + appName
 	cmdDir := baseDir + "/cmd/" + appName
 	internalDir := baseDir + "/internal"
@@ -78,7 +84,7 @@ func gen(appName, protoFile string) {
 
 	serviceInfo := parseProto(protoFile, appName)
 	data := map[string]interface{}{
-		"port":        9005,
+		"port":        port,
 		"appName":     appName,
 		"serviceName": serviceInfo.Name,
 		"RpcMeths":    serviceInfo.RpcMeths,
@@ -120,12 +126,16 @@ func mkFile(data map[string]interface{}, outFile string, text string) {
 	var codes = buf.Bytes()
 	if strings.HasSuffix(outFile, ".go") {
 		codes, _ = format.Source(buf.Bytes())
+		if fileExists(outFile) {
+			apigen.WriteDecl(outFile, string(codes))
+			return
+		}
 	}
 	err = os.WriteFile(outFile, codes, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("generate file [%s] succeed.\n", outFile)
+	color.Green("generate file [%s] succeed.\n", outFile)
 }
 
 type ServiceInfo struct {
@@ -165,7 +175,7 @@ func parseProto(protoFile, appName string) (info ServiceInfo) {
 			x := MethInfo{
 				MethName:    r.Name,
 				Param:       req,
-				Return:      r.ReturnsType,
+				Return:      convertReturnType(info.PkgName, r.ReturnsType),
 				ServiceName: info.Name,
 				AppName:     appName,
 				PkgName:     info.PkgName,
@@ -179,6 +189,9 @@ func parseProto(protoFile, appName string) (info ServiceInfo) {
 			}
 		}),
 		proto.WithOption(func(o *proto.Option) {
+			if o.Constant.Source == "" {
+				return
+			}
 			x := strings.Split(o.Constant.Source, ";")
 			if len(x) > 0 {
 				info.PkgPath = x[0]
@@ -197,4 +210,18 @@ func convertRequest(pkgName, reqType string) (string, string) {
 	default:
 		return pkgName + "." + reqType, ""
 	}
+}
+
+func convertReturnType(pkgName, returnType string) string {
+	switch returnType {
+	case "google.protobuf.Empty":
+		return "emptypb.Empty"
+	default:
+		return pkgName + "." + returnType
+	}
+}
+
+func fileExists(filename string) bool {
+	_, err := os.Stat(filename)
+	return !os.IsNotExist(err)
 }
