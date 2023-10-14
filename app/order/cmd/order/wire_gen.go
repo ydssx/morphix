@@ -9,6 +9,7 @@ package main
 import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/ydssx/morphix/app/order/internal/biz"
 	"github.com/ydssx/morphix/app/order/internal/listener"
 	"github.com/ydssx/morphix/app/order/internal/server"
 	"github.com/ydssx/morphix/app/order/internal/service"
@@ -23,7 +24,8 @@ import (
 // Injectors from wire.go:
 
 func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
-	orderService := service.NewOrderService()
+	orderUseCase := biz.NewOrderUseCase()
+	orderService := service.NewOrderService(orderUseCase)
 	grpcServer := server.NewGRPCServer(bootstrap, orderService)
 	conn, cleanup, err := common.NewNatsConn(bootstrap)
 	if err != nil {

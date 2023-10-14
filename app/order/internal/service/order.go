@@ -4,39 +4,40 @@ import (
 	"context"
 
 	orderv1 "github.com/ydssx/morphix/api/order/v1"
+	"github.com/ydssx/morphix/app/order/internal/biz"
 )
 
-var _ orderv1.OrderServiceServer = (*OrderService)(nil)
-
 type OrderService struct {
+	uc *biz.OrderUseCase
+
 	orderv1.UnimplementedOrderServiceServer
 }
 
-func NewOrderService() *OrderService {
-	return &OrderService{}
+func NewOrderService(uc *biz.OrderUseCase) *OrderService {
+	return &OrderService{uc: uc}
 }
 
-// CreateOrder implements orderv1.OrderServiceServer.
-func (*OrderService) CreateOrder(context.Context, *orderv1.CreateOrderRequest) (*orderv1.CreateOrderResponse, error) {
-	panic("unimplemented")
+// 创建订单
+func (s *OrderService) CreateOrder(ctx context.Context, req *orderv1.CreateOrderRequest) (res *orderv1.CreateOrderResponse, err error) {
+	return s.uc.CreateOrder(ctx, req)
 }
 
-// DeleteOrder implements orderv1.OrderServiceServer.
-func (*OrderService) DeleteOrder(context.Context, *orderv1.DeleteOrderRequest) (*orderv1.DeleteOrderResponse, error) {
-	panic("unimplemented")
+// 查询订单
+func (s *OrderService) GetOrder(ctx context.Context, req *orderv1.GetOrderRequest) (res *orderv1.GetOrderResponse, err error) {
+	return s.uc.GetOrder(ctx, req)
 }
 
-// GetOrder implements orderv1.OrderServiceServer.
-func (*OrderService) GetOrder(context.Context, *orderv1.GetOrderRequest) (*orderv1.GetOrderResponse, error) {
-	panic("unimplemented")
+// 更新订单状态
+func (s *OrderService) UpdateOrderStatus(ctx context.Context, req *orderv1.UpdateOrderStatusRequest) (res *orderv1.UpdateOrderStatusResponse, err error) {
+	return s.uc.UpdateOrderStatus(ctx, req)
 }
 
-// ListOrders implements orderv1.OrderServiceServer.
-func (*OrderService) ListOrders(context.Context, *orderv1.ListOrdersRequest) (*orderv1.ListOrdersResponse, error) {
-	panic("unimplemented")
+// 删除订单
+func (s *OrderService) DeleteOrder(ctx context.Context, req *orderv1.DeleteOrderRequest) (res *orderv1.DeleteOrderResponse, err error) {
+	return s.uc.DeleteOrder(ctx, req)
 }
 
-// UpdateOrderStatus implements orderv1.OrderServiceServer.
-func (*OrderService) UpdateOrderStatus(context.Context, *orderv1.UpdateOrderStatusRequest) (*orderv1.UpdateOrderStatusResponse, error) {
-	panic("unimplemented")
+// 查询订单列表
+func (s *OrderService) ListOrders(ctx context.Context, req *orderv1.ListOrdersRequest) (res *orderv1.ListOrdersResponse, err error) {
+	return s.uc.ListOrders(ctx, req)
 }
