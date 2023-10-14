@@ -14,7 +14,7 @@ func NewOrderUseCase() *OrderUseCase {
 }
 
 // 创建订单
-func (*OrderUseCase) CreateOrder(ctx context.Context, req *orderv1.CreateOrderRequest) (res *orderv1.CreateOrderResponse, err error) {
+func (b *OrderUseCase) CreateOrder(ctx context.Context, req *orderv1.CreateOrderRequest) (res *orderv1.CreateOrderResponse, err error) {
 	res = new(orderv1.CreateOrderResponse)
 
 	// TODO:ADD logic here and delete this line.
@@ -23,7 +23,7 @@ func (*OrderUseCase) CreateOrder(ctx context.Context, req *orderv1.CreateOrderRe
 }
 
 // 查询订单
-func (*OrderUseCase) GetOrder(ctx context.Context, req *orderv1.GetOrderRequest) (res *orderv1.GetOrderResponse, err error) {
+func (b *OrderUseCase) GetOrder(ctx context.Context, req *orderv1.GetOrderRequest) (res *orderv1.GetOrderResponse, err error) {
 	res = new(orderv1.GetOrderResponse)
 
 	// TODO:ADD logic here and delete this line.
@@ -32,7 +32,7 @@ func (*OrderUseCase) GetOrder(ctx context.Context, req *orderv1.GetOrderRequest)
 }
 
 // 更新订单状态
-func (*OrderUseCase) UpdateOrderStatus(ctx context.Context, req *orderv1.UpdateOrderStatusRequest) (res *orderv1.UpdateOrderStatusResponse, err error) {
+func (b *OrderUseCase) UpdateOrderStatus(ctx context.Context, req *orderv1.UpdateOrderStatusRequest) (res *orderv1.UpdateOrderStatusResponse, err error) {
 	res = new(orderv1.UpdateOrderStatusResponse)
 
 	// TODO:ADD logic here and delete this line.
@@ -41,7 +41,7 @@ func (*OrderUseCase) UpdateOrderStatus(ctx context.Context, req *orderv1.UpdateO
 }
 
 // 删除订单
-func (*OrderUseCase) DeleteOrder(ctx context.Context, req *orderv1.DeleteOrderRequest) (res *orderv1.DeleteOrderResponse, err error) {
+func (b *OrderUseCase) DeleteOrder(ctx context.Context, req *orderv1.DeleteOrderRequest) (res *orderv1.DeleteOrderResponse, err error) {
 	res = new(orderv1.DeleteOrderResponse)
 
 	// TODO:ADD logic here and delete this line.
@@ -50,7 +50,7 @@ func (*OrderUseCase) DeleteOrder(ctx context.Context, req *orderv1.DeleteOrderRe
 }
 
 // 查询订单列表
-func (*OrderUseCase) ListOrders(ctx context.Context, req *orderv1.ListOrdersRequest) (res *orderv1.ListOrdersResponse, err error) {
+func (b *OrderUseCase) ListOrders(ctx context.Context, req *orderv1.ListOrdersRequest) (res *orderv1.ListOrdersResponse, err error) {
 	res = new(orderv1.ListOrdersResponse)
 
 	// TODO:ADD logic here and delete this line.
