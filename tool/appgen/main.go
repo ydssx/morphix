@@ -191,7 +191,7 @@ func parseProto(protoFile, appName string) (info ServiceInfo) {
 				PkgName:     info.PkgName,
 			}
 			if r.Comment != nil {
-				x.Comment = r.Comment.Message()
+				x.Comment = strings.Join(r.Comment.Lines, "\n//")
 			}
 			info.RpcMeths = append(info.RpcMeths, x)
 			if !util.SliceContain(info.pkgs, pkg) && pkg != "" {
