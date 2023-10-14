@@ -12,6 +12,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/cheggaaa/pb/v3"
 	"github.com/emicklei/proto"
 	"github.com/fatih/color"
 	apigen "github.com/ydssx/api-gen/gen"
@@ -64,9 +65,6 @@ func main() {
 	gen(*appName, *protoFile, *port)
 }
 
-type Generator struct {
-}
-
 func gen(appName, protoFile string, port int) {
 	baseDir := "app/" + appName
 	cmdDir := baseDir + "/cmd/" + appName
@@ -75,13 +73,20 @@ func gen(appName, protoFile string, port int) {
 	serviceDir := internalDir + "/service"
 	bizDir := internalDir + "/biz"
 	paths := []string{baseDir, cmdDir, internalDir, serverDir, bizDir, serviceDir}
+	bar := pb.StartNew(len(paths))
+	bar.SetMaxWidth(150)
+	tmpl := `{{ red "generating:" }} {{ bar . "<" "▇" (cycle . "=" ) "." ">"}} {{speed . | rndcolor }} {{percent .}} {{string . "my_green_string" | green}}`
+	bar.SetTemplateString(tmpl)
+	bar.Set("my_green_string", "green")
 	for _, v := range paths {
+		bar.Set("my_green_string", v)
+		bar.Increment()
 		err := os.MkdirAll(v, 0644)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-
+	bar.Finish()
 	serviceInfo := parseProto(protoFile, appName)
 	data := map[string]interface{}{
 		"port":        port,
@@ -127,9 +132,14 @@ func mkFile(data map[string]interface{}, outFile string, text string) {
 	if strings.HasSuffix(outFile, ".go") {
 		codes, _ = format.Source(buf.Bytes())
 		if fileExists(outFile) {
-			apigen.WriteDecl(outFile, string(codes))
+			if strings.HasSuffix(outFile, *appName+".go") {
+				apigen.WriteDecl(outFile, string(codes))
+			}
 			return
 		}
+	}
+	if fileExists(outFile) {
+		return
 	}
 	err = os.WriteFile(outFile, codes, 0644)
 	if err != nil {
