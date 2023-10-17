@@ -3,7 +3,7 @@ package biz
 import (
 	"context"
 
-	pb "github.com/ydssx/morphix/api/aiart/v1"
+	aiartv1 "github.com/ydssx/morphix/api/aiart/v1"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -15,8 +15,8 @@ func NewAiartUseCase() *AiartUseCase {
 }
 
 // 生成图像
-func (*AiartUseCase) GenerateImage(ctx context.Context, req *pb.GenerateImageRequest) (res *pb.GenerateImageResponse, err error) {
-	res = new(pb.GenerateImageResponse)
+func (b *AiartUseCase) GenerateImage(ctx context.Context, req *aiartv1.GenerateImageRequest) (res *aiartv1.GenerateImageResponse, err error) {
+	res = new(aiartv1.GenerateImageResponse)
 
 	// TODO:ADD logic here and delete this line.
 
@@ -24,8 +24,8 @@ func (*AiartUseCase) GenerateImage(ctx context.Context, req *pb.GenerateImageReq
 }
 
 // 获取生成任务状态
-func (*AiartUseCase) GetGenerateStatus(ctx context.Context, req *pb.GetGenerateStatusRequest) (res *pb.GenerateStatusResponse, err error) {
-	res = new(pb.GenerateStatusResponse)
+func (b *AiartUseCase) GetGenerateStatus(ctx context.Context, req *aiartv1.GetGenerateStatusRequest) (res *aiartv1.GenerateStatusResponse, err error) {
+	res = new(aiartv1.GenerateStatusResponse)
 
 	// TODO:ADD logic here and delete this line.
 
@@ -33,8 +33,8 @@ func (*AiartUseCase) GetGenerateStatus(ctx context.Context, req *pb.GetGenerateS
 }
 
 // 获取已生成的图像
-func (*AiartUseCase) GetGeneratedImage(ctx context.Context, req *pb.GetGeneratedImageRequest) (res *pb.GetGeneratedImageResponse, err error) {
-	res = new(pb.GetGeneratedImageResponse)
+func (b *AiartUseCase) GetGeneratedImage(ctx context.Context, req *aiartv1.GetGeneratedImageRequest) (res *aiartv1.GetGeneratedImageResponse, err error) {
+	res = new(aiartv1.GetGeneratedImageResponse)
 
 	// TODO:ADD logic here and delete this line.
 
@@ -42,8 +42,8 @@ func (*AiartUseCase) GetGeneratedImage(ctx context.Context, req *pb.GetGenerated
 }
 
 // 获取模型信息
-func (*AiartUseCase) GetModelInfo(ctx context.Context, req *emptypb.Empty) (res *pb.GetModelInfoResponse, err error) {
-	res = new(pb.GetModelInfoResponse)
+func (b *AiartUseCase) GetModelInfo(ctx context.Context, req *emptypb.Empty) (res *aiartv1.GetModelInfoResponse, err error) {
+	res = new(aiartv1.GetModelInfoResponse)
 
 	// TODO:ADD logic here and delete this line.
 

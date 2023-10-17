@@ -11,7 +11,6 @@ import (
 	"os/exec"
 	"strings"
 	"text/template"
-	"time"
 
 	"github.com/cheggaaa/pb/v3"
 	"github.com/emicklei/proto"
@@ -81,7 +80,6 @@ func gen(appName, protoFile string, port int) {
 	bar.Set("my_green_string", "green")
 	for _, v := range paths {
 		bar.Set("my_green_string", v)
-		time.Sleep(time.Millisecond * 100)
 		bar.Increment()
 		err := os.MkdirAll(v, 0644)
 		if err != nil {

@@ -17,7 +17,7 @@ func New{{.appName | Title}}UseCase() *{{.appName | Title}}UseCase {
 {{$appName := .appName}}
 {{range $m := .serviceInfo.RpcMeths}}
 {{if .Comment}}//{{$m.Comment}}{{end}}
-func (b *{{$appName| Title}}UseCase) {{$m.MethName}}(ctx context.Context, req *{{$m.Param}}) (res *{{$m.Return}}, err error) {
+func (uc *{{$appName| Title}}UseCase) {{$m.MethName}}(ctx context.Context, req *{{$m.Param}}) (res *{{$m.Return}}, err error) {
 	res = new({{$m.Return}})
 
 	// TODO:ADD logic here and delete this line.
