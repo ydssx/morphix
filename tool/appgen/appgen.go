@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/cheggaaa/pb/v3"
 	"github.com/emicklei/proto"
@@ -80,6 +81,7 @@ func gen(appName, protoFile string, port int) {
 	bar.Set("my_green_string", "green")
 	for _, v := range paths {
 		bar.Set("my_green_string", v)
+		time.Sleep(time.Millisecond * 100)
 		bar.Increment()
 		err := os.MkdirAll(v, 0644)
 		if err != nil {
@@ -87,15 +89,12 @@ func gen(appName, protoFile string, port int) {
 		}
 	}
 	bar.Finish()
-	serviceInfo := parseProto(protoFile, appName)
+	serviceInfo := parseProto(protoFile)
 	data := map[string]interface{}{
 		"port":        port,
 		"appName":     appName,
-		"serviceName": serviceInfo.Name,
-		"RpcMeths":    serviceInfo.RpcMeths,
-		"Imports":     serviceInfo.pkgs,
-		"PkgPath":     serviceInfo.PkgPath,
-		"PkgName":     serviceInfo.PkgName,
+		"serviceInfo": serviceInfo,
+		"module":      parseGoModule(),
 	}
 
 	mkFile(data, baseDir+"/Dockerfile", Dockerfile)
@@ -111,7 +110,7 @@ func gen(appName, protoFile string, port int) {
 	cmd := exec.Command("sh", "-c", fmt.Sprintf("make api && cd app/%s/cmd/%s/ && wire", appName, appName))
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(string(output))
 	}
 	fmt.Println(string(output))
 }
@@ -150,23 +149,20 @@ func mkFile(data map[string]interface{}, outFile string, text string) {
 
 type ServiceInfo struct {
 	Name     string
-	pkgs     []string
+	Pkgs     []string
 	RpcMeths []MethInfo
 	PkgPath  string
 	PkgName  string
 }
 
 type MethInfo struct {
-	MethName    string
-	Param       string
-	Return      string
-	Comment     string
-	ServiceName string
-	AppName     string
-	PkgName     string
+	MethName string
+	Param    string
+	Return   string
+	Comment  string
 }
 
-func parseProto(protoFile, appName string) (info ServiceInfo) {
+func parseProto(protoFile string) (info ServiceInfo) {
 	reader, err := os.Open(protoFile)
 	if err != nil {
 		log.Fatal(err)
@@ -183,19 +179,16 @@ func parseProto(protoFile, appName string) (info ServiceInfo) {
 		proto.WithRPC(func(r *proto.RPC) {
 			req, pkg := convertRequest(info.PkgName, r.RequestType)
 			x := MethInfo{
-				MethName:    r.Name,
-				Param:       req,
-				Return:      convertReturnType(info.PkgName, r.ReturnsType),
-				ServiceName: info.Name,
-				AppName:     appName,
-				PkgName:     info.PkgName,
+				MethName: r.Name,
+				Param:    req,
+				Return:   convertReturnType(info.PkgName, r.ReturnsType),
 			}
 			if r.Comment != nil {
 				x.Comment = strings.Join(r.Comment.Lines, "\n//")
 			}
 			info.RpcMeths = append(info.RpcMeths, x)
-			if !util.SliceContain(info.pkgs, pkg) && pkg != "" {
-				info.pkgs = append(info.pkgs, pkg)
+			if !util.SliceContain(info.Pkgs, pkg) && pkg != "" {
+				info.Pkgs = append(info.Pkgs, pkg)
 			}
 		}),
 		proto.WithOption(func(o *proto.Option) {
@@ -234,4 +227,13 @@ func convertReturnType(pkgName, returnType string) string {
 func fileExists(filename string) bool {
 	_, err := os.Stat(filename)
 	return !os.IsNotExist(err)
+}
+
+func parseGoModule() string {
+	content, err := os.ReadFile("go.mod")
+	if err != nil {
+		log.Fatal(err)
+	}
+	x := strings.Split(string(content), "\n")[0]
+	return strings.TrimSpace(strings.Split(x, " ")[1])
 }

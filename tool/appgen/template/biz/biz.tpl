@@ -3,8 +3,8 @@ package biz
 import (
 	"context"
 
-	{{.PkgName}} "{{.PkgPath}}"
-    {{range .Imports}}"{{.}}"
+	{{.serviceInfo.PkgName}} "{{.serviceInfo.PkgPath}}"
+    {{range .serviceInfo.Pkgs}}"{{.}}"
 	{{end }}
 )
 
@@ -14,9 +14,10 @@ type {{.appName | Title}}UseCase struct {
 func New{{.appName | Title}}UseCase() *{{.appName | Title}}UseCase {
 	return &{{.appName | Title}}UseCase{}
 }
-{{range $m := .RpcMeths}}
+{{$appName := .appName}}
+{{range $m := .serviceInfo.RpcMeths}}
 {{if .Comment}}//{{$m.Comment}}{{end}}
-func (b *{{$m.AppName | Title}}UseCase) {{$m.MethName}}(ctx context.Context, req *{{$m.Param}}) (res *{{$m.Return}}, err error) {
+func (b *{{$appName| Title}}UseCase) {{$m.MethName}}(ctx context.Context, req *{{$m.Param}}) (res *{{$m.Return}}, err error) {
 	res = new({{$m.Return}})
 
 	// TODO:ADD logic here and delete this line.
@@ -24,4 +25,3 @@ func (b *{{$m.AppName | Title}}UseCase) {{$m.MethName}}(ctx context.Context, req
 	return
 }
 {{end -}}
-

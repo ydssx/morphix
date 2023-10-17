@@ -7,10 +7,10 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
-	"github.com/ydssx/morphix/common"
-	"github.com/ydssx/morphix/common/conf"
-	"github.com/ydssx/morphix/pkg/logger"
-	"github.com/ydssx/morphix/pkg/provider"
+	"{{.module}}/common"
+	"{{.module}}/common/conf"
+	"{{.module}}/pkg/logger"
+	"{{.module}}/pkg/provider"
 	_ "go.uber.org/automaxprocs"
 )
 

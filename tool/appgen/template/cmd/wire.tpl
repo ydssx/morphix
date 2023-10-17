@@ -7,10 +7,10 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
-	"github.com/ydssx/morphix/app/{{.appName}}/internal/server"
-	"github.com/ydssx/morphix/app/{{.appName}}/internal/service"
-	"github.com/ydssx/morphix/app/{{.appName}}/internal/biz"
-	"github.com/ydssx/morphix/common/conf"
+	"{{.module}}/app/{{.appName}}/internal/server"
+	"{{.module}}/app/{{.appName}}/internal/service"
+	"{{.module}}/app/{{.appName}}/internal/biz"
+	"{{.module}}/common/conf"
 )
 
 func wireApp(*conf.Bootstrap, log.Logger) (*kratos.App, func(), error) {

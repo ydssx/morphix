@@ -3,24 +3,25 @@ package service
 import (
 	"context"
 
-	{{.PkgName}} "{{.PkgPath}}"
-	"github.com/ydssx/morphix/app/{{.appName}}/internal/biz"
-	{{range .Imports}}"{{.}}"
+	{{.serviceInfo.PkgName}} "{{.serviceInfo.PkgPath}}"
+	"{{.module}}/app/{{.appName}}/internal/biz"
+	{{range .serviceInfo.Pkgs}}"{{.}}"
 	{{end }}
 )
 
-type {{.serviceName}} struct {
+type {{.serviceInfo.Name}} struct {
 	uc *biz.{{.appName | Title}}UseCase
 
-	{{.PkgName}}.Unimplemented{{.serviceName}}Server
+	{{.serviceInfo.PkgName}}.Unimplemented{{.serviceInfo.Name}}Server
 }
 
-func New{{.serviceName | Title}}(uc *biz.{{.appName | Title}}UseCase) *{{.serviceName}} {
-	return &{{.serviceName}}{uc: uc}
+func New{{.serviceInfo.Name | Title}}(uc *biz.{{.appName | Title}}UseCase) *{{.serviceInfo.Name}} {
+	return &{{.serviceInfo.Name}}{uc: uc}
 }
-{{range .RpcMeths}}
+{{$serviceName := .serviceInfo.Name}}
+{{range .serviceInfo.RpcMeths}}
 {{if .Comment}}//{{.Comment}}{{end}}
-func (s *{{.ServiceName}}) {{.MethName}}(ctx context.Context,req *{{.Param}}) (res *{{.Return}}, err error) {
+func (s *{{$serviceName}}) {{.MethName}}(ctx context.Context,req *{{.Param}}) (res *{{.Return}}, err error) {
 	return s.uc.{{.MethName}}(ctx, req)
 }
 {{end -}}
