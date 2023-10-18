@@ -21,7 +21,6 @@ init:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 	go install github.com/go-kratos/kratos/cmd/kratos/v2@latest
-	go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
 	go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
 	go install github.com/google/wire/cmd/wire@latest
 	go install github.com/bufbuild/buf/cmd/buf@latest
@@ -89,6 +88,14 @@ sealsecret:
 		--controller-name=sealed-secrets-controller \
 		--controller-namespace=kube-system \
 		--format yaml > deploy/kubernetes/svc/secret.yaml
+
+.PHONY: restart
+restart:
+	kubectl rollout restart -k deploy/kubernetes/svc
+
+.PHONY: deploy
+deploy:
+	kustomize build deploy/kubernetes/svc/ --load-restrictor=LoadRestrictionsNone | kubectl apply -f -
 
 .PHONY: k8s
 k8s:

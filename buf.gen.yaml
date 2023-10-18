@@ -32,9 +32,9 @@ plugins:
     opt:
       - allow_merge=true
     
-  - plugin: openapi
-    out: docs
-    opt:
-      - fq_schema_naming=true
-      - default_response=false
-    strategy: all
+  # - plugin: openapi
+  #   out: docs
+  #   opt:
+  #     - fq_schema_naming=true
+  #     - default_response=false
+  #   strategy: all

@@ -78,12 +78,6 @@ func newGateway(ctx context.Context, c *conf.Bootstrap) http.Handler {
 	withMeta := gwruntime.WithMetadata(func(ctx context.Context, r *http.Request) metadata.MD {
 		return metadata.New(map[string]string{"external-request": "true"})
 	})
-	// withTrace := gwruntime.WithOutgoingHeaderMatcher(func(s string) (string, bool) {
-	// 	if s == "trace-id" {
-	// 		return s, true
-	// 	}
-	// 	return s, true
-	// })
 	opts := []gwruntime.ServeMuxOption{withMeta}
 
 	r := common.NewEtcdRegistry(c.Etcd)

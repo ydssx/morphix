@@ -36,6 +36,8 @@ manifests:
   kustomize:
     paths:
       - deploy\kubernetes\svc
+    buildArgs:
+      - --load-restrictor=LoadRestrictionsNone
 deploy:
   kubectl:
     hooks:
