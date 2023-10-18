@@ -1,7 +1,7 @@
 configMapGenerator:
   - name: morphix-config
     files:
-      - ../../../configs/config-test.yaml
+      - ../../../configs/config.test.yaml
     namespace: morphix
 resources:
   - gateway-svc.yaml
