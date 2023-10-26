@@ -55,8 +55,17 @@ func LoggingServer(l log.Logger) grpc.UnaryServerInterceptor {
 	return logging.UnaryServerInterceptor(interceptorLogger(l), initOpt()...)
 }
 
+func LoggingStreamServer(l log.Logger) grpc.StreamServerInterceptor {
+	return logging.StreamServerInterceptor(interceptorLogger(l), initOpt()...)
+}
+
+
 func LoggingClient(l log.Logger) grpc.UnaryClientInterceptor {
 	return logging.UnaryClientInterceptor(interceptorLogger(l), initOpt()...)
+}
+
+func LoggingStreamClient(l log.Logger) grpc.StreamClientInterceptor {
+	return logging.StreamClientInterceptor(interceptorLogger(l), initOpt()...)
 }
 
 func initOpt() []logging.Option {

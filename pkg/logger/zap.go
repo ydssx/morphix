@@ -16,6 +16,7 @@ func NewZapLogger() *zap.Logger {
 		pae.AppendString(t.Format("2006-01-02 15:04:05"))
 	}
 	cfg.EncodeLevel = zapcore.CapitalLevelEncoder
+	cfg.MessageKey = ""
 	l := zap.New(zapcore.NewCore(zapcore.NewJSONEncoder(cfg), zapcore.Lock(os.Stdout), zap.DebugLevel))
 	return l
 }
@@ -51,11 +52,7 @@ func (l *Logger) Log(level log.Level, keyvals ...interface{}) error {
 	var msg string
 	data := make([]zap.Field, 0, (keylen/2)+1)
 	for i := 0; i < keylen; i += 2 {
-		if keyvals[i] == log.DefaultMessageKey {
-			msg = keyvals[i+1].(string)
-		} else {
-			data = append(data, zap.Any(fmt.Sprint(keyvals[i]), keyvals[i+1]))
-		}
+		data = append(data, zap.Any(fmt.Sprint(keyvals[i]), keyvals[i+1]))
 	}
 	switch level {
 	case log.LevelDebug:

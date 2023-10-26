@@ -154,10 +154,12 @@ type ServiceInfo struct {
 }
 
 type MethInfo struct {
-	MethName string
-	Param    string
-	Return   string
-	Comment  string
+	MethName       string
+	Param          string
+	Return         string
+	Comment        string
+	StreamsRequest bool
+	StreamsReturns bool
 }
 
 func parseProto(protoFile string) (info ServiceInfo) {
@@ -177,9 +179,11 @@ func parseProto(protoFile string) (info ServiceInfo) {
 		proto.WithRPC(func(r *proto.RPC) {
 			req, pkg := convertRequest(info.PkgName, r.RequestType)
 			x := MethInfo{
-				MethName: r.Name,
-				Param:    req,
-				Return:   convertReturnType(info.PkgName, r.ReturnsType),
+				MethName:       r.Name,
+				Param:          req,
+				Return:         convertReturnType(info.PkgName, r.ReturnsType),
+				StreamsRequest: r.StreamsRequest,
+				StreamsReturns: r.StreamsReturns,
 			}
 			if r.Comment != nil {
 				x.Comment = strings.Join(r.Comment.Lines, "\n//")

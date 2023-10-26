@@ -31,10 +31,16 @@ func IsChinese(str string) bool {
 func JsonToMap(s string) (map[string]interface{}, error) {
 	var m map[string]interface{}
 	err := json.Unmarshal([]byte(s), &m)
+	return m, err
+}
+
+func StructToMap(s interface{}) (m map[string]interface{},err error) {
+	sb,err:=json.Marshal(s)
 	if err != nil {
 		return nil, err
 	}
-	return m, nil
+	err = json.Unmarshal(sb, &m)
+	return
 }
 
 // Map函数，接受一个数组和一个映射函数f，返回一个新的数组

@@ -9,6 +9,10 @@ func ValidatorServer(opts ...validator.Option) grpc.UnaryServerInterceptor {
 	return validator.UnaryServerInterceptor(opts...)
 }
 
+func ValidatorStreamServer(opts ...validator.Option) grpc.StreamServerInterceptor {
+	return validator.StreamServerInterceptor(opts...)
+}
+
 func ValidatorClient(opts ...validator.Option) grpc.UnaryClientInterceptor {
 	return validator.UnaryClientInterceptor(opts...)
 }

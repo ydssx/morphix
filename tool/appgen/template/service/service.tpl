@@ -19,9 +19,20 @@ func New{{.serviceInfo.Name | Title}}(uc *biz.{{.appName | Title}}UseCase) *{{.s
 	return &{{.serviceInfo.Name}}{uc: uc}
 }
 {{$serviceName := .serviceInfo.Name}}
+{{$pkgName := .serviceInfo.PkgName}}
 {{range .serviceInfo.RpcMeths}}
-{{if .Comment}}//{{.Comment}}{{end}}
+{{if .Comment}}//{{.Comment}}{{end -}}
+{{if or (and .StreamsReturns .StreamsRequest) .StreamsRequest}}
+func (s *{{$serviceName}}) {{.MethName}}(stream {{$pkgName}}.{{$serviceName}}_{{.MethName}}Server) (err error) {
+	return s.uc.{{.MethName}}(stream)
+}
+{{else if .StreamsReturns }}
+func (s *{{$serviceName}}) {{.MethName}}(req *{{.Param}}, stream {{$pkgName}}.{{$serviceName}}_{{.MethName}}Server) (err error) {
+	return s.uc.{{.MethName}}(req, stream)
+}
+{{else}}
 func (s *{{$serviceName}}) {{.MethName}}(ctx context.Context,req *{{.Param}}) (res *{{.Return}}, err error) {
 	return s.uc.{{.MethName}}(ctx, req)
 }
+{{end -}}
 {{end -}}
