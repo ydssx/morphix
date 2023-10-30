@@ -5,4 +5,4 @@ import (
 	"github.com/ydssx/morphix/app/job/internal/common"
 )
 
-var ProviderSet = wire.NewSet(NewJobService, common.NewAsynqClient,common.NewAsynqInspector)
+var ProviderSet = wire.NewSet(NewJobService, common.NewAsynqClient, common.NewAsynqInspector)

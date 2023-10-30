@@ -33,6 +33,7 @@ redis:
   write_timeout: 2s
   dial_timeout: 5s
 
+###############################################
 clientSet:
   userRpcClient:
     network: tcp
@@ -59,6 +60,7 @@ clientSet:
     addr: discovery:///job-rpc
     timeout: 2s
 
+####################################################
 serviceSet:
   # gateway配置
   gateway:
