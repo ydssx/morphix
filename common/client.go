@@ -5,6 +5,7 @@ import (
 
 	_ "github.com/dtm-labs/driver-kratos"
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
+	"github.com/go-kratos/kratos/v2/log"
 	kgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/nats-io/nats.go"
 	goredis "github.com/redis/go-redis/v9"
@@ -53,6 +54,10 @@ func CreateClientConn(ctx context.Context, rpcCliConf *conf.ClientConf, r *etcd.
 			interceptors.TraceClient(),
 			interceptors.LoggingClient(logger.DefaultLogger),
 			interceptors.MetricClient(),
+		),
+		kgrpc.WithStreamInterceptor(
+			interceptors.LoggingStreamClient(log.DefaultLogger),
+			interceptors.TraceStreamClient(),
 		),
 		kgrpc.WithOptions(grpc.WithKeepaliveParams(keepalive.ClientParameters{})),
 	)

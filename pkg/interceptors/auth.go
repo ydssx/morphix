@@ -29,27 +29,30 @@ var (
 	}
 )
 
+func match(_ context.Context, callMeta interceptors.CallMeta) bool {
+	result := !(util.SliceContain(srvNames, callMeta.Service) || util.SliceContain(methNames, callMeta.FullMethod()))
+	return result
+}
+
 func AuthServer() grpc.UnaryServerInterceptor {
-	authFn := func(ctx context.Context) (context.Context, error) {
-		md := metadata.ExtractIncoming(ctx)
-		ctx = md.ToOutgoing(ctx)
-		if !isExternalRequest(md) {
-			newCtx, err := parseToken(ctx)
-			if err == nil {
-				return newCtx, nil
-			}
-			return ctx, nil
+	return selector.UnaryServerInterceptor(auth.UnaryServerInterceptor(authCtx), selector.MatchFunc(match))
+}
+
+func AuthStreamServer() grpc.StreamServerInterceptor {
+	return selector.StreamServerInterceptor(auth.StreamServerInterceptor(authCtx), selector.MatchFunc(match))
+}
+
+func authCtx(ctx context.Context) (context.Context, error) {
+	md := metadata.ExtractIncoming(ctx)
+	ctx = md.ToOutgoing(ctx)
+	if !isExternalRequest(md) {
+		newCtx, err := parseToken(ctx)
+		if err == nil {
+			return newCtx, nil
 		}
-		return parseToken(ctx)
+		return ctx, nil
 	}
-
-	// Setup auth matcher.
-	authMatcher := func(_ context.Context, callMeta interceptors.CallMeta) bool {
-		result := !(util.SliceContain(srvNames, callMeta.Service) || util.SliceContain(methNames, callMeta.FullMethod()))
-		return result
-	}
-
-	return selector.UnaryServerInterceptor(auth.UnaryServerInterceptor(authFn), selector.MatchFunc(authMatcher))
+	return parseToken(ctx)
 }
 
 func parseToken(ctx context.Context) (context.Context, error) {

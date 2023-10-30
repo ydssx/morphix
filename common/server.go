@@ -18,7 +18,13 @@ func NewGRPCServer(server *conf.Server) *grpc.Server {
 			interceptors.MetricServer(),
 			interceptors.RecoveryServer(),
 		),
-		grpc.StreamInterceptor(interceptors.TraceStreamServer()),
+		grpc.StreamInterceptor(
+			interceptors.TraceStreamServer(),
+			interceptors.LoggingStreamServer(logger.DefaultLogger),
+			interceptors.ValidatorStreamServer(),
+			interceptors.AuthStreamServer(),
+			interceptors.RecoveryStreamServer(),
+		),
 	}
 	if server.Grpc.Addr != "" {
 		opts = append(opts, grpc.Address(server.Grpc.Addr))
