@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"text/template"
 
@@ -105,7 +106,11 @@ func gen(appName, protoFile string, port int) {
 	mkFile(data, bizDir+"/biz.go", bizSetFile)
 	mkFile(data, bizDir+"/"+appName+".go", bizFile)
 
-	cmd := exec.Command("sh", "-c", fmt.Sprintf("make api && cd app/%s/cmd/%s/ && wire", appName, appName))
+	x := fmt.Sprintf("make api && cd app/%s/cmd/%s/ && wire", appName, appName)
+	cmd := exec.Command("cmd.exe", "/C", x)
+	if runtime.GOOS != "windows" {
+		cmd = exec.Command("sh", "-c", x)
+	}
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Fatal(string(output))
@@ -168,11 +173,13 @@ func parseProto(protoFile string) (info ServiceInfo) {
 		log.Fatal(err)
 	}
 	defer reader.Close()
+
 	parser := proto.NewParser(reader)
 	definition, err := parser.Parse()
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	proto.Walk(definition,
 		proto.WithPackage(func(p *proto.Package) { info.PkgName = p.Name }),
 		proto.WithService(func(s *proto.Service) { info.Name = s.Name }),
