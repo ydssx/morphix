@@ -54,18 +54,7 @@ func (l *Logger) Log(level log.Level, keyvals ...interface{}) error {
 	for i := 0; i < keylen; i += 2 {
 		data = append(data, zap.Any(fmt.Sprint(keyvals[i]), keyvals[i+1]))
 	}
-	switch level {
-	case log.LevelDebug:
-		l.Zlog.Debug(msg, data...)
-	case log.LevelInfo:
-		l.Zlog.Info(msg, data...)
-	case log.LevelWarn:
-		l.Zlog.Warn(msg, data...)
-	case log.LevelError:
-		l.Zlog.Error(msg, data...)
-	case log.LevelFatal:
-		l.Zlog.Fatal(msg, data...)
-	}
+	l.Zlog.Log(zapcore.Level(level), msg, data...)
 	return nil
 }
 

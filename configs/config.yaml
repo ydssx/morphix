@@ -160,3 +160,9 @@ serviceSet:
         read_timeout: 2s
         write_timeout: 2s
         dial_timeout: 5s
+  aiart:
+    name: aiart-rpc
+    server:
+      grpc:
+        addr: 0.0.0.0:9005
+        timeout: 5s

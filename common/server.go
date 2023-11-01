@@ -4,14 +4,13 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/interceptors"
-	"github.com/ydssx/morphix/pkg/logger"
 )
 
 func NewGRPCServer(server *conf.Server) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.UnaryInterceptor(
 			interceptors.TraceServer(),
-			interceptors.LoggingServer(logger.DefaultLogger),
+			interceptors.LoggingServer(),
 			interceptors.ValidatorServer(),
 			interceptors.EventServer(),
 			interceptors.AuthServer(),
@@ -20,7 +19,7 @@ func NewGRPCServer(server *conf.Server) *grpc.Server {
 		),
 		grpc.StreamInterceptor(
 			interceptors.TraceStreamServer(),
-			interceptors.LoggingStreamServer(logger.DefaultLogger),
+			interceptors.LoggingStreamServer(),
 			interceptors.ValidatorStreamServer(),
 			interceptors.AuthStreamServer(),
 			interceptors.RecoveryStreamServer(),

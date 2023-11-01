@@ -5,7 +5,6 @@ import (
 
 	_ "github.com/dtm-labs/driver-kratos"
 	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
-	"github.com/go-kratos/kratos/v2/log"
 	kgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/nats-io/nats.go"
 	goredis "github.com/redis/go-redis/v9"
@@ -14,7 +13,6 @@ import (
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/interceptors"
-	"github.com/ydssx/morphix/pkg/logger"
 	"github.com/ydssx/morphix/pkg/mq"
 	"github.com/ydssx/morphix/pkg/redis"
 	"google.golang.org/grpc"
@@ -52,11 +50,11 @@ func CreateClientConn(ctx context.Context, rpcCliConf *conf.ClientConf, r *etcd.
 		kgrpc.WithDiscovery(r),
 		kgrpc.WithUnaryInterceptor(
 			interceptors.TraceClient(),
-			interceptors.LoggingClient(logger.DefaultLogger),
+			interceptors.LoggingClient(),
 			interceptors.MetricClient(),
 		),
 		kgrpc.WithStreamInterceptor(
-			interceptors.LoggingStreamClient(log.DefaultLogger),
+			interceptors.LoggingStreamClient(),
 			interceptors.TraceStreamClient(),
 		),
 		kgrpc.WithOptions(grpc.WithKeepaliveParams(keepalive.ClientParameters{})),
