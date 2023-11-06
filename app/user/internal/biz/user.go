@@ -15,6 +15,7 @@ import (
 	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type UserRepo interface {
@@ -43,19 +44,19 @@ type UserRepoWithCache interface {
 	cache.Cache
 }
 
-type UserUsecase struct {
+type UserUseCase struct {
 	repo UserRepoWithCache
 	log  *log.Helper
 	sms  smsv1.SMSServiceClient
 	tm   Transaction
 }
 
-func NewUserUsecase(repo UserRepoWithCache, logger log.Logger, sms smsv1.SMSServiceClient, tm Transaction) *UserUsecase {
-	return &UserUsecase{repo: repo, log: log.NewHelper(logger), sms: sms, tm: tm}
+func NewUserUseCase(repo UserRepoWithCache, logger log.Logger, sms smsv1.SMSServiceClient, tm Transaction) *UserUseCase {
+	return &UserUseCase{repo: repo, log: log.NewHelper(logger), sms: sms, tm: tm}
 }
 
-// Register 用户注册逻辑
-func (uc *UserUsecase) Register(ctx context.Context, req *userv1.RegistrationRequest) (*userv1.User, error) {
+// 用户注册
+func (uc *UserUseCase) Register(ctx context.Context, req *userv1.RegistrationRequest) (*userv1.User, error) {
 	checkResult, err := uc.sms.CheckSMSStatus(ctx, &smsv1.QuerySMSStatusRequest{MobileNumber: req.Phone, SmsCode: req.SmsCode, Scene: smsv1.SmsScene_USER_REGISTER})
 	if err != nil {
 		return nil, err
@@ -96,7 +97,7 @@ func (uc *UserUsecase) Register(ctx context.Context, req *userv1.RegistrationReq
 	return response, nil
 }
 
-func (uc *UserUsecase) ListUser(ctx context.Context, req *userv1.UserListRequest) (*userv1.UserListResponse, error) {
+func (uc *UserUseCase) ListUser(ctx context.Context, req *userv1.UserListRequest) (*userv1.UserListResponse, error) {
 	users := uc.repo.ListUser(ctx, &ListUserCond{Page: req.Page, Limit: req.Limit})
 
 	resp := new(userv1.UserListResponse)
@@ -112,7 +113,8 @@ func (uc *UserUsecase) ListUser(ctx context.Context, req *userv1.UserListRequest
 	return resp, nil
 }
 
-func (uc *UserUsecase) Login(ctx context.Context, req *userv1.LoginRequest) (*userv1.AuthenticationResponse, error) {
+// 用户登录
+func (uc *UserUseCase) Login(ctx context.Context, req *userv1.LoginRequest) (*userv1.AuthenticationResponse, error) {
 	if req.Username == "" || req.PhoneNumber == "" {
 		return nil, status.Error(codes.InvalidArgument, "用户名和手机号不能同时为空")
 	}
@@ -140,7 +142,7 @@ func (uc *UserUsecase) Login(ctx context.Context, req *userv1.LoginRequest) (*us
 	return &userv1.AuthenticationResponse{Token: token, UserId: strconv.Itoa(int(userInfo.ID))}, nil
 }
 
-func (uc *UserUsecase) GetUser(ctx context.Context, req *userv1.GetUserRequest) (*userv1.User, error) {
+func (uc *UserUseCase) GetUser(ctx context.Context, req *userv1.GetUserRequest) (*userv1.User, error) {
 	user, err := uc.repo.GetUserByID(ctx, uint(req.UserId))
 	if err != nil {
 		return nil, err
@@ -153,7 +155,7 @@ func (uc *UserUsecase) GetUser(ctx context.Context, req *userv1.GetUserRequest) 
 	}, nil
 }
 
-func (uc *UserUsecase) ResetPassword(ctx context.Context, req *userv1.ResetPasswordRequest) error {
+func (uc *UserUseCase) ResetPassword(ctx context.Context, req *userv1.ResetPasswordRequest) error {
 	checkResult, err := uc.sms.CheckSMSStatus(ctx, &smsv1.QuerySMSStatusRequest{MobileNumber: "", SmsCode: req.VerificationCode, Scene: smsv1.SmsScene_USER_RESET_PASSWORD})
 	if err != nil {
 		return err
@@ -170,7 +172,7 @@ func (uc *UserUsecase) ResetPassword(ctx context.Context, req *userv1.ResetPassw
 	return uc.repo.UpdateUser(ctx, &models.User{BaseModel: models.BaseModel{ID: user.ID}, Password: util.MD5(req.NewPassword)})
 }
 
-func (uc *UserUsecase) UpdateProfile(ctx context.Context, req *userv1.UpdateProfileRequest) (*userv1.User, error) {
+func (uc *UserUseCase) UpdateProfile(ctx context.Context, req *userv1.UpdateProfileRequest) (*userv1.User, error) {
 	claims, _ := interceptors.AuthFromContext(ctx)
 
 	err := uc.repo.UpdateUser(ctx, &models.User{BaseModel: models.BaseModel{ID: uint(claims.Uid)}, Email: req.Email, Phone: req.Phone})
@@ -179,4 +181,52 @@ func (uc *UserUsecase) UpdateProfile(ctx context.Context, req *userv1.UpdateProf
 	}
 
 	return uc.GetUser(ctx, &userv1.GetUserRequest{UserId: claims.Uid})
+}
+
+func (uc *UserUseCase) Logout(ctx context.Context, req *userv1.LogoutRequest) (res *emptypb.Empty, err error) {
+	res = new(emptypb.Empty)
+
+	// TODO:ADD logic here and delete this line.
+
+	return
+}
+
+func (uc *UserUseCase) Authenticate(ctx context.Context, req *emptypb.Empty) (res *userv1.AuthenticationResponse, err error) {
+	res = new(userv1.AuthenticationResponse)
+
+	// TODO:ADD logic here and delete this line.
+
+	return
+}
+
+func (uc *UserUseCase) Authorize(ctx context.Context, req *userv1.AuthorizationRequest) (res *emptypb.Empty, err error) {
+	res = new(emptypb.Empty)
+
+	// TODO:ADD logic here and delete this line.
+
+	return
+}
+
+func (uc *UserUseCase) GetUserList(ctx context.Context, req *userv1.UserListRequest) (res *userv1.UserListResponse, err error) {
+	res = new(userv1.UserListResponse)
+
+	// TODO:ADD logic here and delete this line.
+
+	return
+}
+
+func (uc *UserUseCase) ManageUserPermission(ctx context.Context, req *userv1.ManageUserPermissionRequest) (res *userv1.User, err error) {
+	res = new(userv1.User)
+
+	// TODO:ADD logic here and delete this line.
+
+	return
+}
+
+func (uc *UserUseCase) LogActivity(ctx context.Context, req *userv1.LogEntry) (res *emptypb.Empty, err error) {
+	res = new(emptypb.Empty)
+
+	// TODO:ADD logic here and delete this line.
+
+	return
 }

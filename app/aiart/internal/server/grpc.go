@@ -9,7 +9,6 @@ import (
 )
 
 func NewGRPCServer(c *conf.Bootstrap, svc *service.ArtService) *grpc.Server {
-
 	srv := common.NewGRPCServer(c.ServiceSet.Aiart.Server)
 
 	aiartv1.RegisterArtServiceServer(srv, svc)

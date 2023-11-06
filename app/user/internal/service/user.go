@@ -12,37 +12,27 @@ import (
 type UserService struct {
 	userv1.UnimplementedUserServiceServer
 
-	uc *biz.UserUsecase
+	uc *biz.UserUseCase
 }
 
-// NewUserService new a greeter service.
-func NewUserService(uc *biz.UserUsecase) *UserService {
+func NewUserService(uc *biz.UserUseCase) *UserService {
 	return &UserService{uc: uc}
 }
 
-// Register 实现用户注册接口
+// 用户注册
 func (s *UserService) Register(ctx context.Context, req *userv1.RegistrationRequest) (*userv1.User, error) {
 	return s.uc.Register(ctx, req)
 }
 
-// Login 实现用户登录接口
+// 用户登录
 func (s *UserService) Login(ctx context.Context, req *userv1.LoginRequest) (*userv1.AuthenticationResponse, error) {
 	return s.uc.Login(ctx, req)
 }
 
-// Logout 实现用户登出接口
-func (s *UserService) Logout(ctx context.Context, req *userv1.LogoutRequest) (*emptypb.Empty, error) {
-	// 在这里实现用户登出逻辑
-	// 使用 s.userRepository 进行数据库操作
-	return nil, nil
-}
-
-// UpdateProfile 实现更新用户信息接口
 func (s *UserService) UpdateProfile(ctx context.Context, req *userv1.UpdateProfileRequest) (*userv1.User, error) {
 	return s.uc.UpdateProfile(ctx, req)
 }
 
-// ResetPassword 实现重置密码接口
 func (s *UserService) ResetPassword(ctx context.Context, req *userv1.ResetPasswordRequest) (*emptypb.Empty, error) {
 	if err := s.uc.ResetPassword(ctx, req); err != nil {
 		return nil, err
@@ -51,39 +41,32 @@ func (s *UserService) ResetPassword(ctx context.Context, req *userv1.ResetPasswo
 	return &emptypb.Empty{}, nil
 }
 
-// Authenticate 实现用户身份认证接口
-func (s *UserService) Authenticate(ctx context.Context, req *emptypb.Empty) (*userv1.AuthenticationResponse, error) {
-	// 在这里实现用户身份认证逻辑
-	// 使用 s.userRepository 进行数据库操作
-	return nil, nil
-}
-
-// Authorize 实现用户授权接口
-func (s *UserService) Authorize(ctx context.Context, req *userv1.AuthorizationRequest) (*emptypb.Empty, error) {
-	// 在这里实现用户授权逻辑
-	// 使用 s.userRepository 进行数据库操作
-	return nil, nil
-}
-
-// GetUserList 实现获取用户列表接口
 func (s *UserService) GetUserList(ctx context.Context, req *userv1.UserListRequest) (*userv1.UserListResponse, error) {
 	return s.uc.ListUser(ctx, req)
 }
 
-// ManageUserPermission 实现管理用户权限接口
 func (s *UserService) ManageUserPermission(ctx context.Context, req *userv1.ManageUserPermissionRequest) (*userv1.User, error) {
 	// 在这里实现管理用户权限逻辑
 	// 使用 s.userRepository 进行数据库操作
 	return nil, nil
 }
 
-// LogActivity 实现记录用户活动接口
-func (s *UserService) LogActivity(ctx context.Context, req *userv1.LogEntry) (*emptypb.Empty, error) {
-	// 在这里实现记录用户活动逻辑
-	// 使用 s.userRepository 进行数据库操作
-	return nil, nil
-}
-
 func (s *UserService) GetUser(ctx context.Context, req *userv1.GetUserRequest) (*userv1.User, error) {
 	return s.uc.GetUser(ctx, req)
+}
+
+func (s *UserService) Logout(ctx context.Context, req *userv1.LogoutRequest) (res *emptypb.Empty, err error) {
+	return s.uc.Logout(ctx, req)
+}
+
+func (s *UserService) Authenticate(ctx context.Context, req *emptypb.Empty) (res *userv1.AuthenticationResponse, err error) {
+	return s.uc.Authenticate(ctx, req)
+}
+
+func (s *UserService) Authorize(ctx context.Context, req *userv1.AuthorizationRequest) (res *emptypb.Empty, err error) {
+	return s.uc.Authorize(ctx, req)
+}
+
+func (s *UserService) LogActivity(ctx context.Context, req *userv1.LogEntry) (res *emptypb.Empty, err error) {
+	return s.uc.LogActivity(ctx, req)
 }
