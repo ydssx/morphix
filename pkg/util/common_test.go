@@ -78,7 +78,6 @@ func TestSetDefaults(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			SetDefaults(tt.args.data)
 			t.Logf("%#+v", tt.args.data)
-
 		})
 	}
 }

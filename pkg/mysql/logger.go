@@ -62,7 +62,6 @@ func (g GormLogger) Info(ctx context.Context, msg string, data ...interface{}) {
 	if g.logLevel <= zap.InfoLevel {
 		g.CtxLogger(ctx).Sugar().Infof(msg, data...)
 	}
-
 }
 
 // Warn 实现 gorm logger 接口方法
@@ -81,7 +80,6 @@ func (g GormLogger) Error(ctx context.Context, msg string, data ...interface{}) 
 
 // Trace 实现 gorm logger 接口方法
 func (g GormLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
-
 	latency := float64(time.Since(begin).Nanoseconds()) / 1e6
 	sql, rows := fc()
 	sql = goutils.RemoveDuplicateWhitespace(sql, true)

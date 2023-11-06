@@ -10,8 +10,10 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-type eventSource struct{}
-type eventType struct{}
+type (
+	eventSource struct{}
+	eventType   struct{}
+)
 
 func EventServer() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {

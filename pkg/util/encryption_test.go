@@ -6,8 +6,8 @@ import (
 )
 
 func TestEncrypt(t *testing.T) {
-	d:="123456"
-	k:="qwerqwerqwerqwer"
+	d := "123456"
+	k := "qwerqwerqwerqwer"
 	type args struct {
 		data []byte
 		key  []byte
@@ -19,7 +19,7 @@ func TestEncrypt(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
-		{"",args{data: []byte(d),key: []byte(k)},nil,false},
+		{"", args{data: []byte(d), key: []byte(k)}, nil, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -36,8 +36,8 @@ func TestEncrypt(t *testing.T) {
 }
 
 func TestDecrypt(t *testing.T) {
-	k:="qwerqwerqwerqwer"
-	e:="\xd63#\x05\xe9\x9a\b\xd7V\xf6Ɗ \xcf\xdeu"
+	k := "qwerqwerqwerqwer"
+	e := "\xd63#\x05\xe9\x9a\b\xd7V\xf6Ɗ \xcf\xdeu"
 	type args struct {
 		encrypted []byte
 		key       []byte
@@ -49,7 +49,7 @@ func TestDecrypt(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
-		{"",args{encrypted: []byte(e),key: []byte(k)},nil,false},
+		{"", args{encrypted: []byte(e), key: []byte(k)}, nil, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

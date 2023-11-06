@@ -7,7 +7,7 @@ import (
 )
 
 func NewGRPCServer(server *conf.Server) *grpc.Server {
-	var opts = []grpc.ServerOption{
+	opts := []grpc.ServerOption{
 		grpc.UnaryInterceptor(
 			interceptors.TraceServer(),
 			interceptors.LoggingServer(),

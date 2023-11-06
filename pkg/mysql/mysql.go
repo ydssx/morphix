@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"context"
 	"database/sql"
 	"time"
 
@@ -35,4 +36,14 @@ func Transaction(fc func(tx *gorm.DB) error, opts ...*sql.TxOptions) error {
 
 func GlobalDB() *gorm.DB {
 	return db
+}
+
+type contextTxKey struct{}
+
+func NewContextWithDB(ctx context.Context) context.Context {
+	return context.WithValue(ctx, contextTxKey{}, db)
+}
+
+func DBFromContext(ctx context.Context) *gorm.DB {
+	return ctx.Value(contextTxKey{}).(*gorm.DB)
 }

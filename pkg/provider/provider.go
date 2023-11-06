@@ -16,8 +16,10 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
 
-var resource *sdkresource.Resource
-var initResourcesOnce sync.Once
+var (
+	resource          *sdkresource.Resource
+	initResourcesOnce sync.Once
+)
 
 func initResource() *sdkresource.Resource {
 	initResourcesOnce.Do(func() {

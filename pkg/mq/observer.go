@@ -10,8 +10,7 @@ import (
 
 var _ client.ObservabilityService = (*Observer)(nil)
 
-type Observer struct {
-}
+type Observer struct{}
 
 func NewObserver() *Observer {
 	return &Observer{}
@@ -29,7 +28,6 @@ func (*Observer) RecordCallingInvoker(ctx context.Context, event *event.Event) (
 
 // RecordReceivedMalformedEvent implements client.ObservabilityService.
 func (*Observer) RecordReceivedMalformedEvent(ctx context.Context, err error) {
-
 }
 
 // RecordRequestEvent implements client.ObservabilityService.

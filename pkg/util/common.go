@@ -34,8 +34,8 @@ func JsonToMap(s string) (map[string]interface{}, error) {
 	return m, err
 }
 
-func StructToMap(s interface{}) (m map[string]interface{},err error) {
-	sb,err:=json.Marshal(s)
+func StructToMap(s interface{}) (m map[string]interface{}, err error) {
+	sb, err := json.Marshal(s)
 	if err != nil {
 		return nil, err
 	}
