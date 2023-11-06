@@ -68,7 +68,7 @@ func newGinHandler(ctx context.Context, c *conf.Bootstrap) *gin.Engine {
 		auth := middleware.AuthFromGinContext(ctx)
 		util.OKWithData(ctx, auth)
 	})
-	
+
 	return server
 }
 

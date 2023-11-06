@@ -9,7 +9,6 @@ import (
 )
 
 func NewGRPCServer(c *conf.Bootstrap, srv *service.JobService) *grpc.Server {
-
 	s := common.NewGRPCServer(c.ServiceSet.Job.Server)
 
 	jobv1.RegisterJobServiceServer(s, srv)

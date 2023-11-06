@@ -82,7 +82,7 @@ func gen(appName, protoFile string, port int) {
 	for _, v := range paths {
 		bar.Set("my_green_string", v)
 		bar.Increment()
-		err := os.MkdirAll(v, 0644)
+		err := os.MkdirAll(v, 0o644)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -130,7 +130,7 @@ func mkFile(data map[string]interface{}, outFile string, text string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var codes = buf.Bytes()
+	codes := buf.Bytes()
 	if strings.HasSuffix(outFile, ".go") {
 		codes, _ = format.Source(buf.Bytes())
 		if fileExists(outFile) {
@@ -143,7 +143,7 @@ func mkFile(data map[string]interface{}, outFile string, text string) {
 	if fileExists(outFile) {
 		return
 	}
-	err = os.WriteFile(outFile, codes, 0644)
+	err = os.WriteFile(outFile, codes, 0o644)
 	if err != nil {
 		log.Fatal(err)
 	}

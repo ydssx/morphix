@@ -11,8 +11,10 @@ import (
 	"github.com/ydssx/morphix/common/conf"
 )
 
-var rdbClientOpt asynq.RedisClientOpt
-var once sync.Once
+var (
+	rdbClientOpt asynq.RedisClientOpt
+	once         sync.Once
+)
 
 func InitRedisOpt(c *conf.Bootstrap) asynq.RedisClientOpt {
 	redisConf := c.Redis

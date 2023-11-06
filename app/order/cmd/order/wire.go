@@ -7,10 +7,10 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
+	"github.com/ydssx/morphix/app/order/internal/biz"
 	"github.com/ydssx/morphix/app/order/internal/listener"
 	"github.com/ydssx/morphix/app/order/internal/server"
 	"github.com/ydssx/morphix/app/order/internal/service"
-	"github.com/ydssx/morphix/app/order/internal/biz"
 	"github.com/ydssx/morphix/common/conf"
 )
 

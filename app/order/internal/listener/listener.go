@@ -29,7 +29,6 @@ func updateOrderStatus(ctx context.Context, e cloudevents.Event) error {
 	logger.Infof(ctx, "Got Data: %+v\n", data)
 
 	return nil
-
 }
 
 func updateOrder(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {

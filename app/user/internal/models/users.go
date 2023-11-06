@@ -84,7 +84,6 @@ func (u *userModel) List(limit, offset int) (users []User, total int64, err erro
 	err = query.Count(&total).Error
 	if err != nil {
 		return nil, 0, err
-
 	}
 	err = query.Limit(limit).Offset(offset).Find(&users).Error
 	return

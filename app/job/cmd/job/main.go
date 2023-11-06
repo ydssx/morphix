@@ -36,7 +36,6 @@ func main() {
 	if err := app.Run(); err != nil {
 		panic(err)
 	}
-
 }
 
 func newApp(ls *server.JobServer, gs *grpc.Server, c *conf.Bootstrap) *kratos.App {

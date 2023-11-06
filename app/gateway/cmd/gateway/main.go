@@ -31,7 +31,6 @@ func main() {
 }
 
 func newApp(hs *khttp.Server, c *conf.Bootstrap) *kratos.App {
-
 	tp, err := provider.InitTraceProvider(c.Otelcol.Addr, c.ServiceSet.Gateway.Name)
 	if err != nil {
 		panic(err)

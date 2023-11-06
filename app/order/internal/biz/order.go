@@ -6,8 +6,7 @@ import (
 	orderv1 "github.com/ydssx/morphix/api/order/v1"
 )
 
-type OrderUseCase struct {
-}
+type OrderUseCase struct{}
 
 func NewOrderUseCase() *OrderUseCase {
 	return &OrderUseCase{}

@@ -7,7 +7,6 @@ type Role struct {
 	BaseModel
 	Name     string `json:"name" gorm:"column:name;not null"`                     // 角色名
 	ParentId int    `json:"parent_id" gorm:"column:parent_id;not null;default:0"` // 父角色ID
-
 }
 
 type roleModel DB

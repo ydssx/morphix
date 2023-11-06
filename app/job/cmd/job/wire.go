@@ -12,5 +12,5 @@ import (
 )
 
 func wireApp(*conf.Bootstrap) (*kratos.App, func(), error) {
-	panic(wire.Build(server.ProviderSet,service.ProviderSet,newApp))
+	panic(wire.Build(server.ProviderSet, service.ProviderSet, newApp))
 }

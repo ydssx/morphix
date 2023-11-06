@@ -44,7 +44,6 @@ func (s *UserService) UpdateProfile(ctx context.Context, req *userv1.UpdateProfi
 
 // ResetPassword 实现重置密码接口
 func (s *UserService) ResetPassword(ctx context.Context, req *userv1.ResetPasswordRequest) (*emptypb.Empty, error) {
-
 	if err := s.uc.ResetPassword(ctx, req); err != nil {
 		return nil, err
 	}
