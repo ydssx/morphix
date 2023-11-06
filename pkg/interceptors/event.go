@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2"
+	middleware "github.com/grpc-ecosystem/go-grpc-middleware/v2"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -18,7 +19,7 @@ func EventServer() grpc.UnaryServerInterceptor {
 		if ok {
 			ctx = context.WithValue(ctx, eventSource{}, app.Name())
 		}
-		
+
 		ctx = context.WithValue(ctx, eventType{}, info.FullMethod)
 
 		if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
@@ -29,6 +30,29 @@ func EventServer() grpc.UnaryServerInterceptor {
 		}
 
 		return handler(ctx, req)
+	}
+}
+
+func EventStreamServer() grpc.StreamServerInterceptor {
+	return func(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+		ctx := ss.Context()
+		app, ok := kratos.FromContext(ctx)
+		if ok {
+			ctx = context.WithValue(ctx, eventSource{}, app.Name())
+		}
+
+		ctx = context.WithValue(ctx, eventType{}, info.FullMethod)
+
+		if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
+			err := ss.SendHeader(metadata.Pairs("trace-id", span.TraceID().String()))
+			if err != nil {
+				return err
+			}
+		}
+
+		wrapped := middleware.WrapServerStream(ss)
+		wrapped.WrappedContext = ctx
+		return handler(srv, wrapped)
 	}
 }
 

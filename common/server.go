@@ -22,6 +22,7 @@ func NewGRPCServer(server *conf.Server) *grpc.Server {
 			interceptors.LoggingStreamServer(),
 			interceptors.ValidatorStreamServer(),
 			interceptors.AuthStreamServer(),
+			interceptors.EventStreamServer(),
 			interceptors.RecoveryStreamServer(),
 		),
 	}
