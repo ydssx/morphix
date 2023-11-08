@@ -40,7 +40,7 @@ func (uc *{{$appName| Title}}UseCase) {{$m.MethName}}(req *{{$m.Param}}, stream 
 }
 {{else if .StreamsRequest}}
 func (uc *{{$appName | Title}}UseCase) {{$m.MethName}}(stream {{$pkgName}}.{{$svcName}}_{{$m.MethName}}Server) (err error) {
-	resp := new(aiartv1.GetGeneratedImageResponse)
+	resp := new({{$m.Return}})
 
 	// TODO:ADD logic here and delete this line.
 

@@ -9,7 +9,6 @@ import (
 )
 
 func NewGRPCServer(c *conf.Bootstrap, svc *service.{{.serviceInfo.Name}}) *grpc.Server {
-
 	srv := common.NewGRPCServer(c.ServiceSet.{{.appName | Title}}.Server)
 
 	{{.serviceInfo.PkgName}}.Register{{.serviceInfo.Name}}Server(srv, svc)

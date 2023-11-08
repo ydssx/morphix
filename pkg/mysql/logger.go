@@ -16,7 +16,7 @@ var (
 	// GormLoggerName gorm logger 名称
 	GormLoggerName = "gorm"
 	// GormLoggerCallerSkip caller skip
-	GormLoggerCallerSkip = 3
+	GormLoggerCallerSkip = 4
 )
 
 // GormLogger 使用 zap 来打印 gorm 的日志
@@ -86,19 +86,11 @@ func (g GormLogger) Trace(ctx context.Context, begin time.Time, fc func() (strin
 	logger := g.CtxLogger(ctx)
 	switch {
 	case err != nil:
-		logger.Error("sql: "+sql, zap.String("latency", fmt.Sprintf("%.3fms", latency)), zap.Int64("rows", rows), zap.String("error", err.Error()))
+		logger.Log(zap.ErrorLevel, "", zap.String("msg", err.Error()), zap.String("latency", fmt.Sprintf("%.3fms", latency)), zap.Int64("rows", rows), zap.String("sql", sql))
 	case g.slowThreshold != 0 && latency > float64(g.slowThreshold.Milliseconds()):
-		logger.Warn("sql: "+sql, zap.String("latency", fmt.Sprintf("%.3fms", latency)), zap.Int64("rows", rows), zap.Float64("threshold", float64(g.slowThreshold.Milliseconds())))
+		logger.Log(zap.WarnLevel, "slow sql", zap.String("latency", fmt.Sprintf("%.3fms", latency)), zap.Int64("rows", rows), zap.Float64("threshold", float64(g.slowThreshold.Milliseconds())), zap.String("sql", sql))
 	default:
-		log := logger.Debug
-		if g.traceWithLevel == zap.InfoLevel {
-			log = logger.Info
-		} else if g.traceWithLevel == zap.WarnLevel {
-			log = logger.Warn
-		} else if g.traceWithLevel == zap.ErrorLevel {
-			log = logger.Error
-		}
-		log("sql: "+sql, zap.String("latency", fmt.Sprintf("%.3fms", latency)), zap.Int64("rows", rows))
+		logger.Log(zap.InfoLevel, "", zap.String("latency", fmt.Sprintf("%.3fms", latency)), zap.Int64("rows", rows), zap.String("sql", sql))
 	}
 }
 
