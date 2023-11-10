@@ -8,8 +8,7 @@ import (
 	{{end }}
 )
 
-type {{.appName | Title}}UseCase struct {
-}
+type {{.appName | Title}}UseCase struct {}
 
 func New{{.appName | Title}}UseCase() *{{.appName | Title}}UseCase {
 	return &{{.appName | Title}}UseCase{}
