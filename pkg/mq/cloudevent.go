@@ -48,21 +48,23 @@ func (c *CloudEvent) PublishEvent(ctx context.Context, subject string, payload i
 	return nil
 }
 
-func (c *CloudEvent) AddEventListener(ctx context.Context, subject string, handler EventHandler, opts ...cenats.ConsumerOption) (err error) {
-	p, err := cenats.NewConsumerFromConn(c.natsConn, subject, opts...)
+func (c *CloudEvent) AddEventListener(ctx context.Context, subject string, handler EventHandler, opts ...cenats.ConsumerOption) error {
+	consumer, err := cenats.NewConsumerFromConn(c.natsConn, subject, opts...)
 	if err != nil {
-		logger.Fatalf(ctx, "failed to create nats protocol, %s", err.Error())
+		return fmt.Errorf("failed to create nats protocol: %s", err)
 	}
-	defer p.Close(ctx)
+	defer consumer.Close(ctx)
 
-	ce, err := cloudevents.NewClient(p, client.WithObservabilityService(NewObserver()))
+	client, err := cloudevents.NewClient(consumer, client.WithObservabilityService(NewObserver()))
 	if err != nil {
-		logger.Fatalf(ctx, "failed to create client, %s", err.Error())
+		return fmt.Errorf("failed to create client: %s", err)
 	}
-	if err := ce.StartReceiver(ctx, handler); err != nil {
-		logger.Fatalf(ctx, "failed to start nats receiver, %s", err.Error())
+
+	if err := client.StartReceiver(ctx, handler); err != nil {
+		return fmt.Errorf("failed to start nats receiver: %s", err)
 	}
-	return
+
+	return nil
 }
 
 func (c *CloudEvent) AddEventListenerAsync(ctx context.Context, subject string, handler EventHandler, opts ...cenats.ConsumerOption) (err error) {

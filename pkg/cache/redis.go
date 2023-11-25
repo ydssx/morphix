@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -34,7 +35,10 @@ func (c *RedisCache) Set(key string, value interface{}, expire time.Duration) er
 	if err != nil {
 		return err
 	}
-	err = c.client.Set(context.Background(), key, string(data), expire).Err()
+
+	randomExpire := expire + time.Duration(rand.Int63n(int64(time.Second)))
+
+	err = c.client.Set(context.Background(), key, string(data), randomExpire).Err()
 	if err != nil {
 		return err
 	}

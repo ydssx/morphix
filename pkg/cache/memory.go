@@ -36,6 +36,10 @@ func (c *MemoryCache) Clear() {
 	c.data = make(map[string]interface{})
 }
 
+// Set stores the given value in the cache for the given key and expiration time.
+// It locks the cache during the set, and handles expiration by starting a goroutine
+// that will delete the key after the expiration time. If expiration is 0, it deletes
+// any existing expiration for the key.
 func (c *MemoryCache) Set(key string, value interface{}, expiration time.Duration) {
 	c.Lock()
 	defer c.Unlock()
@@ -48,19 +52,15 @@ func (c *MemoryCache) Set(key string, value interface{}, expiration time.Duratio
 		c.expirations.Store(key, expirationTime)
 		go func() {
 			timer := time.NewTimer(expiration)
-			defer timer.Stop()
+			<-timer.C
 
-			// 在定时器到期之前如果该键值对被更新或删除了，则不进行删除操作
-			select {
-			case <-timer.C:
-				c.Lock()
-				defer c.Unlock()
+			c.Lock()
+			defer c.Unlock()
 
-				// 原子操作检查键值对是否过期
-				if expire, ok := c.expirations.Load(key); ok && expire.(time.Time).Equal(expirationTime) {
-					delete(c.data, key)
-					c.expirations.Delete(key)
-				}
+			// 原子操作检查键值对是否过期
+			if expire, ok := c.expirations.Load(key); ok && expire.(time.Time).Equal(expirationTime) {
+				delete(c.data, key)
+				c.expirations.Delete(key)
 			}
 		}()
 	} else {

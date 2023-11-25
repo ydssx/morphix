@@ -9,6 +9,7 @@ import (
 	"github.com/ydssx/morphix/pkg/errors"
 )
 
+// NewRedis 连接Redis并返回Client对象
 func NewRedis(opt *redis.Options) *redis.Client {
 	cli := redis.NewClient(opt)
 	_, err := cli.Ping(context.Background()).Result()
@@ -18,10 +19,12 @@ func NewRedis(opt *redis.Options) *redis.Client {
 	return cli
 }
 
+// NewRedisLock 创建Redis的锁Client对象
 func NewRedisLock(cli *redis.Client) *redislock.Client {
 	return redislock.New(cli)
 }
 
+// NewRedisCluster 连接Redis集群并返回ClusterClient对象
 func NewRedisCluster(opt *redis.ClusterOptions) *redis.ClusterClient {
 	cli := redis.NewClusterClient(opt)
 	_, err := cli.Ping(context.Background()).Result()
@@ -31,23 +34,27 @@ func NewRedisCluster(opt *redis.ClusterOptions) *redis.ClusterClient {
 	return cli
 }
 
+// RedisPubSub Redis的发布/订阅结构
 type RedisPubSub struct {
 	cli  *redis.Client
 	subs map[string]*redis.PubSub
 }
 
+// NewRedisPubSub 创建RedisPubSub对象
 func NewRedisPubSub(cli *redis.Client) *RedisPubSub {
 	return &RedisPubSub{cli: cli, subs: make(map[string]*redis.PubSub)}
 }
 
+// PublishMessage 发布消息到Redis
 func (ps *RedisPubSub) PublishMessage(topic string, message interface{}) error {
 	err := ps.cli.Publish(context.Background(), topic, message).Err()
 	if err != nil {
-		return errors.Wrap(err, "failed to publish message")
+		return errors.Wrap(err, "发布消息失败")
 	}
 	return nil
 }
 
+// SubscribeToTopic 订阅指定主题的消息
 func (ps *RedisPubSub) SubscribeToTopic(topic string, handler func(message []byte)) {
 	sub := ps.cli.Subscribe(context.Background(), topic)
 	ps.subs[topic] = sub
@@ -58,15 +65,16 @@ func (ps *RedisPubSub) SubscribeToTopic(topic string, handler func(message []byt
 				handler([]byte(msg.Payload))
 			}
 		}
-		log.Infof("stopping subscriber for topic [%s]", topic)
+		log.Infof("停止订阅主题[%s]的消息", topic)
 	}()
 }
 
+// Close 关闭RedisPubSub对象
 func (ps *RedisPubSub) Close() error {
 	var errs []error
 	for t, v := range ps.subs {
 		err := v.Close()
-		errs = append(errs, errors.Wrap(err, "failed to close subscription for topic "+t))
+		errs = append(errs, errors.Wrap(err, "关闭主题["+t+"]的订阅失败"))
 	}
 	return errors.Join(errs...)
 }

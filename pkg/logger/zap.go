@@ -3,7 +3,6 @@ package logger
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"go.uber.org/zap"
@@ -11,14 +10,15 @@ import (
 )
 
 func NewZapLogger() *zap.Logger {
-	cfg := zap.NewProductionEncoderConfig()
-	cfg.EncodeTime = func(t time.Time, pae zapcore.PrimitiveArrayEncoder) {
-		pae.AppendString(t.Format("2006-01-02 15:04:05"))
-	}
-	cfg.EncodeLevel = zapcore.CapitalLevelEncoder
-	cfg.MessageKey = ""
-	l := zap.New(zapcore.NewCore(zapcore.NewJSONEncoder(cfg), zapcore.Lock(os.Stdout), zap.DebugLevel))
-	return l
+	encoderConfig := zap.NewProductionEncoderConfig()
+	encoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05")
+	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+	encoderConfig.MessageKey = ""
+
+	core := zapcore.NewCore(zapcore.NewJSONEncoder(encoderConfig), zapcore.Lock(os.Stdout), zap.DebugLevel)
+
+	logger := zap.New(core)
+	return logger
 }
 
 var _ log.Logger = (*Logger)(nil)
@@ -39,22 +39,17 @@ func NewLogger(zlog *zap.Logger) *Logger {
 }
 
 func (l *Logger) Log(level log.Level, keyvals ...interface{}) error {
-	for i, v := range keyvals {
-		if r, ok := v.([]interface{}); ok {
-			keyvals = append(keyvals[:i], r...)
-		}
-	}
-	keylen := len(keyvals)
-	if keylen == 0 || keylen%2 != 0 {
-		l.Zlog.Warn(fmt.Sprint("Keyvalues must appear in pairs: ", keyvals))
+	if len(keyvals) == 0 || len(keyvals)%2 != 0 {
+		l.Zlog.Warn("Keyvalues must appear in pairs", zap.Any("keyvalues", keyvals))
 		return nil
 	}
-	var msg string
-	data := make([]zap.Field, 0, (keylen/2)+1)
-	for i := 0; i < keylen; i += 2 {
+
+	var data []zap.Field
+	for i := 0; i < len(keyvals); i += 2 {
 		data = append(data, zap.Any(fmt.Sprint(keyvals[i]), keyvals[i+1]))
 	}
-	l.Zlog.Log(zapcore.Level(level), msg, data...)
+
+	l.Zlog.Log(zapcore.Level(level), "", data...)
 	return nil
 }
 
