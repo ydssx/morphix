@@ -25,3 +25,28 @@ func InitMongoDB(url string) (*mongo.Client, func()) {
 
 	return cli, cleanup
 }
+
+type Mongo struct {
+	db      *mongo.Database
+	cli     *mongo.Client
+	cleanup func()
+}
+
+func NewMongo(url string, dbName string) *Mongo {
+	cli, cleanup := InitMongoDB(url)
+	db := cli.Database(dbName)
+	return &Mongo{db: db, cli: cli, cleanup: cleanup}
+}
+
+func (m *Mongo) Close() {
+	m.cleanup()
+}
+
+func (m *Mongo) Database() *mongo.Database {
+	return m.db
+}
+
+func (m *Mongo) Collection(collectionName string) *mongo.Collection {
+	return m.db.Collection(collectionName)
+}
+

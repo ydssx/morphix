@@ -55,3 +55,46 @@ func RemoveElements[T comparable](s []T, elems ...T) []T {
 	}
 	return result
 }
+
+func Unique[T comparable](s []T) []T {
+	m := make(map[T]bool)
+	result := make([]T, 0, len(s))
+	for _, v := range s {
+		if !m[v] {
+			m[v] = true
+			result = append(result, v)
+		}
+	}
+	return result
+}
+
+// SliceEqual returns true if two slices have the same elements in the same order.
+func SliceEqual[T comparable](a, b []T) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// SliceIntersect returns the intersection of two slices.
+// It iterates over the first slice to build a set, then iterates over the second slice,
+// appending elements from the second slice if they exist in the set built from the first slice.
+// Returns a new slice containing the intersecting elements.
+func SliceIntersect[T comparable](a, b []T) []T {
+	m := make(map[T]bool)
+	for _, v := range a {
+		m[v] = true
+	}
+	result := make([]T, 0, len(a))
+	for _, v := range b {
+		if m[v] {
+			result = append(result, v)
+		}
+	}
+	return result
+}

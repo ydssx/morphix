@@ -37,3 +37,17 @@ func MaskEmail(email string) string {
 		return username + "@" + parts[2] + parts[3]
 	})
 }
+
+func MaskUrl(url string) string {
+	reg := regexp.MustCompile(`(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]`) // 匹配URL
+	return reg.ReplaceAllStringFunc(url, func(s string) string {
+		return Mask(s, 4, len(s)-1)
+	})
+}
+
+func MaskIP(ip string) string {
+	reg := regexp.MustCompile(`(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})`) // 匹配IP
+	return reg.ReplaceAllStringFunc(ip, func(s string) string {
+		return Mask(s, 1, len(s)-1)
+	})
+}

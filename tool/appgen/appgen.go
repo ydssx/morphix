@@ -118,36 +118,63 @@ func gen(appName, protoFile string, port int) {
 	fmt.Println(string(output))
 }
 
-func mkFile(data map[string]interface{}, outFile string, text string) {
+// mkFile generates a file with the provided data, template, and file path.
+// It checks if the file already exists and if the file extension is ".go".
+// If the file exists and has the same name as the application,
+// it writes the formatted code to the file using apigen.WriteDecl.
+// If the file exists and does not have the same name as the application,
+// it returns without doing anything.
+// If the file does not exist, it writes the code to the file.
+// It uses the "Title" function from the strings package as a custom template function.
+// It returns an error if any error occurs during the process.
+func mkFile(data map[string]interface{}, outFile string, text string) error {
+	// Define custom template function
 	funcs := template.FuncMap{"Title": strings.Title}
+
+	// Parse the template
 	tmpl, err := template.New("tmp").Funcs(funcs).Parse(text)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	var buf bytes.Buffer
 
+	// Execute the template with the provided data
+	var buf bytes.Buffer
 	err = tmpl.Execute(&buf, data)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	// Get the bytes of the generated code
 	codes := buf.Bytes()
+
+	// Format the code if the file extension is ".go"
 	if strings.HasSuffix(outFile, ".go") {
-		codes, _ = format.Source(buf.Bytes())
-		if fileExists(outFile) {
-			if strings.HasSuffix(outFile, *appName+".go") {
-				apigen.WriteDecl(outFile, string(codes))
-			}
-			return
+		formattedCodes, err := format.Source(codes)
+		if err != nil {
+			return err
 		}
+		codes = formattedCodes
 	}
+
+	// Check if the file exists
 	if fileExists(outFile) {
-		return
+		// If the file has the same name as the application, write the code to the file
+		if strings.HasSuffix(outFile, *appName+".go") {
+			apigen.WriteDecl(outFile, string(codes))
+		}
+		return nil
 	}
+
+	// Write the code to the file
 	err = os.WriteFile(outFile, codes, 0o644)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	// Print success message
 	color.Green("generate file [%s] succeed.\n", outFile)
+
+	return nil
 }
 
 type ServiceInfo struct {
@@ -167,43 +194,66 @@ type MethInfo struct {
 	StreamsReturns bool
 }
 
+//	parseProto parses a proto file and extracts information about the service, RPC methods, and package.
+//
+// It returns a ServiceInfo struct containing the extracted information.
 func parseProto(protoFile string) (info ServiceInfo) {
+	// Open the proto file
 	reader, err := os.Open(protoFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer reader.Close()
 
+	// Create a parser and parse the proto file
 	parser := proto.NewParser(reader)
 	definition, err := parser.Parse()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Walk through the proto definition and extract information
 	proto.Walk(definition,
-		proto.WithPackage(func(p *proto.Package) { info.PkgName = p.Name }),
-		proto.WithService(func(s *proto.Service) { info.Name = s.Name }),
+		proto.WithPackage(func(p *proto.Package) {
+			info.PkgName = p.Name
+		}),
+		proto.WithService(func(s *proto.Service) {
+			info.Name = s.Name
+		}),
 		proto.WithRPC(func(r *proto.RPC) {
+			// Convert the request type and return type
 			req, pkg := convertRequest(info.PkgName, r.RequestType)
+			returnType := convertReturnType(info.PkgName, r.ReturnsType)
+
+			// Create a MethInfo struct and populate it with the extracted information
 			x := MethInfo{
 				MethName:       r.Name,
 				Param:          req,
-				Return:         convertReturnType(info.PkgName, r.ReturnsType),
+				Return:         returnType,
 				StreamsRequest: r.StreamsRequest,
 				StreamsReturns: r.StreamsReturns,
 			}
+
+			// Add the comment to the MethInfo struct if it exists
 			if r.Comment != nil {
 				x.Comment = strings.Join(r.Comment.Lines, "\n//")
 			}
+
+			// Add the MethInfo struct to the RpcMeths slice in the ServiceInfo struct
 			info.RpcMeths = append(info.RpcMeths, x)
+
+			// Add the package to the Pkgs slice in the ServiceInfo struct if it doesn't already exist
 			if !util.SliceContain(info.Pkgs, pkg) && pkg != "" {
 				info.Pkgs = append(info.Pkgs, pkg)
 			}
 		}),
 		proto.WithOption(func(o *proto.Option) {
+			// Check if the constant source exists
 			if o.Constant.Source == "" {
 				return
 			}
+
+			// Split the constant source and set the package path in the ServiceInfo struct
 			x := strings.Split(o.Constant.Source, ";")
 			if len(x) > 0 {
 				info.PkgPath = x[0]
@@ -212,6 +262,7 @@ func parseProto(protoFile string) (info ServiceInfo) {
 			}
 		}),
 	)
+
 	return
 }
 

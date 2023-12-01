@@ -113,7 +113,9 @@ func IsZeroStruct(s any) bool {
 	return true
 }
 
-// SetDefaults set default value for struct field with `default` tag if the field is zero value, will panic if data is not a pointer struct.
+// SetDefaults sets default values for struct fields tagged with "default"
+// by reflecting over the struct. It handles setting defaults for string,
+// int, float64 and bool struct fields based on the tag value.
 func SetDefaults(data interface{}) {
 	value := reflect.ValueOf(data).Elem()
 	typ := value.Type()
@@ -121,26 +123,21 @@ func SetDefaults(data interface{}) {
 	for i := 0; i < value.NumField(); i++ {
 		field := value.Field(i)
 		tag := typ.Field(i).Tag.Get("default")
-		if tag == "" || (!field.IsZero()) {
+		if tag == "" || !field.IsZero() {
 			continue
 		}
+
 		switch field.Kind() {
 		case reflect.String:
 			field.SetString(tag)
 		case reflect.Int:
-			// You might want to handle errors here for non-integer tag values.
-			// This example assumes the tags are valid integers.
 			intValue, _ := strconv.Atoi(tag)
 			field.SetInt(int64(intValue))
 		case reflect.Float64:
 			v, _ := strconv.ParseFloat(tag, 64)
 			field.SetFloat(v)
 		case reflect.Bool:
-			if tag == "true" {
-				field.SetBool(true)
-			} else if tag == "false" {
-				field.SetBool(false)
-			}
+			field.SetBool(tag == "true")
 		}
 	}
 }

@@ -78,19 +78,27 @@ func (g GormLogger) Error(ctx context.Context, msg string, data ...interface{}) 
 	}
 }
 
-// Trace 实现 gorm logger 接口方法
+// Trace implements the gorm logger interface method
 func (g GormLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
-	latency := float64(time.Since(begin).Nanoseconds()) / 1e6
+	latency := time.Since(begin).Milliseconds()
 	sql, rows := fc()
 	sql = goutils.RemoveDuplicateWhitespace(sql, true)
 	logger := g.CtxLogger(ctx)
+	
+	logFields := []zap.Field{
+		zap.String("latency", fmt.Sprintf("%.3fms", float64(latency))),
+		zap.Int64("rows", rows),
+		zap.String("sql", sql),
+	}
+
 	switch {
 	case err != nil:
-		logger.Log(zap.ErrorLevel, "", zap.String("msg", err.Error()), zap.String("latency", fmt.Sprintf("%.3fms", latency)), zap.Int64("rows", rows), zap.String("sql", sql))
-	case g.slowThreshold != 0 && latency > float64(g.slowThreshold.Milliseconds()):
-		logger.Log(zap.WarnLevel, "slow sql", zap.String("latency", fmt.Sprintf("%.3fms", latency)), zap.Int64("rows", rows), zap.Float64("threshold", float64(g.slowThreshold.Milliseconds())), zap.String("sql", sql))
+		logger.Error(err.Error(), logFields...)
+	case g.slowThreshold != 0 && float64(latency) > float64(g.slowThreshold.Milliseconds()):
+		logFields = append(logFields, zap.Float64("threshold", float64(g.slowThreshold.Milliseconds())))
+		logger.Warn("slow sql", logFields...)
 	default:
-		logger.Log(zap.InfoLevel, "", zap.String("latency", fmt.Sprintf("%.3fms", latency)), zap.Int64("rows", rows), zap.String("sql", sql))
+		logger.Info("", logFields...)
 	}
 }
 

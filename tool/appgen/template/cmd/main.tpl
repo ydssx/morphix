@@ -22,6 +22,7 @@ func init() {
 
 func main() {
 	flag.Parse()
+	
 	var c conf.Bootstrap
 	close := conf.MustLoad(&c, flagconf)
 	defer close()
