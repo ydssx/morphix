@@ -49,10 +49,10 @@ func NewGroup(ctx context.Context, opts ...Opt) *Group {
 // The Run function takes in multiple functions as arguments and executes them concurrently using goroutines. It adds each function to the underlying errgroup Group using the Go method. If the fastFail flag is set to false, the function waits for all the goroutines to complete by calling the Wait method on the Group. If the fastFail flag is set to true, the function spins off a separate goroutine to wait for the completion of the Group. After all the goroutines have completed, the function returns the error, if any, encountered during the execution of the goroutines.
 //
 // Parameters:
-// - fs: A variadic parameter that accepts functions of type func() error. These functions are executed concurrently.
+//  - fs: A variadic parameter that accepts functions of type func() error. These functions are executed concurrently.
 //
 // Returns:
-// - error: An error that occurred during the execution of the goroutines, if any. If no error occurred, the function returns nil.
+//  - error: An error that occurred during the execution of the goroutines, if any. If no error occurred, the function returns nil.
 func (g *Group) Run(fs ...func() error) (err error) {
 	for _, f := range fs {
 		g.eg.Go(f)

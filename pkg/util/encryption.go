@@ -8,6 +8,14 @@ import (
 )
 
 // 定义一个加密函数，用于对数据进行加密
+//
+// data: 需要加密的数据
+// key: 密钥，长度必须为16、24或32字节
+// 返回: 加密后的数据
+//
+// 示例:
+//
+//	Encrypt([]byte("Hello, World!"), []byte("1234567890123456")) // []byte("3e5b6b1a1a9c0f8b7f5d8d8e1c5b8a9f")
 func Encrypt(data []byte, key []byte) ([]byte, error) {
 	// 创建一个加密器
 	block, err := aes.NewCipher(key)
