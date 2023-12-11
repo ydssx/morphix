@@ -1,5 +1,14 @@
 package util
 
+// SliceContain checks if a slice contains a given element.
+// It takes a slice s and an element target as parameters. 
+// It returns true if target is found in s, false otherwise.
+//
+// Example:
+//
+//	slice := []int{1, 2, 3}
+//	contains := SliceContain(slice, 2) // true
+//	contains = SliceContain(slice, 4) // false
 func SliceContain[T comparable](s []T, target T) bool {
 	for _, v := range s {
 		if v == target {
@@ -153,9 +162,11 @@ func SliceEqual[T comparable](a, b []T) bool {
 }
 
 // SliceIntersect returns the intersection of two slices.
-// It iterates over the first slice to build a set, then iterates over the second slice,
-// appending elements from the second slice if they exist in the set built from the first slice.
-// Returns a new slice containing the intersecting elements.
+// It takes two slices a and b as parameters. 
+// It returns a new slice containing the elements that are present in both a and b.
+// The two slices must be of comparable type T.
+// It uses a map to keep track of the elements in slice a. 
+// Then it iterates through slice b and appends elements to the result if they are present in the map.
 func SliceIntersect[T comparable](a, b []T) []T {
 	m := make(map[T]bool)
 	for _, v := range a {

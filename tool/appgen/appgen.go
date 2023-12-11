@@ -47,6 +47,9 @@ var (
 
 	//go:embed template/biz/biz_set.tpl
 	bizSetFile string
+	
+	//go:embed template/data/data.tpl
+	dataFile string
 )
 
 var (
@@ -66,6 +69,10 @@ func main() {
 	gen(*appName, *protoFile, *port)
 }
 
+// gen generates a new Go application from the given app name, proto file, and port.
+// It creates the application directory structure, parses the proto file for service info,
+// generates files from templates using that info, runs `make api` and `wire`,
+// and executes the compiled application.
 func gen(appName, protoFile string, port int) {
 	baseDir := "app/" + appName
 	cmdDir := baseDir + "/cmd/" + appName
@@ -73,7 +80,8 @@ func gen(appName, protoFile string, port int) {
 	serverDir := internalDir + "/server"
 	serviceDir := internalDir + "/service"
 	bizDir := internalDir + "/biz"
-	paths := []string{baseDir, cmdDir, internalDir, serverDir, bizDir, serviceDir}
+	dataDir := internalDir + "/data"
+	paths := []string{baseDir, cmdDir, internalDir, serverDir, bizDir, serviceDir, dataDir}
 	bar := pb.StartNew(len(paths))
 	bar.SetMaxWidth(150)
 	tmpl := `{{ red "generating:" }} {{ bar . "<" "▇" (cycle . "=" ) "." ">"}} {{speed . | rndcolor }} {{percent .}} {{string . "my_green_string" | green}}`
@@ -105,6 +113,7 @@ func gen(appName, protoFile string, port int) {
 	mkFile(data, serviceDir+"/"+appName+".go", serviceFile)
 	mkFile(data, bizDir+"/biz.go", bizSetFile)
 	mkFile(data, bizDir+"/"+appName+".go", bizFile)
+	mkFile(data, dataDir+"/data.go", dataFile)
 
 	x := fmt.Sprintf("make api && cd app/%s/cmd/%s/ && wire", appName, appName)
 	cmd := exec.Command("cmd.exe", "/C", x)
@@ -194,7 +203,7 @@ type MethInfo struct {
 	StreamsReturns bool
 }
 
-//	parseProto parses a proto file and extracts information about the service, RPC methods, and package.
+// parseProto parses a proto file and extracts information about the service, RPC methods, and package.
 //
 // It returns a ServiceInfo struct containing the extracted information.
 func parseProto(protoFile string) (info ServiceInfo) {

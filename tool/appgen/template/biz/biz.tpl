@@ -8,6 +8,10 @@ import (
 	{{end }}
 )
 
+type Transaction interface {
+	InTx(context.Context, func(ctx context.Context) error) error
+}
+
 type {{.appName | Title}}UseCase struct {}
 
 func New{{.appName | Title}}UseCase() *{{.appName | Title}}UseCase {

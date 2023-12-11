@@ -28,8 +28,11 @@ type registerFn func(ctx context.Context, mux *gwruntime.ServeMux, conn *grpc.Cl
 
 var handlers = make(map[*conf.ClientConf]registerFn)
 
-// 注册rpc服务
-func registerRpcHandler(c *conf.Bootstrap) {
+// registerRPCHandler registers RPC handlers for all configured RPC clients.
+// It maps each RPC client in the Bootstrap config to the appropriate 
+// register handler function for that API. This allows the gateway to set
+// up RPC proxying for each configured downstream service.
+func registerRPCHandler(c *conf.Bootstrap) {
 	clientSet := c.ClientSet
 	handlers[clientSet.UserRpcClient] = userv1.RegisterUserServiceHandler
 	handlers[clientSet.SmsRpcClient] = smsv1.RegisterSMSServiceHandler
@@ -52,40 +55,57 @@ func NewHTTPServer(ctx context.Context, c *conf.Bootstrap) *khttp.Server {
 	return httpSrv
 }
 
-func newGinHandler(ctx context.Context, c *conf.Bootstrap) *gin.Engine {
+func newGinHandler(ctx context.Context, conf *conf.Bootstrap) *gin.Engine {
 	server := gin.New()
 	server.ContextWithFallback = true
-	rdb := common.NewRedisClient(c)
-	server.Use(gin.Logger(), ginprom.PromMiddleware(nil), middleware.RateLimit(rdb), gin.Recovery())
-
+	redisClient := common.NewRedisClient(conf)
+	server.Use(
+		gin.Logger(),
+		ginprom.PromMiddleware(nil),
+		middleware.RateLimit(redisClient),
+		gin.Recovery(),
+	)
 	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
-	server.GET("/healthz", func(c *gin.Context) { c.String(http.StatusOK, "%s", "ok") })
-	server.GET("/docs", func(ctx *gin.Context) { ctx.Writer.Write(docs.ApiDocs) })
-	server.Any("/api/*any", gin.WrapH(newGateway(ctx, c)))
-
+	server.GET("/healthz", healthHandler)
+	server.GET("/docs", docsHandler)
+	server.Any("/api/*any", gatewayHandler(ctx, conf))
 	server.Use(middleware.Auth())
-	server.GET("/auth", func(ctx *gin.Context) {
-		auth := middleware.AuthFromGinContext(ctx)
-		util.OKWithData(ctx, auth)
-	})
-
+	server.GET("/auth", authHandler)
 	return server
 }
 
+func healthHandler(c *gin.Context) {
+	c.String(http.StatusOK, "%s", "ok")
+}
+
+func docsHandler(c *gin.Context) {
+	c.Writer.Write(docs.ApiDocs)
+}
+
+func gatewayHandler(ctx context.Context, conf *conf.Bootstrap) gin.HandlerFunc {
+	return gin.WrapH(newGateway(ctx, conf))
+}
+
+func authHandler(c *gin.Context) {
+	auth := middleware.AuthFromGinContext(c)
+	util.OKWithData(c, auth)
+}
+
 func newGateway(ctx context.Context, c *conf.Bootstrap) http.Handler {
-	registerRpcHandler(c)
+	registerRPCHandler(c)
 
 	withMeta := gwruntime.WithMetadata(func(ctx context.Context, r *http.Request) metadata.MD {
 		return metadata.New(map[string]string{"external-request": "true"})
 	})
-	opts := []gwruntime.ServeMuxOption{withMeta}
 
 	r := common.NewEtcdRegistry(c.Etcd)
 
-	mux := gwruntime.NewServeMux(opts...)
-	for cliConf, f := range handlers {
-		conn := common.CreateClientConn(ctx, cliConf, r)
-		if err := f(ctx, mux, conn); err != nil {
+	muxOpts := []gwruntime.ServeMuxOption{withMeta}
+	mux := gwruntime.NewServeMux(muxOpts...)
+
+	for clientConf, handlerFunc := range handlers {
+		clientConn := common.CreateClientConn(ctx, clientConf, r)
+		if err := handlerFunc(ctx, mux, clientConn); err != nil {
 			panic(err)
 		}
 	}

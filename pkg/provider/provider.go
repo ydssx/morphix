@@ -30,14 +30,15 @@ func initResource() *sdkresource.Resource {
 			sdkresource.WithContainer(),
 			sdkresource.WithHost(),
 		)
-		resource, _ = sdkresource.Merge(
-			sdkresource.Default(),
-			extraResources,
-		)
+		resource, _ = sdkresource.Merge(sdkresource.Default(), extraResources)
 	})
 	return resource
 }
 
+// InitTraceProvider initializes and returns a TracerProvider for exporting
+// traces to the specified endpoint. It creates an OTLP exporter, configures
+// a resource with service name and attributes, sets the global tracer
+// provider, and returns the provider.
 func InitTraceProvider(url string, tracename string) (*sdktrace.TracerProvider, error) {
 	// 创建 Jaeger exporter
 	// exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
@@ -68,15 +69,24 @@ func InitTraceProvider(url string, tracename string) (*sdktrace.TracerProvider, 
 	return tp, nil
 }
 
+// InitMeterProvider initializes and returns a MeterProvider for exporting
+// metrics to the specified endpoint. It creates an OTLP exporter, a
+// PeriodicReader, and a MeterProvider with the exporter and default
+// resource. It also sets the global MeterProvider.
 func InitMeterProvider(endpoint string) *sdkmetric.MeterProvider {
 	exporter, err := otlpmetricgrpc.New(context.Background(), otlpmetricgrpc.WithEndpoint(endpoint), otlpmetricgrpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
+
+	reader := sdkmetric.NewPeriodicReader(exporter, sdkmetric.WithInterval(time.Second*30))
+	resource := initResource()
+
 	provider := sdkmetric.NewMeterProvider(
-		sdkmetric.WithReader(sdkmetric.NewPeriodicReader(exporter, sdkmetric.WithInterval(time.Second*30))),
-		sdkmetric.WithResource(initResource()),
+		sdkmetric.WithReader(reader),
+		sdkmetric.WithResource(resource),
 	)
 	otel.SetMeterProvider(provider)
+
 	return provider
 }

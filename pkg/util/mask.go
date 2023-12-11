@@ -38,6 +38,10 @@ func MaskEmail(email string) string {
 	})
 }
 
+// MaskUrl masks parts of a URL string to anonymize it.
+// It takes a URL string as input, uses a regular expression to match the URL format, 
+// and calls Mask() to replace characters with "*" symbols while preserving the overall structure.
+// The characters between the 4th and 2nd last position are masked.
 func MaskUrl(url string) string {
 	reg := regexp.MustCompile(`(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]`) // 匹配URL
 	return reg.ReplaceAllStringFunc(url, func(s string) string {
@@ -49,5 +53,12 @@ func MaskIP(ip string) string {
 	reg := regexp.MustCompile(`(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})`) // 匹配IP
 	return reg.ReplaceAllStringFunc(ip, func(s string) string {
 		return Mask(s, 1, len(s)-1)
+	})
+}
+
+func MaskIDCard(idCard string) string {
+	reg := regexp.MustCompile(`^(\d{6})(\d{4})(\d{2})(\d{2})(\d{3})([0-9Xx])$`) // 匹配身份证号码
+	return reg.ReplaceAllStringFunc(idCard, func(s string) string {
+		return s[:6] + Mask(s[6:], 1, len(s[6:])-1)
 	})
 }

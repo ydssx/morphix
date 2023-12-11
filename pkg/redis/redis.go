@@ -54,10 +54,12 @@ func (ps *RedisPubSub) PublishMessage(topic string, message interface{}) error {
 	return nil
 }
 
-// SubscribeToTopic 订阅指定主题的消息
+// SubscribeToTopic subscribes to the given topic and calls the handler
+// function whenever a new message is received on that topic.
 func (ps *RedisPubSub) SubscribeToTopic(topic string, handler func(message []byte)) {
 	sub := ps.cli.Subscribe(context.Background(), topic)
 	ps.subs[topic] = sub
+
 	ch := sub.Channel()
 	go func() {
 		for msg := range ch {
@@ -65,7 +67,7 @@ func (ps *RedisPubSub) SubscribeToTopic(topic string, handler func(message []byt
 				handler([]byte(msg.Payload))
 			}
 		}
-		log.Infof("停止订阅主题[%s]的消息", topic)
+		log.Infof("Stopped subscribing to messages on topic [%s]", topic)
 	}()
 }
 

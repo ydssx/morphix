@@ -17,6 +17,14 @@ func NewMemoryCache() *MemoryCache {
 	return &MemoryCache{data: make(map[string]interface{})}
 }
 
+// Get method retrieves a value from the cache, if it exists,
+// for a given key. The function locks the cache before
+// attempting to retrieve the value to avoid race conditions.
+// The returned value is of type interface{} as the cache
+// can store any type of value. The second returned boolean
+// value indicates if the key was found in the cache or not.
+// If the retrieval was successful, the boolean return is 'true',
+// if not, it's 'false'.
 func (c *MemoryCache) Get(key string) (interface{}, bool) {
 	c.Lock()
 	defer c.Unlock()
@@ -68,7 +76,10 @@ func (c *MemoryCache) Set(key string, value interface{}, expiration time.Duratio
 	}
 }
 
-// 使用 gob 序列化和反序列化实现深拷贝
+// deepCopy makes a deep copy of the given value using gob encoding/decoding.
+// It encodes the value to a bytes buffer, decodes it back to an interface{},
+// and returns the decoded value. This creates a deep copy by value instead of
+// just copying a reference.
 func (c *MemoryCache) deepCopy(value interface{}) interface{} {
 	buffer := new(bytes.Buffer)
 	encoder := gob.NewEncoder(buffer)
