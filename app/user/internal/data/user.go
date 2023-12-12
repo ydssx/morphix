@@ -16,6 +16,25 @@ type userRepo struct {
 	log  *log.Helper
 }
 
+// AddRolePermission implements biz.UserRepo.
+func (*userRepo) AddRolePermission(ctx context.Context, roleID int, permissionID int) error {
+	panic("unimplemented")
+}
+
+// DeleteRolePermission implements biz.UserRepo.
+func (*userRepo) DeleteRolePermission(ctx context.Context, roleID int, permissionID int) error {
+	panic("unimplemented")
+}
+
+// GetRolePermission implements biz.UserRepo.
+func (*userRepo) GetRolePermission(ctx context.Context, roleID int) ([]models.Permission, error) {
+	panic("unimplemented")
+}
+
+func NewUserRepo(data *Data, logger log.Logger) *userRepo {
+	return &userRepo{data: data, log: log.NewHelper(logger)}
+}
+
 // GetUserByPhone implements biz.UserRepo.
 func (r *userRepo) GetUserByPhone(ctx context.Context, phoneNumber string) (*models.User, error) {
 	user, err := models.NewUserModel(r.data.DB(ctx)).SetPhoneNumber(phoneNumber).FirstOne()
@@ -32,10 +51,6 @@ func (r *userRepo) GetUserByName(ctx context.Context, username string) (*models.
 		return nil, errors.New("user not found")
 	}
 	return &user, nil
-}
-
-func NewUserRepo(data *Data, logger log.Logger) *userRepo {
-	return &userRepo{data: data, log: log.NewHelper(logger)}
 }
 
 func (r *userRepo) GetUserByID(ctx context.Context, id uint) (*models.User, error) {
@@ -85,4 +100,49 @@ func (r *userRepo) ListUser(ctx context.Context, cond *biz.ListUserCond) []model
 	users, _, _ := model.List(int(cond.Limit), (int(cond.Page)-1)*int(cond.Limit))
 
 	return users
+}
+
+func (r *userRepo) AddUserPermission(ctx context.Context, userID int, permissionID int) error {
+	return nil
+}
+
+func (r *userRepo) GetUserPermission(ctx context.Context, userID int) ([]models.Permission, error) {
+	return nil, nil
+}
+
+func (r *userRepo) GetUserPermissionByRole(ctx context.Context, roleID int) ([]models.Permission, error) {
+	return nil, nil
+}
+
+func (r *userRepo) AddUserRole(ctx context.Context, userID int, roleID int) error {
+	return models.NewUserRoleModel(r.data.DB(ctx)).Create(models.UserRole{UserId: userID, RoleId: roleID})
+}
+
+func (r *userRepo) DeleteUserRole(ctx context.Context, userID int, roleID int) error {
+	return nil
+}
+
+// GetUserRole retrieves the roles associated with the given user ID.
+// It queries the user_roles table to get the role IDs for the user,
+// then queries the roles table to hydrate the role objects.
+// Returns a slice of Role structs and any error.
+func (r *userRepo) GetUserRole(ctx context.Context, userID int) ([]models.Role, error) {
+	userRoles, _, err := models.NewUserRoleModel(r.data.DB(ctx)).SetUserId(userID).List(0, 0)
+	if err != nil {
+		return nil, err
+	}
+	var roles []models.Role
+	var roleIDs []int
+	for _, userRole := range userRoles {
+		roleIDs = append(roleIDs, userRole.RoleId)
+	}
+	roles, _, err = models.NewRoleModel(r.data.DB(ctx)).SetIds(roleIDs...).List(0, 0)
+	if err != nil {
+		return nil, err
+	}
+	return roles, nil
+}
+
+func (r *userRepo) DeleteUserPermission(ctx context.Context, userID int, permissionID int) error {
+	return nil
 }

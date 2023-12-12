@@ -17,7 +17,7 @@ type UserRepoCacheDecorator struct {
 	cache.Cache
 }
 
-func NewUserRepoCacheDecorator(repo *userRepo, cache cache.Cache) biz.UserRepoWithCache {
+func NewUserRepoCacheDecorator(repo *userRepo, cache cache.Cache) biz.UserRepo {
 	return &UserRepoCacheDecorator{repo, cache}
 }
 

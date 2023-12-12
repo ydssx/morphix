@@ -21,6 +21,11 @@ func (m *userRoleModel) SetId(id int) *userRoleModel {
 	return m
 }
 
+func (m *userRoleModel) SetUserId(userId int) *userRoleModel {
+	m.db = m.db.Where("user_id =?", userId)
+	return m
+}
+
 func (m *userRoleModel) Order(expr string) *userRoleModel {
 	m.db = m.db.Order(expr)
 	return m

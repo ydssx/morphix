@@ -33,10 +33,10 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	}
 	userRepo := data.NewUserRepo(dataData, logger)
 	cache := data.NewRedisCache(client)
-	userRepoWithCache := data.NewUserRepoCacheDecorator(userRepo, cache)
+	bizUserRepo := data.NewUserRepoCacheDecorator(userRepo, cache)
 	smsServiceClient := common.NewSMSClient(bootstrap)
 	transaction := data.NewTransaction(dataData)
-	userUseCase := biz.NewUserUseCase(userRepoWithCache, logger, smsServiceClient, transaction)
+	userUseCase := biz.NewUserUseCase(bizUserRepo, logger, smsServiceClient, transaction)
 	userService := service.NewUserService(userUseCase)
 	grpcServer := server.NewGRPCServer(bootstrap, userService)
 	app := newApp(grpcServer, bootstrap)

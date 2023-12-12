@@ -50,7 +50,7 @@ func newApp(gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
 		kratos.Metadata(map[string]string{}),
 		kratos.Server(gs),
 		kratos.Registrar(r),
-		kratos.BeforeStart(func(ctx context.Context) error {
+		kratos.BeforeStart(func(_ context.Context) error {
 			log.Infow("app.version", "1.0.0")
 			return nil
 		}),
@@ -58,3 +58,4 @@ func newApp(gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
 		kratos.AfterStop(mp.Shutdown),
 	)
 }
+

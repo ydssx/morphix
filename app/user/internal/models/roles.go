@@ -16,8 +16,18 @@ func NewRoleModel(tx *gorm.DB) *roleModel {
 	return &roleModel{db: db}
 }
 
-func (m *roleModel) SetId(id int) *roleModel {
-	m.db = m.db.Where("id = ?", id)
+func (m *roleModel) SetIds(id ...int) *roleModel {
+	m.db = m.db.Where("id in (?)", id)
+	return m
+}
+
+func (m *roleModel) SetParentId(parentId int) *roleModel {
+	m.db = m.db.Where("parent_id = ?", parentId)
+	return m
+}
+
+func (m *roleModel) Clone() *roleModel {
+	m.db = m.db.Session(&gorm.Session{Initialized: true}).Session(&gorm.Session{})
 	return m
 }
 

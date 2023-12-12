@@ -60,6 +60,9 @@ const (
 	UserServiceLogActivityProcedure = "/userv1.UserService/LogActivity"
 	// UserServiceGetUserProcedure is the fully-qualified name of the UserService's GetUser RPC.
 	UserServiceGetUserProcedure = "/userv1.UserService/GetUser"
+	// UserServiceGetUserPermissionProcedure is the fully-qualified name of the UserService's
+	// GetUserPermission RPC.
+	UserServiceGetUserPermissionProcedure = "/userv1.UserService/GetUserPermission"
 )
 
 // UserServiceClient is a client for the userv1.UserService service.
@@ -77,6 +80,7 @@ type UserServiceClient interface {
 	ManageUserPermission(context.Context, *connect_go.Request[v1.ManageUserPermissionRequest]) (*connect_go.Response[v1.User], error)
 	LogActivity(context.Context, *connect_go.Request[v1.LogEntry]) (*connect_go.Response[emptypb.Empty], error)
 	GetUser(context.Context, *connect_go.Request[v1.GetUserRequest]) (*connect_go.Response[v1.User], error)
+	GetUserPermission(context.Context, *connect_go.Request[v1.GetUserPermissionRequest]) (*connect_go.Response[v1.UserPermissionListResponse], error)
 }
 
 // NewUserServiceClient constructs a client for the userv1.UserService service. By default, it uses
@@ -144,6 +148,11 @@ func NewUserServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts
 			baseURL+UserServiceGetUserProcedure,
 			opts...,
 		),
+		getUserPermission: connect_go.NewClient[v1.GetUserPermissionRequest, v1.UserPermissionListResponse](
+			httpClient,
+			baseURL+UserServiceGetUserPermissionProcedure,
+			opts...,
+		),
 	}
 }
 
@@ -160,6 +169,7 @@ type userServiceClient struct {
 	manageUserPermission *connect_go.Client[v1.ManageUserPermissionRequest, v1.User]
 	logActivity          *connect_go.Client[v1.LogEntry, emptypb.Empty]
 	getUser              *connect_go.Client[v1.GetUserRequest, v1.User]
+	getUserPermission    *connect_go.Client[v1.GetUserPermissionRequest, v1.UserPermissionListResponse]
 }
 
 // Register calls userv1.UserService.Register.
@@ -217,6 +227,11 @@ func (c *userServiceClient) GetUser(ctx context.Context, req *connect_go.Request
 	return c.getUser.CallUnary(ctx, req)
 }
 
+// GetUserPermission calls userv1.UserService.GetUserPermission.
+func (c *userServiceClient) GetUserPermission(ctx context.Context, req *connect_go.Request[v1.GetUserPermissionRequest]) (*connect_go.Response[v1.UserPermissionListResponse], error) {
+	return c.getUserPermission.CallUnary(ctx, req)
+}
+
 // UserServiceHandler is an implementation of the userv1.UserService service.
 type UserServiceHandler interface {
 	// 用户注册
@@ -232,6 +247,7 @@ type UserServiceHandler interface {
 	ManageUserPermission(context.Context, *connect_go.Request[v1.ManageUserPermissionRequest]) (*connect_go.Response[v1.User], error)
 	LogActivity(context.Context, *connect_go.Request[v1.LogEntry]) (*connect_go.Response[emptypb.Empty], error)
 	GetUser(context.Context, *connect_go.Request[v1.GetUserRequest]) (*connect_go.Response[v1.User], error)
+	GetUserPermission(context.Context, *connect_go.Request[v1.GetUserPermissionRequest]) (*connect_go.Response[v1.UserPermissionListResponse], error)
 }
 
 // NewUserServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -295,6 +311,11 @@ func NewUserServiceHandler(svc UserServiceHandler, opts ...connect_go.HandlerOpt
 		svc.GetUser,
 		opts...,
 	)
+	userServiceGetUserPermissionHandler := connect_go.NewUnaryHandler(
+		UserServiceGetUserPermissionProcedure,
+		svc.GetUserPermission,
+		opts...,
+	)
 	return "/userv1.UserService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case UserServiceRegisterProcedure:
@@ -319,6 +340,8 @@ func NewUserServiceHandler(svc UserServiceHandler, opts ...connect_go.HandlerOpt
 			userServiceLogActivityHandler.ServeHTTP(w, r)
 		case UserServiceGetUserProcedure:
 			userServiceGetUserHandler.ServeHTTP(w, r)
+		case UserServiceGetUserPermissionProcedure:
+			userServiceGetUserPermissionHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -370,4 +393,8 @@ func (UnimplementedUserServiceHandler) LogActivity(context.Context, *connect_go.
 
 func (UnimplementedUserServiceHandler) GetUser(context.Context, *connect_go.Request[v1.GetUserRequest]) (*connect_go.Response[v1.User], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("userv1.UserService.GetUser is not implemented"))
+}
+
+func (UnimplementedUserServiceHandler) GetUserPermission(context.Context, *connect_go.Request[v1.GetUserPermissionRequest]) (*connect_go.Response[v1.UserPermissionListResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("userv1.UserService.GetUserPermission is not implemented"))
 }
