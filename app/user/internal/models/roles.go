@@ -67,3 +67,13 @@ func (m *roleModel) List(limit, offset int) (data []Role, total int64, err error
 	err = query.Limit(limit).Offset(offset).Find(&data).Error
 	return
 }
+
+func (m *roleModel) ListAll() (data []Role, err error) {
+	err = m.db.Find(&data).Error
+	return
+}
+
+func (m *roleModel) ListByParentId(parentId int) (data []Role, err error) {
+	err = m.db.Where("parent_id = ?", parentId).Find(&data).Error
+	return
+}

@@ -17,13 +17,13 @@ type userRepo struct {
 }
 
 // AddRolePermission implements biz.UserRepo.
-func (*userRepo) AddRolePermission(ctx context.Context, roleID int, permissionID int) error {
-	panic("unimplemented")
+func (r *userRepo) AddRolePermission(ctx context.Context, roleID int, permissionID int) error {
+	return models.NewRolePermissionModel(r.data.DB(ctx)).Create(models.RolePermission{RoleId: int(roleID), PermissionId: int(permissionID)})
 }
 
 // DeleteRolePermission implements biz.UserRepo.
-func (*userRepo) DeleteRolePermission(ctx context.Context, roleID int, permissionID int) error {
-	panic("unimplemented")
+func (r *userRepo) DeleteRolePermission(ctx context.Context, roleID int, permissionID int) error {
+	return models.NewRolePermissionModel(r.data.DB(ctx)).SetRoleId(uint(roleID)).SetPermissionId(uint(permissionID)).Delete()
 }
 
 // GetRolePermission implements biz.UserRepo.

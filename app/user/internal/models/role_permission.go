@@ -26,6 +26,11 @@ func (m *rolePermissionModel) SetRoleId(roleId uint) *rolePermissionModel {
 	return m
 }
 
+func (m *rolePermissionModel) SetPermissionId(permissionId uint) *rolePermissionModel {
+	m.db = m.db.Where("permission_id = ?", permissionId)
+	return m
+}
+
 func (m *rolePermissionModel) Order(expr string) *rolePermissionModel {
 	m.db = m.db.Order(expr)
 	return m
@@ -72,3 +77,7 @@ func (m *rolePermissionModel) PluckPermissionID() (permissionIDs []uint) {
 	m.db.Pluck("permission_id", &permissionIDs)
 	return
 }
+
+ func (m *rolePermissionModel) Delete() error {
+ 	return m.db.Delete(&RolePermission{}).Error
+ }

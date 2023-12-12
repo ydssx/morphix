@@ -22,4 +22,4 @@ func getDB(tx ...*gorm.DB) *gorm.DB {
 		return tx[0]
 	}
 	return mysql.GlobalDB()
-}
+}		
