@@ -7,8 +7,8 @@ CREATE TABLE orders (
   status VARCHAR(20) NOT NULL,  -- 订单状态
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 创建时间
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- 更新时间
-  FOREIGN KEY (user_id) REFERENCES users(id)  -- 外键关联用户表
-);
+  FOREIGN KEY (user_id) REFERENCES users(id),  -- 外键关联用户表
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单表';
 
 -- 支付表，存储支付信息
 CREATE TABLE payments (
@@ -35,3 +35,4 @@ CREATE TABLE refunds (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- 更新时间
   FOREIGN KEY (payment_id) REFERENCES payments(id)  -- 外键关联支付表
 );
+

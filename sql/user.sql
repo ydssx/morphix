@@ -42,3 +42,15 @@ CREATE TABLE `role_permission_relation` (
   FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE,
   FOREIGN KEY (permission_id) REFERENCES user_permission (id) ON DELETE CASCADE
 ) COMMENT '角色权限关联表';
+
+CREATE TABLE `user_role_permission_relation` (
+  user_id INT NOT NULL COMMENT '用户ID',
+  role_id INT NOT NULL COMMENT '角色ID',
+  permission_id INT NOT NULL COMMENT '权限ID',
+  PRIMARY KEY (user_id, role_id, permission_id),
+  FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+  FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE,
+  FOREIGN KEY (permission_id) REFERENCES user_permission (id) ON DELETE CASCADE,
+  UNIQUE KEY (user_id, role_id, permission_id)
+) COMMENT '用户角色权限关联表';
+
