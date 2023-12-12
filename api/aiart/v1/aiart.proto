@@ -96,8 +96,11 @@ message GetModelInfoResponse {
 }
 
 enum GenerateStatus {
-  PENDING = 0;
-  RUNNING = 1;
-  COMPLETED = 2;
-  FAILED = 3;
+  PENDING = 0; // 待处理
+  RUNNING = 1; // 处理中
+  COMPLETED = 2; // 处理完成
+  FAILED = 3; // 处理失败
+  CANCELED = 4; // 处理取消
+  TIMEOUT = 5; // 处理超时
+  UNKNOWN = 6; // 未知状态
 }

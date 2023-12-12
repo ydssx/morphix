@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package quote;
 
+import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ydssx/morphix/api/quote/v1;quotev1";
@@ -11,7 +12,9 @@ service QuoteService {
   rpc CreateQuote(CreateQuoteRequest) returns (CreateQuoteResponse);
 
   // 获取报价列表
-  rpc GetQuotes(GetQuotesRequest) returns (GetQuotesResponse);
+  rpc GetQuotes(GetQuotesRequest) returns (GetQuotesResponse) {
+    option (google.api.http) = {get: "/api/v1/quotes"};
+  }
 
   // 获取单个报价
   rpc GetQuote(GetQuoteRequest) returns (Quote);
