@@ -18,10 +18,10 @@ type JobServer struct {
 	mux *asynq.ServeMux
 }
 
-func NewJobServer(c *conf.Bootstrap) *JobServer {
+func NewJobServer(c *conf.Bootstrap, clientSet *common.ServiceClientSet) *JobServer {
 	opt := common.InitRedisOpt(c)
 
-	clientSet := common.NewServiceClientSet(c)
+	// clientSet := common.NewServiceClientSet(c)
 
 	server := asynq.NewServer(opt, asynq.Config{
 		Concurrency:  10,
@@ -41,10 +41,12 @@ func NewJobServer(c *conf.Bootstrap) *JobServer {
 }
 
 func (j *JobServer) Start(ctx context.Context) error {
-	return concurrent.NewGroup(ctx, concurrent.WithFastFail(true)).Run(
+	group := concurrent.NewGroup(ctx, concurrent.WithFastFail(true))
+	err := group.Run(
 		j.sd.Start,
 		func() error { return j.sr.Start(j.mux) },
 	)
+	return err
 }
 
 func (j *JobServer) Stop(_ context.Context) error {

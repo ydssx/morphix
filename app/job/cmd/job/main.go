@@ -5,7 +5,6 @@ import (
 	"flag"
 
 	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/ydssx/morphix/app/job/internal/server"
 	"github.com/ydssx/morphix/common"
@@ -22,36 +21,37 @@ func init() {
 
 func main() {
 	flag.Parse()
-	var c conf.Bootstrap
-	close := conf.MustLoad(&c, flagconf)
-	defer close()
 
-	app, cleanup, err := wireApp(&c)
+	// Load configuration
+	var config conf.Bootstrap
+	closeConfig := conf.MustLoad(&config, flagconf)
+	defer closeConfig()
+
+	// Create and initialize the application
+	app, cleanup, err := wireApp(&config)
 	if err != nil {
 		panic(err)
 	}
 	defer cleanup()
 
-	// start and wait for stop signal
+	// Run the application
 	if err := app.Run(); err != nil {
 		panic(err)
 	}
 }
 
 func newApp(ls *server.JobServer, gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
-	r := common.NewEtcdRegistry(c.Etcd)
-
-	tp, _ := provider.InitTraceProvider(c.Otelcol.Addr, "morphix-job")
+	etcdRegistry := common.NewEtcdRegistry(c.Etcd)
+	traceProvider, _ := provider.InitTraceProvider(c.Otelcol.Addr, "morphix-job")
 
 	return kratos.New(
 		kratos.Name("morphix-job"),
 		kratos.Metadata(map[string]string{}),
 		kratos.Server(gs, ls),
-		kratos.Registrar(r),
+		kratos.Registrar(etcdRegistry),
 		kratos.BeforeStart(func(_ context.Context) error {
-			log.Infow("app.version", "1.0.0")
 			return nil
 		}),
-		kratos.AfterStop(tp.Shutdown),
+		kratos.AfterStop(traceProvider.Shutdown),
 	)
 }

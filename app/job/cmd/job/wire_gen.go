@@ -21,7 +21,8 @@ import (
 // Injectors from wire.go:
 
 func wireApp(bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
-	jobServer := server.NewJobServer(bootstrap)
+	serviceClientSet := common.NewServiceClientSet(bootstrap)
+	jobServer := server.NewJobServer(bootstrap, serviceClientSet)
 	client := common.NewAsynqClient(bootstrap)
 	inspector := common.NewAsynqInspector(bootstrap)
 	jobService := service.NewJobService(client, inspector)
