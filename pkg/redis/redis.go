@@ -45,7 +45,8 @@ func NewRedisPubSub(cli *redis.Client) *RedisPubSub {
 	return &RedisPubSub{cli: cli, subs: make(map[string]*redis.PubSub)}
 }
 
-// PublishMessage 发布消息到Redis
+// PublishMessage publishes a message to the given topic.
+// It returns an error if the publish failed.
 func (ps *RedisPubSub) PublishMessage(topic string, message interface{}) error {
 	err := ps.cli.Publish(context.Background(), topic, message).Err()
 	if err != nil {

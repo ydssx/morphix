@@ -42,6 +42,10 @@ func AuthStreamServer() grpc.StreamServerInterceptor {
 	return selector.StreamServerInterceptor(auth.StreamServerInterceptor(authCtx), selector.MatchFunc(match))
 }
 
+// authCtx authenticates the incoming request context.
+// It checks for a valid authentication token and populates the
+// context with the parsed claims. If no token is present, it
+// returns the existing context unmodified.
 func authCtx(ctx context.Context) (context.Context, error) {
 	md := metadata.ExtractIncoming(ctx)
 	ctx = md.ToOutgoing(ctx)
@@ -68,6 +72,8 @@ func parseToken(ctx context.Context) (context.Context, error) {
 	return newContext(ctx, claims), nil
 }
 
+// isExternalRequest checks if the request is from an external client.
+// It looks for a custom "external-request" header and returns true if it's set to "true".
 func isExternalRequest(md metadata.MD) bool {
 	// Determine if the request is coming from an external client based on the presence of custom headers.
 	// For example, you can define a custom "external-request" header.

@@ -15,6 +15,10 @@ type (
 	eventType   struct{}
 )
 
+// EventServer is a grpc.UnaryServerInterceptor that adds application name, event type and trace context to the context.
+// It retrieves the application name from the Kratos context and adds it to the context as eventSource.
+// It adds the gRPC method info as eventType to the context.
+// If tracing is enabled, it adds the trace ID to the gRPC metadata.
 func EventServer() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 		app, ok := kratos.FromContext(ctx)
