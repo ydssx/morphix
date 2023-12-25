@@ -18,6 +18,10 @@ func Mask(str string, start, end int) string {
 	return str[:start] + mask + str[end:]
 }
 
+// MaskChineseName masks the Chinese name by replacing the characters with asterisks.
+//
+// It takes a string parameter `name` which represents the Chinese name to be masked.
+// It returns a string which is the masked Chinese name.
 func MaskChineseName(name string) string {
 	reg := regexp.MustCompile(`([\p{Han}]{1})([\p{Han}]*)([\p{Han}]{1})`) // 匹配中文姓名
 	return reg.ReplaceAllStringFunc(name, func(s string) string {

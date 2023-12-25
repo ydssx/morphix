@@ -94,6 +94,8 @@ func (m *GenerateImageRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ImageGenerationMode
+
 	if len(errors) > 0 {
 		return GenerateImageRequestMultiError(errors)
 	}
@@ -907,3 +909,443 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetModelInfoResponseValidationError{}
+
+// Validate checks the field values on ImageToImageRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ImageToImageRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ImageToImageRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ImageToImageRequestMultiError, or nil if none found.
+func (m *ImageToImageRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ImageToImageRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for OriginalImage
+
+	// no validation rules for Prompt
+
+	// no validation rules for ImageSize
+
+	// no validation rules for GuidanceScale
+
+	// no validation rules for SamplingSteps
+
+	// no validation rules for SamplingMethod
+
+	if len(errors) > 0 {
+		return ImageToImageRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ImageToImageRequestMultiError is an error wrapping multiple validation
+// errors returned by ImageToImageRequest.ValidateAll() if the designated
+// constraints aren't met.
+type ImageToImageRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ImageToImageRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ImageToImageRequestMultiError) AllErrors() []error { return m }
+
+// ImageToImageRequestValidationError is the validation error returned by
+// ImageToImageRequest.Validate if the designated constraints aren't met.
+type ImageToImageRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ImageToImageRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ImageToImageRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ImageToImageRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ImageToImageRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ImageToImageRequestValidationError) ErrorName() string {
+	return "ImageToImageRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ImageToImageRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sImageToImageRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ImageToImageRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ImageToImageRequestValidationError{}
+
+// Validate checks the field values on ImageToImageResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ImageToImageResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ImageToImageResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ImageToImageResponseMultiError, or nil if none found.
+func (m *ImageToImageResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ImageToImageResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ImageId
+
+	if len(errors) > 0 {
+		return ImageToImageResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// ImageToImageResponseMultiError is an error wrapping multiple validation
+// errors returned by ImageToImageResponse.ValidateAll() if the designated
+// constraints aren't met.
+type ImageToImageResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ImageToImageResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ImageToImageResponseMultiError) AllErrors() []error { return m }
+
+// ImageToImageResponseValidationError is the validation error returned by
+// ImageToImageResponse.Validate if the designated constraints aren't met.
+type ImageToImageResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ImageToImageResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ImageToImageResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ImageToImageResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ImageToImageResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ImageToImageResponseValidationError) ErrorName() string {
+	return "ImageToImageResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ImageToImageResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sImageToImageResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ImageToImageResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ImageToImageResponseValidationError{}
+
+// Validate checks the field values on
+// GenerateImageRequest_GenerationParameters with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GenerateImageRequest_GenerationParameters) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// GenerateImageRequest_GenerationParameters with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in
+// GenerateImageRequest_GenerationParametersMultiError, or nil if none found.
+func (m *GenerateImageRequest_GenerationParameters) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GenerateImageRequest_GenerationParameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ModelName
+
+	// no validation rules for SamplingSteps
+
+	// no validation rules for SamplingMethod
+
+	if len(errors) > 0 {
+		return GenerateImageRequest_GenerationParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// GenerateImageRequest_GenerationParametersMultiError is an error wrapping
+// multiple validation errors returned by
+// GenerateImageRequest_GenerationParameters.ValidateAll() if the designated
+// constraints aren't met.
+type GenerateImageRequest_GenerationParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GenerateImageRequest_GenerationParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GenerateImageRequest_GenerationParametersMultiError) AllErrors() []error { return m }
+
+// GenerateImageRequest_GenerationParametersValidationError is the validation
+// error returned by GenerateImageRequest_GenerationParameters.Validate if the
+// designated constraints aren't met.
+type GenerateImageRequest_GenerationParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GenerateImageRequest_GenerationParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GenerateImageRequest_GenerationParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GenerateImageRequest_GenerationParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GenerateImageRequest_GenerationParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GenerateImageRequest_GenerationParametersValidationError) ErrorName() string {
+	return "GenerateImageRequest_GenerationParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GenerateImageRequest_GenerationParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGenerateImageRequest_GenerationParameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GenerateImageRequest_GenerationParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GenerateImageRequest_GenerationParametersValidationError{}
+
+// Validate checks the field values on GenerateImageRequest_GuidanceParameters
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *GenerateImageRequest_GuidanceParameters) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// GenerateImageRequest_GuidanceParameters with the rules defined in the proto
+// definition for this message. If any rules are violated, the result is a
+// list of violation errors wrapped in
+// GenerateImageRequest_GuidanceParametersMultiError, or nil if none found.
+func (m *GenerateImageRequest_GuidanceParameters) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GenerateImageRequest_GuidanceParameters) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Prompt
+
+	// no validation rules for GuidanceScale
+
+	if len(errors) > 0 {
+		return GenerateImageRequest_GuidanceParametersMultiError(errors)
+	}
+
+	return nil
+}
+
+// GenerateImageRequest_GuidanceParametersMultiError is an error wrapping
+// multiple validation errors returned by
+// GenerateImageRequest_GuidanceParameters.ValidateAll() if the designated
+// constraints aren't met.
+type GenerateImageRequest_GuidanceParametersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GenerateImageRequest_GuidanceParametersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GenerateImageRequest_GuidanceParametersMultiError) AllErrors() []error { return m }
+
+// GenerateImageRequest_GuidanceParametersValidationError is the validation
+// error returned by GenerateImageRequest_GuidanceParameters.Validate if the
+// designated constraints aren't met.
+type GenerateImageRequest_GuidanceParametersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GenerateImageRequest_GuidanceParametersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GenerateImageRequest_GuidanceParametersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GenerateImageRequest_GuidanceParametersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GenerateImageRequest_GuidanceParametersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GenerateImageRequest_GuidanceParametersValidationError) ErrorName() string {
+	return "GenerateImageRequest_GuidanceParametersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GenerateImageRequest_GuidanceParametersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGenerateImageRequest_GuidanceParameters.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GenerateImageRequest_GuidanceParametersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GenerateImageRequest_GuidanceParametersValidationError{}

@@ -12,7 +12,7 @@ import (
 type HttpClient interface {
 	Get(url string, result interface{}) error
 	Post(url string, payload interface{}, result interface{}) error
-}
+	}
 
 // Request represents a HTTP request
 type Request struct {
@@ -41,6 +41,8 @@ func (r *Request) SetHeader(key, value string) *Request {
 	return r
 }
 
+// SetHeaders sets the request headers from the given map.
+// The key-value pairs in the headers map will be set as the request headers.
 func (r *Request) SetHeaders(headers map[string]string) *Request {
 	for key, value := range headers {
 		r.headers[key] = value
@@ -54,6 +56,8 @@ func (r *Request) SetQuery(key, value string) *Request {
 	return r
 }
 
+// SetQuerys sets multiple query parameters from a map.
+// The key-value pairs in the querys map will be set as the query parameters.
 func (r *Request) SetQuerys(querys map[string]string) *Request {
 	for k, v := range querys {
 		r.SetQuery(k, v)
@@ -79,7 +83,12 @@ func (r *Request) WithContentType(contentType string) *Request {
 	return r
 }
 
-// Get sends a GET request.
+// Get performs a GET request to the specified URL and stores the response in the provided result variable.
+//
+//  - url: the URL to send the GET request to.
+//  - result: a pointer to a variable that will store the response data.
+// error: an error that occurred during the request, if any.
+// Return type: error, returns any error that occurred during the request.
 func (r *Request) Get(url string, result interface{}) error {
 	req := r.client.R()
 	r.addHeaders(req)
@@ -92,7 +101,15 @@ func (r *Request) Get(url string, result interface{}) error {
 	return r.handleResponse(resp, result)
 }
 
-// Post sends a POST request.
+// Post sends a POST request to the specified URL with the given payload and stores the response in the provided result.
+//
+// Parameters:
+//  - url: The URL to send the request to.
+//  - payload: The data to send in the request body.
+//  - result: A pointer to the variable where the response will be stored.
+//
+// Returns:
+//  - error: An error if there was a problem sending the request or handling the response.
 func (r *Request) Post(url string, payload interface{}, result interface{}) error {
 	req := r.client.R()
 	r.addHeaders(req)

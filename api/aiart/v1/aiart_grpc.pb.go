@@ -24,6 +24,7 @@ const (
 	ArtService_GetGenerateStatus_FullMethodName = "/aiartv1.ArtService/GetGenerateStatus"
 	ArtService_GetGeneratedImage_FullMethodName = "/aiartv1.ArtService/GetGeneratedImage"
 	ArtService_GetModelInfo_FullMethodName      = "/aiartv1.ArtService/GetModelInfo"
+	ArtService_ImageToImage_FullMethodName      = "/aiartv1.ArtService/ImageToImage"
 )
 
 // ArtServiceClient is the client API for ArtService service.
@@ -38,6 +39,7 @@ type ArtServiceClient interface {
 	GetGeneratedImage(ctx context.Context, in *GetGeneratedImageRequest, opts ...grpc.CallOption) (*GetGeneratedImageResponse, error)
 	// 获取模型信息
 	GetModelInfo(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetModelInfoResponse, error)
+	ImageToImage(ctx context.Context, in *ImageToImageRequest, opts ...grpc.CallOption) (*ImageToImageResponse, error)
 }
 
 type artServiceClient struct {
@@ -84,6 +86,15 @@ func (c *artServiceClient) GetModelInfo(ctx context.Context, in *emptypb.Empty, 
 	return out, nil
 }
 
+func (c *artServiceClient) ImageToImage(ctx context.Context, in *ImageToImageRequest, opts ...grpc.CallOption) (*ImageToImageResponse, error) {
+	out := new(ImageToImageResponse)
+	err := c.cc.Invoke(ctx, ArtService_ImageToImage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArtServiceServer is the server API for ArtService service.
 // All implementations should embed UnimplementedArtServiceServer
 // for forward compatibility
@@ -96,6 +107,7 @@ type ArtServiceServer interface {
 	GetGeneratedImage(context.Context, *GetGeneratedImageRequest) (*GetGeneratedImageResponse, error)
 	// 获取模型信息
 	GetModelInfo(context.Context, *emptypb.Empty) (*GetModelInfoResponse, error)
+	ImageToImage(context.Context, *ImageToImageRequest) (*ImageToImageResponse, error)
 }
 
 // UnimplementedArtServiceServer should be embedded to have forward compatible implementations.
@@ -113,6 +125,9 @@ func (UnimplementedArtServiceServer) GetGeneratedImage(context.Context, *GetGene
 }
 func (UnimplementedArtServiceServer) GetModelInfo(context.Context, *emptypb.Empty) (*GetModelInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetModelInfo not implemented")
+}
+func (UnimplementedArtServiceServer) ImageToImage(context.Context, *ImageToImageRequest) (*ImageToImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ImageToImage not implemented")
 }
 
 // UnsafeArtServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -198,6 +213,24 @@ func _ArtService_GetModelInfo_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArtService_ImageToImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImageToImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArtServiceServer).ImageToImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArtService_ImageToImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArtServiceServer).ImageToImage(ctx, req.(*ImageToImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArtService_ServiceDesc is the grpc.ServiceDesc for ArtService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -220,6 +253,10 @@ var ArtService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetModelInfo",
 			Handler:    _ArtService_GetModelInfo_Handler,
+		},
+		{
+			MethodName: "ImageToImage",
+			Handler:    _ArtService_ImageToImage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

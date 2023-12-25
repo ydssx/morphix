@@ -45,6 +45,9 @@ func (w *Webhook) SendMessage(msg string) error {
 	}
 }
 
+// SendMessageWithAt 使用机器人@指定用户发送消息。
+// msg 为消息内容,atMobiles 为要@的用户手机号列表。
+// 根据配置的不同,会调用不同机器人接口发送消息。
 func (w *Webhook) SendMessageWithAt(msg string, atMobiles ...string) error {
 	switch {
 	case w.DingDingWebhook != "":

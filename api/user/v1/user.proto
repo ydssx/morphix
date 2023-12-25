@@ -77,6 +77,9 @@ service UserService {
       body: "*"
     };
   }
+  rpc GetUserActivity(GetUserActivityRequest) returns (UserActivityListResponse) {
+    option (google.api.http) = {get: "/api/users/activity"};
+  }
 
   rpc GetUser(GetUserRequest) returns (User) {
     option (google.api.http) = {get: "/api/user/{user_id}"};
@@ -161,16 +164,24 @@ message UserListRequest {
 }
 
 message ManageUserPermissionRequest {
-  string user_id = 1;
+  int64 user_id = 1;
   repeated string roles = 2;
   repeated string permissions = 3;
+  enum Mode {
+    ADD = 0; // 新增
+    REMOVE = 1; // 删除
+    UPDATE = 2; // 更新
+    REPLACE = 3; // 替换
+  }
+  Mode mode = 4;
 }
 
 message LogEntry {
-  string user_id = 1;
-  string action = 2;
-  string timestamp = 3;
-  // 其他日志信息字段...
+  int64 user_id = 1;
+  string action = 2; // 操作 例如: login, logout
+  string timestamp = 3; // 时间戳
+  string resource = 4; // 资源 例如: /api/users
+  string message = 5; // 消息 例如: 登录成功
 }
 
 message GetUserRequest {
@@ -189,4 +200,22 @@ message UserPermission {
   string resource = 1; // 资源 例如: /api/users
   repeated string actions = 2; // 权限 例如: GET, POST, PUT, DELETE
   repeated string roles = 3; // 角色 例如: admin, user
+}
+
+message UserActivityListResponse {
+  repeated UserActivity activity = 1;
+}
+
+message GetUserActivityRequest {
+  int64 user_id = 1;
+  int64 page = 2;
+  int64 limit = 3;
+}
+
+message UserActivity {
+  string timestamp = 1;
+  string action = 2;
+  string resource = 3;
+  string message = 4;
+  int64 id = 5;
 }

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"os"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -19,7 +20,7 @@ import (
 //
 // Example:
 //
-//	IsPhoneNumber("1234567890") // true
+//	IsPhoneNumber("1234567890") // false
 func IsPhoneNumber(phoneNumber string) bool {
 	// 定义手机号码正则表达式
 	pattern := `^(1[3-9])\d{9}$`
@@ -122,6 +123,8 @@ func GenerateCode(length int) string {
 	return code
 }
 
+// CalculateChecksum 计算给定请求的校验和
+// 它将请求转换为字符串,计算 MD5 哈希,并将哈希转换为十六进制编码的字符串
 func CalculateChecksum(request interface{}) string {
 	data := fmt.Sprintf("%v", request) // Convert request to a string
 	hash := md5.Sum([]byte(data))      // Calculate MD5 hash
@@ -237,6 +240,8 @@ func SetDefaults(data interface{}) {
 	}
 }
 
+// GenerateRandomString generates a random string of the given length.
+// It does this by selecting random bytes from the set of alphanumeric characters.
 func GenerateRandomString(length int) string {
 	str := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	bytes := []byte(str)
@@ -247,3 +252,137 @@ func GenerateRandomString(length int) string {
 	}
 	return string(result)
 }
+
+// InterfaceToString将任意类型的数据转换为字符串
+// 根据数据类型,使用不同的方式进行转换
+//   - string类型直接返回
+//   - 整型使用strconv.Itoa转换为字符串
+//   - 浮点数使用strconv.FormatFloat转换为字符串
+//   - 其他类型使用fmt.Sprintf转换为字符串
+func InterfaceToString(data interface{}) string {
+	switch data.(type) {
+	case string:
+		return data.(string)
+	case int:
+		return strconv.Itoa(data.(int))
+	case int8:
+		return strconv.Itoa(int(data.(int8)))
+	case int16:
+		return strconv.Itoa(int(data.(int16)))
+	case int32:
+		return strconv.Itoa(int(data.(int32)))
+	case int64:
+		return strconv.Itoa(int(data.(int64)))
+	case uint:
+		return strconv.Itoa(int(data.(uint)))
+	case uint8:
+		return strconv.Itoa(int(data.(uint8)))
+	case uint16:
+		return strconv.Itoa(int(data.(uint16)))
+	case uint32:
+		return strconv.Itoa(int(data.(uint32)))
+	case uint64:
+		return strconv.Itoa(int(data.(uint64)))
+	case float32:
+		return strconv.FormatFloat(float64(data.(float32)), 'f', -1, 32)
+	case float64:
+		return strconv.FormatFloat(data.(float64), 'f', -1, 64)
+	default:
+		return fmt.Sprintf("%v", data)
+	}
+}
+
+// InterfaceToInt将任意类型的数据转换为int类型
+// 根据数据类型,使用不同的方式进行转换:
+//   - string类型使用strconv.Atoi转换为int
+//   - 整型和浮点型使用类型转换转换为int
+//   - 其他类型返回0
+func InterfaceToInt(data interface{}) int {
+	switch data.(type) {
+	case string:
+		v, _ := strconv.Atoi(data.(string))
+		return v
+	case int:
+		return data.(int)
+	case int8:
+		return int(data.(int8))
+	case int16:
+		return int(data.(int16))
+	case int32:
+		return int(data.(int32))
+	case int64:
+		return int(data.(int64))
+	case uint:
+		return int(data.(uint))
+	case uint8:
+		return int(data.(uint8))
+	case uint16:
+		return int(data.(uint16))
+	case uint32:
+		return int(data.(uint32))
+	case uint64:
+		return int(data.(uint64))
+	case float32:
+		return int(data.(float32))
+	case float64:
+		return int(data.(float64))
+	default:
+		return 0
+	}
+}
+
+// InterfaceToFloat64 converts the given data of type interface{} to a float64.
+//
+// The data can be of type string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32,
+// uint64, float32, or float64. If the data is of type string, it is parsed to a float64 using
+// the strconv.ParseFloat function. For other numeric types, they are directly converted to
+// float64. If the data is not one of the supported types, the function returns 0.
+//
+// Parameters:
+//   - data: The data to be converted to float64.
+//
+// Returns:
+//   - float64: The converted value of data as a float64.
+func InterfaceToFloat64(data interface{}) float64 {
+	switch data.(type) {
+	case string:
+		v, _ := strconv.ParseFloat(data.(string), 64)
+		return v
+	case int:
+		return float64(data.(int))
+	case int8:
+		return float64(data.(int8))
+	case int16:
+		return float64(data.(int16))
+	case int32:
+		return float64(data.(int32))
+	case int64:
+		return float64(data.(int64))
+	case uint:
+		return float64(data.(uint))
+	case uint8:
+		return float64(data.(uint8))
+	case uint16:
+		return float64(data.(uint16))
+	case uint32:
+		return float64(data.(uint32))
+	case uint64:
+		return float64(data.(uint64))
+	case float32:
+		return float64(data.(float32))
+	case float64:
+		return data.(float64)
+	default:
+		return 0
+	}
+}
+
+// GetEnv returns the value of the environment variable named by the key.
+// If the environment variable is not present, the fallback value is returned instead.
+func GetEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}
+

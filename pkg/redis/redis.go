@@ -14,7 +14,7 @@ func NewRedis(opt *redis.Options) *redis.Client {
 	cli := redis.NewClient(opt)
 	_, err := cli.Ping(context.Background()).Result()
 	if err != nil {
-		panic(err)
+		panic("redis connect error: " + err.Error())
 	}
 	return cli
 }

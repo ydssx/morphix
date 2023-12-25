@@ -45,6 +45,8 @@ const (
 	ArtServiceGetGeneratedImageProcedure = "/aiartv1.ArtService/GetGeneratedImage"
 	// ArtServiceGetModelInfoProcedure is the fully-qualified name of the ArtService's GetModelInfo RPC.
 	ArtServiceGetModelInfoProcedure = "/aiartv1.ArtService/GetModelInfo"
+	// ArtServiceImageToImageProcedure is the fully-qualified name of the ArtService's ImageToImage RPC.
+	ArtServiceImageToImageProcedure = "/aiartv1.ArtService/ImageToImage"
 )
 
 // ArtServiceClient is a client for the aiartv1.ArtService service.
@@ -57,6 +59,7 @@ type ArtServiceClient interface {
 	GetGeneratedImage(context.Context, *connect_go.Request[v1.GetGeneratedImageRequest]) (*connect_go.Response[v1.GetGeneratedImageResponse], error)
 	// 获取模型信息
 	GetModelInfo(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[v1.GetModelInfoResponse], error)
+	ImageToImage(context.Context, *connect_go.Request[v1.ImageToImageRequest]) (*connect_go.Response[v1.ImageToImageResponse], error)
 }
 
 // NewArtServiceClient constructs a client for the aiartv1.ArtService service. By default, it uses
@@ -89,6 +92,11 @@ func NewArtServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts 
 			baseURL+ArtServiceGetModelInfoProcedure,
 			opts...,
 		),
+		imageToImage: connect_go.NewClient[v1.ImageToImageRequest, v1.ImageToImageResponse](
+			httpClient,
+			baseURL+ArtServiceImageToImageProcedure,
+			opts...,
+		),
 	}
 }
 
@@ -98,6 +106,7 @@ type artServiceClient struct {
 	getGenerateStatus *connect_go.Client[v1.GetGenerateStatusRequest, v1.GenerateStatusResponse]
 	getGeneratedImage *connect_go.Client[v1.GetGeneratedImageRequest, v1.GetGeneratedImageResponse]
 	getModelInfo      *connect_go.Client[emptypb.Empty, v1.GetModelInfoResponse]
+	imageToImage      *connect_go.Client[v1.ImageToImageRequest, v1.ImageToImageResponse]
 }
 
 // GenerateImage calls aiartv1.ArtService.GenerateImage.
@@ -120,6 +129,11 @@ func (c *artServiceClient) GetModelInfo(ctx context.Context, req *connect_go.Req
 	return c.getModelInfo.CallUnary(ctx, req)
 }
 
+// ImageToImage calls aiartv1.ArtService.ImageToImage.
+func (c *artServiceClient) ImageToImage(ctx context.Context, req *connect_go.Request[v1.ImageToImageRequest]) (*connect_go.Response[v1.ImageToImageResponse], error) {
+	return c.imageToImage.CallUnary(ctx, req)
+}
+
 // ArtServiceHandler is an implementation of the aiartv1.ArtService service.
 type ArtServiceHandler interface {
 	// 生成图像
@@ -130,6 +144,7 @@ type ArtServiceHandler interface {
 	GetGeneratedImage(context.Context, *connect_go.Request[v1.GetGeneratedImageRequest]) (*connect_go.Response[v1.GetGeneratedImageResponse], error)
 	// 获取模型信息
 	GetModelInfo(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[v1.GetModelInfoResponse], error)
+	ImageToImage(context.Context, *connect_go.Request[v1.ImageToImageRequest]) (*connect_go.Response[v1.ImageToImageResponse], error)
 }
 
 // NewArtServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -158,6 +173,11 @@ func NewArtServiceHandler(svc ArtServiceHandler, opts ...connect_go.HandlerOptio
 		svc.GetModelInfo,
 		opts...,
 	)
+	artServiceImageToImageHandler := connect_go.NewUnaryHandler(
+		ArtServiceImageToImageProcedure,
+		svc.ImageToImage,
+		opts...,
+	)
 	return "/aiartv1.ArtService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ArtServiceGenerateImageProcedure:
@@ -168,6 +188,8 @@ func NewArtServiceHandler(svc ArtServiceHandler, opts ...connect_go.HandlerOptio
 			artServiceGetGeneratedImageHandler.ServeHTTP(w, r)
 		case ArtServiceGetModelInfoProcedure:
 			artServiceGetModelInfoHandler.ServeHTTP(w, r)
+		case ArtServiceImageToImageProcedure:
+			artServiceImageToImageHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -191,4 +213,8 @@ func (UnimplementedArtServiceHandler) GetGeneratedImage(context.Context, *connec
 
 func (UnimplementedArtServiceHandler) GetModelInfo(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[v1.GetModelInfoResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("aiartv1.ArtService.GetModelInfo is not implemented"))
+}
+
+func (UnimplementedArtServiceHandler) ImageToImage(context.Context, *connect_go.Request[v1.ImageToImageRequest]) (*connect_go.Response[v1.ImageToImageResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("aiartv1.ArtService.ImageToImage is not implemented"))
 }

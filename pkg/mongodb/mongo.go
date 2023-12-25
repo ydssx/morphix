@@ -1,4 +1,4 @@
-package mongo
+package mongodb
 
 import (
 	"context"
@@ -50,3 +50,10 @@ func (m *Mongo) Collection(collectionName string) *mongo.Collection {
 	return m.db.Collection(collectionName)
 }
 
+func InitMongoCollection(db *mongo.Database, collectionName string) *mongo.Collection {
+	return db.Collection(collectionName)
+}
+
+func InitMongoDatabase(cli *mongo.Client, dbName string) *mongo.Database {
+	return cli.Database(dbName)
+}

@@ -30,6 +30,7 @@ const (
 	UserService_GetUserList_FullMethodName          = "/userv1.UserService/GetUserList"
 	UserService_ManageUserPermission_FullMethodName = "/userv1.UserService/ManageUserPermission"
 	UserService_LogActivity_FullMethodName          = "/userv1.UserService/LogActivity"
+	UserService_GetUserActivity_FullMethodName      = "/userv1.UserService/GetUserActivity"
 	UserService_GetUser_FullMethodName              = "/userv1.UserService/GetUser"
 	UserService_GetUserPermission_FullMethodName    = "/userv1.UserService/GetUserPermission"
 )
@@ -50,6 +51,7 @@ type UserServiceClient interface {
 	GetUserList(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error)
 	ManageUserPermission(ctx context.Context, in *ManageUserPermissionRequest, opts ...grpc.CallOption) (*User, error)
 	LogActivity(ctx context.Context, in *LogEntry, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetUserActivity(ctx context.Context, in *GetUserActivityRequest, opts ...grpc.CallOption) (*UserActivityListResponse, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
 	GetUserPermission(ctx context.Context, in *GetUserPermissionRequest, opts ...grpc.CallOption) (*UserPermissionListResponse, error)
 }
@@ -152,6 +154,15 @@ func (c *userServiceClient) LogActivity(ctx context.Context, in *LogEntry, opts 
 	return out, nil
 }
 
+func (c *userServiceClient) GetUserActivity(ctx context.Context, in *GetUserActivityRequest, opts ...grpc.CallOption) (*UserActivityListResponse, error) {
+	out := new(UserActivityListResponse)
+	err := c.cc.Invoke(ctx, UserService_GetUserActivity_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error) {
 	out := new(User)
 	err := c.cc.Invoke(ctx, UserService_GetUser_FullMethodName, in, out, opts...)
@@ -186,6 +197,7 @@ type UserServiceServer interface {
 	GetUserList(context.Context, *UserListRequest) (*UserListResponse, error)
 	ManageUserPermission(context.Context, *ManageUserPermissionRequest) (*User, error)
 	LogActivity(context.Context, *LogEntry) (*emptypb.Empty, error)
+	GetUserActivity(context.Context, *GetUserActivityRequest) (*UserActivityListResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*User, error)
 	GetUserPermission(context.Context, *GetUserPermissionRequest) (*UserPermissionListResponse, error)
 }
@@ -223,6 +235,9 @@ func (UnimplementedUserServiceServer) ManageUserPermission(context.Context, *Man
 }
 func (UnimplementedUserServiceServer) LogActivity(context.Context, *LogEntry) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LogActivity not implemented")
+}
+func (UnimplementedUserServiceServer) GetUserActivity(context.Context, *GetUserActivityRequest) (*UserActivityListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserActivity not implemented")
 }
 func (UnimplementedUserServiceServer) GetUser(context.Context, *GetUserRequest) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
@@ -422,6 +437,24 @@ func _UserService_LogActivity_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetUserActivity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserActivityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUserActivity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetUserActivity_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUserActivity(ctx, req.(*GetUserActivityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserRequest)
 	if err := dec(in); err != nil {
@@ -504,6 +537,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LogActivity",
 			Handler:    _UserService_LogActivity_Handler,
+		},
+		{
+			MethodName: "GetUserActivity",
+			Handler:    _UserService_GetUserActivity_Handler,
 		},
 		{
 			MethodName: "GetUser",
