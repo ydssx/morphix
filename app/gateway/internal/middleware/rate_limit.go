@@ -8,6 +8,12 @@ import (
 	"github.com/ydssx/morphix/pkg/limit"
 )
 
+// RateLimit is a middleware function that uses a RedisLimiter to limit request rates.
+// It gets a redis client and returns a gin HandlerFunc.
+// The returned handler function extracts a limit key from the request URL path and method.
+// It checks if the request is allowed by the redis limiter using the limit key.
+// If allowed, it calls ctx.Next() to process the next handler.
+// If rate limited, it aborts the request with 429 Too Many Requests status and a JSON body.
 func RateLimit(rdb *redis.Client) gin.HandlerFunc {
 	limiter := limit.NewRedisLimiter(rdb)
 	return func(ctx *gin.Context) {

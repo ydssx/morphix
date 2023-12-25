@@ -22,18 +22,19 @@ func init() {
 
 func main() {
 	flag.Parse()
-	var c conf.Bootstrap
-	close := conf.MustLoad(&c, flagconf)
-	defer close()
+	
+	var config conf.Bootstrap
+	closeConfig := conf.MustLoad(&config, flagconf)
+	defer closeConfig()
 
-	app, cleanup, err := wireApp(&c, logger.DefaultLogger)
+	application, cleanup, err := wireApp(&config, logger.DefaultLogger)
 	if err != nil {
 		panic(err)
 	}
 	defer cleanup()
 
-	// start and wait for stop signal
-	if err := app.Run(); err != nil {
+	// Start the application and wait for stop signal
+	if err := application.Run(); err != nil {
 		panic(err)
 	}
 }

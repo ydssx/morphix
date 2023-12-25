@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 	"strconv"
+	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
+	jobv1 "github.com/ydssx/morphix/api/job/v1"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/app/user/internal/models"
@@ -56,6 +58,13 @@ type UserRepo interface {
 	GetUserRole(ctx context.Context, userID int) ([]models.Role, error)
 	// DeleteUserRole 删除用户角色
 	DeleteUserRole(ctx context.Context, userID int, roleID int) error
+	// ListRole 获取角色列表
+	ListRole(ctx context.Context, cond *ListRoleCond) []models.Role
+
+	// CreateUserActivity 创建用户活动
+	CreateUserActivity(ctx context.Context, userActivity *models.UserActivity) error
+	// GetUserActivity 根据用户ID获取用户活动列表
+	GetUserActivity(ctx context.Context, userID int, page int64, limit int64) ([]models.UserActivity, error)
 }
 
 type Transaction interface {
@@ -68,19 +77,27 @@ type ListUserCond struct {
 	Phone string
 }
 
-type UserUseCase struct {
-	repo UserRepo
-	log  *log.Helper
-	sms  smsv1.SMSServiceClient
-	tm   Transaction
+type ListRoleCond struct {
+	Page  int64
+	Limit int64
+	Name  string
 }
 
-func NewUserUseCase(userRepo UserRepo, logger log.Logger, smsClient smsv1.SMSServiceClient, transaction Transaction) *UserUseCase {
+type UserUseCase struct {
+	repo   UserRepo
+	log    *log.Helper
+	sms    smsv1.SMSServiceClient
+	tm     Transaction
+	jobCli jobv1.JobServiceClient
+}
+
+func NewUserUseCase(userRepo UserRepo, logger log.Logger, smsClient smsv1.SMSServiceClient, transaction Transaction, jobClient jobv1.JobServiceClient) *UserUseCase {
 	return &UserUseCase{
-		repo: userRepo,
-		log:  log.NewHelper(logger),
-		sms:  smsClient,
-		tm:   transaction,
+		repo:   userRepo,
+		log:    log.NewHelper(logger),
+		sms:    smsClient,
+		tm:     transaction,
+		jobCli: jobClient,
 	}
 }
 
@@ -186,6 +203,8 @@ func (uc *UserUseCase) Login(ctx context.Context, req *userv1.LoginRequest) (*us
 	return &userv1.AuthenticationResponse{Token: token, UserId: strconv.Itoa(int(userInfo.ID))}, nil
 }
 
+// GetUser 根据用户 ID 获取用户信息。
+// 从仓库中根据用户 ID 查询用户,如果查询成功,返回用户信息对象,如果失败返回错误。
 func (uc *UserUseCase) GetUser(ctx context.Context, req *userv1.GetUserRequest) (*userv1.User, error) {
 	user, err := uc.repo.GetUserByID(ctx, uint(req.UserId))
 	if err != nil {
@@ -215,7 +234,7 @@ func (uc *UserUseCase) ResetPassword(ctx context.Context, req *userv1.ResetPassw
 
 	// If SMS verification fails, return an error
 	if !checkResult.Status {
-		return errors.New("failed to verify SMS code")
+		return errors.New("failed to check SMS verification code")
 	}
 
 	// Get the user by username
@@ -291,12 +310,43 @@ func (uc *UserUseCase) GetUserList(ctx context.Context, req *userv1.UserListRequ
 func (uc *UserUseCase) ManageUserPermission(ctx context.Context, req *userv1.ManageUserPermissionRequest) (res *userv1.User, err error) {
 	res = new(userv1.User)
 
-	// TODO:ADD logic here and delete this line.
-
 	return
 }
 
+// LogActivity logs user activity.
+// It creates a new user activity entry in the repository.
 func (uc *UserUseCase) LogActivity(ctx context.Context, req *userv1.LogEntry) (res *emptypb.Empty, err error) {
+	// Create a new user activity based on the request.
+	activity := &models.UserActivity{
+		UserID:   req.UserId,
+		Action:   req.Action,
+		Resource: req.Resource,
+	}
+
+	// Call the repository to create the user activity.
+	err = uc.repo.CreateUserActivity(ctx, activity)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return an empty response.
 	res = new(emptypb.Empty)
+	return
+}
+
+func (uc *UserUseCase) GetUserActivity(ctx context.Context, req *userv1.GetUserActivityRequest) (res *userv1.UserActivityListResponse, err error) {
+	res = new(userv1.UserActivityListResponse)
+	res.Activity = make([]*userv1.UserActivity, 0)
+	activities, err := uc.repo.GetUserActivity(ctx, int(req.UserId), req.Limit, req.Limit)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get user activities: %v", err)
+	}
+	for _, activity := range activities {
+		res.Activity = append(res.Activity, &userv1.UserActivity{
+			Action:    activity.Action,
+			Resource:  activity.Resource,
+			Timestamp: time.Unix(activity.ActionTime, 0).Format("2006-01-02 15:04:05"),
+		})
+	}
 	return
 }

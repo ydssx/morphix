@@ -27,7 +27,8 @@ import (
 func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
 	client := data.NewRedisCLient(bootstrap)
 	db := data.NewMysqlDB(bootstrap)
-	dataData, cleanup, err := data.NewData(logger, client, db)
+	collection := data.NewCollection(bootstrap)
+	dataData, cleanup, err := data.NewData(logger, client, db, collection)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -36,7 +37,8 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	bizUserRepo := data.NewUserRepoCacheDecorator(userRepo, cache)
 	smsServiceClient := common.NewSMSClient(bootstrap)
 	transaction := data.NewTransaction(dataData)
-	userUseCase := biz.NewUserUseCase(bizUserRepo, logger, smsServiceClient, transaction)
+	jobServiceClient := common.NewJobClient(bootstrap)
+	userUseCase := biz.NewUserUseCase(bizUserRepo, logger, smsServiceClient, transaction, jobServiceClient)
 	userService := service.NewUserService(userUseCase)
 	grpcServer := server.NewGRPCServer(bootstrap, userService)
 	app := newApp(grpcServer, bootstrap)

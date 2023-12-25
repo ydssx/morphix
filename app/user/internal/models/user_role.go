@@ -26,6 +26,11 @@ func (m *userRoleModel) SetUserId(userId int) *userRoleModel {
 	return m
 }
 
+func (m *userRoleModel) SetRoleId(roleId int) *userRoleModel {
+	m.db = m.db.Where("role_id = ?", roleId)
+	return m
+}
+
 func (m *userRoleModel) Order(expr string) *userRoleModel {
 	m.db = m.db.Order(expr)
 	return m
@@ -60,5 +65,19 @@ func (m *userRoleModel) List(limit, offset int) (data []UserRole, total int64, e
 		return nil, 0, err
 	}
 	err = query.Limit(limit).Offset(offset).Find(&data).Error
+	return
+}
+
+func (m *userRoleModel) Delete() error {
+	return m.db.Delete(&UserRole{}).Error
+}
+
+func (m *userRoleModel) ListAll() (data []UserRole, err error) {
+	err = m.db.Find(&data).Error
+	return
+}
+
+func (m *userRoleModel) ListUserId() (data []int, err error) {
+	err = m.db.Pluck("user_id", &data).Error
 	return
 }

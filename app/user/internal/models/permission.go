@@ -16,7 +16,7 @@ func NewPermissionModel(tx *gorm.DB) *permissionModel {
 	return &permissionModel{db: db}
 }
 
-func (m *permissionModel) SetId(id ...uint) *permissionModel {
+func (m *permissionModel) SetId(id ...int) *permissionModel {
 	m.db = m.db.Where("id IN (?)", id)
 	return m
 }

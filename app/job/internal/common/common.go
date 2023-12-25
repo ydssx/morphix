@@ -41,6 +41,9 @@ type ServiceClientSet struct {
 	userv1.UserServiceClient
 }
 
+// NewServiceClientSet creates a new ServiceClientSet instance.
+// It takes a Bootstrap config and uses it to initialize the SMS and User service clients.
+// Returns a pointer to the initialized ServiceClientSet.
 func NewServiceClientSet(c *conf.Bootstrap) *ServiceClientSet {
 	return &ServiceClientSet{
 		common.NewSMSClient(c),

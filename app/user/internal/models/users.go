@@ -33,6 +33,11 @@ func (u *userModel) SetId(id uint) *userModel {
 	return u
 }
 
+func (u *userModel) SetIds(ids []int) *userModel {
+	u.db = u.db.Where("id in (?)", ids)
+	return u
+}
+
 func (u *userModel) SetUsername(username string) *userModel {
 	u.db = u.db.Where("username = ?", username)
 	return u
@@ -86,6 +91,11 @@ func (u *userModel) List(limit, offset int) (users []User, total int64, err erro
 		return nil, 0, err
 	}
 	err = query.Limit(limit).Offset(offset).Find(&users).Error
+	return
+}
+
+func (u *userModel) ListAll() (users []User, err error) {
+	err = u.db.Find(&users).Error
 	return
 }
 

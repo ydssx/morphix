@@ -17,10 +17,15 @@ type UserRepoCacheDecorator struct {
 	cache.Cache
 }
 
+// NewUserRepoCacheDecorator creates a new UserRepoCacheDecorator, which wraps
+// a userRepo with caching capabilities using the provided cache.Cache
+// implementation.
 func NewUserRepoCacheDecorator(repo *userRepo, cache cache.Cache) biz.UserRepo {
 	return &UserRepoCacheDecorator{repo, cache}
 }
 
+// ListUser retrieves users from cache if available, otherwise from database.
+// It caches the retrieved users for 1 hour.
 func (u *UserRepoCacheDecorator) ListUser(ctx context.Context, cond *biz.ListUserCond) (data []models.User) {
 	key := fmt.Sprintf("user.list:%v", util.CalculateChecksum(cond))
 	err := u.Get(key, &data)
@@ -38,6 +43,9 @@ func (u *UserRepoCacheDecorator) ListUser(ctx context.Context, cond *biz.ListUse
 	return
 }
 
+// GetUserByID 从缓存中获取用户数据。
+// 如果缓存中不存在,则从数据库中获取用户数据,并设置缓存。
+// 缓存时间为 1 小时。
 func (u *UserRepoCacheDecorator) GetUserByID(ctx context.Context, id uint) (data *models.User, err error) {
 	key := fmt.Sprintf("user:%v", id)
 	err = u.Get(key, &data)
@@ -58,13 +66,17 @@ func (u *UserRepoCacheDecorator) GetUserByID(ctx context.Context, id uint) (data
 	return
 }
 
-func (u *UserRepoCacheDecorator) UpdateUser(ctx context.Context, user *models.User) error {
-	err := u.userRepo.UpdateUser(ctx, user)
-	if err != nil {
+// UpdateUser updates the user in the database and invalidates the cache.
+func (u *UserRepoCacheDecorator) UpdateUser(ctx context.Context, updatedUser *models.User) error {
+	if err := u.userRepo.UpdateUser(ctx, updatedUser); err != nil {
 		return err
 	}
 
-	key := fmt.Sprintf("user:%v", user.ID)
-	err = u.Delete(key)
-	return err
+	key := fmt.Sprintf("user:%v", updatedUser.ID)
+	err := u.Delete(key)
+	if err != nil {
+		logger.Errorf(ctx, "删除缓存失败：%v", err)
+	}
+
+	return nil
 }

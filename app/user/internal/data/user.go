@@ -7,6 +7,8 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/ydssx/morphix/app/user/internal/biz"
 	"github.com/ydssx/morphix/app/user/internal/models"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var _ biz.UserRepo = (*userRepo)(nil)
@@ -26,9 +28,19 @@ func (r *userRepo) DeleteRolePermission(ctx context.Context, roleID int, permiss
 	return models.NewRolePermissionModel(r.data.DB(ctx)).SetRoleId(uint(roleID)).SetPermissionId(uint(permissionID)).Delete()
 }
 
-// GetRolePermission implements biz.UserRepo.
-func (*userRepo) GetRolePermission(ctx context.Context, roleID int) ([]models.Permission, error) {
-	panic("unimplemented")
+func (r *userRepo) GetRolePermission(ctx context.Context, roleID int) ([]models.Permission, error) {
+	rolePermissionModel := models.NewRolePermissionModel(r.data.DB(ctx)).SetRoleId(uint(roleID)).List()
+
+	if len(rolePermissionModel) == 0 {
+		return nil, errors.New("role permission not found")
+	}
+
+	var rolePermissionIDs []int
+	for _, rp := range rolePermissionModel {
+		rolePermissionIDs = append(rolePermissionIDs, rp.PermissionId)
+	}
+
+	return models.NewPermissionModel(r.data.DB(ctx)).SetId(rolePermissionIDs...).List(), nil
 }
 
 func NewUserRepo(data *Data, logger log.Logger) *userRepo {
@@ -70,7 +82,11 @@ func (r *userRepo) DeleteUser(ctx context.Context, id uint) error {
 }
 
 func (r *userRepo) GetUsersByRole(ctx context.Context, roleID int) (result []models.User, err error) {
-	return
+	userIds, err := models.NewUserRoleModel(r.data.DB(ctx)).SetRoleId((roleID)).ListUserId()
+	if err != nil {
+		return nil, err
+	}
+	return models.NewUserModel(r.data.DB(ctx)).SetIds(userIds).ListAll()
 }
 
 // CreateUser implements biz.UserRepo.
@@ -119,7 +135,7 @@ func (r *userRepo) AddUserRole(ctx context.Context, userID int, roleID int) erro
 }
 
 func (r *userRepo) DeleteUserRole(ctx context.Context, userID int, roleID int) error {
-	return nil
+	return models.NewUserRoleModel(r.data.DB(ctx)).SetUserId(userID).SetRoleId(roleID).Delete()
 }
 
 // GetUserRole retrieves the roles associated with the given user ID.
@@ -136,7 +152,7 @@ func (r *userRepo) GetUserRole(ctx context.Context, userID int) ([]models.Role, 
 	for _, userRole := range userRoles {
 		roleIDs = append(roleIDs, userRole.RoleId)
 	}
-	roles, _, err = models.NewRoleModel(r.data.DB(ctx)).SetIds(roleIDs...).List(0, 0)
+	roles, err = models.NewRoleModel(r.data.DB(ctx)).SetIds(roleIDs...).ListAll()
 	if err != nil {
 		return nil, err
 	}
@@ -145,4 +161,56 @@ func (r *userRepo) GetUserRole(ctx context.Context, userID int) ([]models.Role, 
 
 func (r *userRepo) DeleteUserPermission(ctx context.Context, userID int, permissionID int) error {
 	return nil
+}
+
+func (r *userRepo) ListRole(ctx context.Context, cond *biz.ListRoleCond) []models.Role {
+	if cond == nil {
+		cond = new(biz.ListRoleCond)
+	}
+	model := models.NewRoleModel(r.data.DB(ctx)).WithContext(ctx)
+	if cond.Name != "" {
+		model.NameLike(cond.Name)
+	}
+	if cond.Page == 0 {
+		cond.Page = 1
+	}
+	if cond.Limit == 0 {
+		cond.Limit = 10
+	}
+
+	roles, _, _ := model.List(int(cond.Limit), (int(cond.Page)-1)*int(cond.Limit))
+
+	return roles
+}
+
+func (r *userRepo) CreateUserActivity(ctx context.Context, userActivity *models.UserActivity) error {
+	_, err := r.data.collection.InsertOne(ctx, userActivity)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *userRepo) GetUserActivity(ctx context.Context, userID int, page, limit int64) ([]models.UserActivity, error) {
+	// Create a slice to store the user activities
+	var activities []models.UserActivity
+
+	// Set up the options for the query
+	findOptions := options.Find().
+		SetSkip((page - 1) * limit).
+		SetLimit(limit).
+		SetSort(bson.D{{"create_at", -1}, {"_id", -1}})
+
+	// Perform the query
+	cursor, err := repo.data.collection.Find(ctx, bson.M{"user_id": userID}, findOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	// Decode the results into the activities slice
+	if err = cursor.All(ctx, &activities); err != nil {
+		return nil, err
+	}
+
+	return activities, nil
 }

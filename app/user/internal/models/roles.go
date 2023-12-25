@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"context"
+
+	"gorm.io/gorm"
+)
 
 // roles 用户角色表
 type Role struct {
@@ -76,4 +80,14 @@ func (m *roleModel) ListAll() (data []Role, err error) {
 func (m *roleModel) ListByParentId(parentId int) (data []Role, err error) {
 	err = m.db.Where("parent_id = ?", parentId).Find(&data).Error
 	return
+}
+
+func (m *roleModel) WithContext(ctx context.Context) *roleModel {
+	m.db = m.db.WithContext(ctx)
+	return m
+}
+
+func (m *roleModel) NameLike(name string) *roleModel {
+	m.db = m.db.Where("name like ?", "%"+name+"%")
+	return m
 }
