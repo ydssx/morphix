@@ -59,6 +59,9 @@ func (mq *NATSMessageQueueService) SubscribeToTopic(topic string, handler Handle
 	return err
 }
 
+// QueueSubscribeToTopic 订阅指定主题的指定队列,并使用提供的处理程序处理接收到的消息。
+// topic 是要订阅的主题,queue 是订阅的队列名称,handler 是接收到消息时调用的处理程序。
+// 它会返回订阅信息和一个错误(如果有)。
 func (mq *NATSMessageQueueService) QueueSubscribeToTopic(topic, queue string, handler Handler) error {
 	_, err := mq.ec.QueueSubscribe(topic, queue, handler)
 	return err

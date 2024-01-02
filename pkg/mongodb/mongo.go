@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -10,7 +11,7 @@ import (
 
 func InitMongoDB(url string) (*mongo.Client, func()) {
 	ctx := context.Background()
-	cli, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
+	cli, err := mongo.Connect(ctx, options.Client().ApplyURI(url), options.Client().SetMaxPoolSize(100), options.Client().SetMaxConnIdleTime(10*time.Second))
 	if err != nil {
 		panic(err)
 	}

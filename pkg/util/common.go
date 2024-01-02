@@ -236,6 +236,8 @@ func SetDefaults(data interface{}) {
 			field.SetFloat(v)
 		case reflect.Bool:
 			field.SetBool(tag == "true")
+		default:
+			panic(fmt.Sprintf("unsupported type: %s", field.Kind()))
 		}
 	}
 }

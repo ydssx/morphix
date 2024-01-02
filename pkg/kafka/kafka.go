@@ -47,6 +47,9 @@ type ConsumerHandler struct {
 	handle func(message []byte)
 }
 
+// NewConsumer 创建一个新的消费者。它接受 Kafka broker 地址列表、消费者组 ID、订阅的主题列表以及消息处理函数作为参数。
+// 它会根据给定的配置创建一个 sarama 消费者,并用提供的处理函数封装一个 ConsumerHandler。
+// 最后它会返回一个初始化好的 Consumer 结构体。如果创建消费者失败则返回错误。
 func NewConsumer(brokers []string, groupID string, topics []string, handler func(message []byte)) (*Consumer, error) {
 	config := sarama.NewConfig()
 	config.Consumer.Group.Rebalance.Strategy = sarama.NewBalanceStrategyRange()

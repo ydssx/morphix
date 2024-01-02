@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"context"
+
+	"gorm.io/gorm"
+)
 
 // user_role
 type UserRole struct {
@@ -80,4 +84,9 @@ func (m *userRoleModel) ListAll() (data []UserRole, err error) {
 func (m *userRoleModel) ListUserId() (data []int, err error) {
 	err = m.db.Pluck("user_id", &data).Error
 	return
+}
+
+func (m *userRoleModel) WithContext(ctx context.Context) *userRoleModel {
+	m.db = m.db.WithContext(ctx)
+	return m
 }

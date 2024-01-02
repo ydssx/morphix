@@ -120,6 +120,22 @@ func RemoveElements[T comparable](s []T, elems ...T) []T {
 	return result
 }
 
+// Unique removes duplicate elements from the given slice s.
+// It returns a new slice with all the unique elements from s in the original order.
+// The element type T must be comparable.
+// It uses a map to keep track of seen elements.
+//
+// Parameters:
+//  - s: The slice to remove duplicates from.
+//
+// Returns:
+//  - A new slice with all the unique elements from s in the original order.
+//
+// Example:
+//
+//	s := []int{1, 2, 3, 2, 1, 4}
+//	result := Unique(s)
+//	fmt.Println(result) // Output: [1 2 3 4]
 func Unique[T comparable](s []T) []T {
 	m := make(map[T]bool)
 	result := make([]T, 0, len(s))

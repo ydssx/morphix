@@ -39,6 +39,10 @@ func EventServer() grpc.UnaryServerInterceptor {
 	}
 }
 
+// EventStreamServer 是 grpc.StreamServerInterceptor,它会向上下文中添加应用名称、事件类型和跟踪上下文。
+// 它从 Kratos 上下文中获取应用名称,并将其作为 eventSource 添加到上下文中。
+// 它将 gRPC 方法信息作为 eventType 添加到上下文中。
+// 如果启用了跟踪,它会将 trace ID 添加到 gRPC metadata 中。
 func EventStreamServer() grpc.StreamServerInterceptor {
 	return func(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 		ctx := ss.Context()

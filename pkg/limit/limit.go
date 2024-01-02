@@ -57,6 +57,9 @@ func (l *RedisLimiter) Limit(ctx context.Context) error {
 	return errors.New("rate limited.")
 }
 
+// Allow 检查给定的 key 是否可以进行操作。它接受 key 和选项作为参数。
+// 它会应用提供的选项来配置速率限制器,然后使用 Allow 方法检查 key 是否被允许。
+// 如果允许,它会返回 true,否则返回 false。
 func (l *RedisLimiter) Allow(key string, opts ...Option) bool {
 	opt := defaultConfig()
 	for _, v := range opts {

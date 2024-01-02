@@ -47,7 +47,7 @@ var (
 
 	//go:embed template/biz/biz_set.tpl
 	bizSetFile string
-	
+
 	//go:embed template/data/data.tpl
 	dataFile string
 )
@@ -127,15 +127,14 @@ func gen(appName, protoFile string, port int) {
 	fmt.Println(string(output))
 }
 
-// mkFile generates a file with the provided data, template, and file path.
-// It checks if the file already exists and if the file extension is ".go".
-// If the file exists and has the same name as the application,
-// it writes the formatted code to the file using apigen.WriteDecl.
-// If the file exists and does not have the same name as the application,
-// it returns without doing anything.
-// If the file does not exist, it writes the code to the file.
-// It uses the "Title" function from the strings package as a custom template function.
-// It returns an error if any error occurs during the process.
+// mkFile 根据提供的数据和模板文本生成代码文件。
+//
+// data 是模板数据。outFile 是要生成的文件名。text 是模板文本。
+//
+// 它会解析模板,用数据渲染,格式化生成的代码(如果是 .go 文件),
+// 并写入到指定的文件。如果文件已存在,会特殊处理应用主文件。
+//
+// 最后打印生成成功的消息。返回错误信息。
 func mkFile(data map[string]interface{}, outFile string, text string) error {
 	// Define custom template function
 	funcs := template.FuncMap{"Title": strings.Title}
@@ -195,17 +194,14 @@ type ServiceInfo struct {
 }
 
 type MethInfo struct {
-	MethName       string
-	Param          string
-	Return         string
-	Comment        string
-	StreamsRequest bool
-	StreamsReturns bool
+	MethName       string // rpc方法名
+	Param          string // rpc方法入参
+	Return         string // rpc方法返回值
+	Comment        string // rpc方法注释
+	StreamsRequest bool   // 是否为流式请求
+	StreamsReturns bool   // 是否为流式返回
 }
 
-// parseProto parses a proto file and extracts information about the service, RPC methods, and package.
-//
-// It returns a ServiceInfo struct containing the extracted information.
 func parseProto(protoFile string) (info ServiceInfo) {
 	// Open the proto file
 	reader, err := os.Open(protoFile)
@@ -279,6 +275,10 @@ func convertRequest(pkgName, reqType string) (string, string) {
 	switch reqType {
 	case "google.protobuf.Empty":
 		return "emptypb.Empty", "google.golang.org/protobuf/types/known/emptypb"
+	case "google.protobuf.Timestamp":
+		return "timestamppb.Timestamp", "google.golang.org/protobuf/types/known/timestamppb"
+	case "google.protobuf.Duration":
+		return "durationpb.Duration", "google.golang.org/protobuf/types/known/durationpb"
 	default:
 		return pkgName + "." + reqType, ""
 	}
@@ -293,11 +293,16 @@ func convertReturnType(pkgName, returnType string) string {
 	}
 }
 
+// fileExists 检查给定的文件名是否存在。
+// 如果文件存在返回 true,否则返回 false。
 func fileExists(filename string) bool {
 	_, err := os.Stat(filename)
 	return !os.IsNotExist(err)
 }
 
+// parseGoModule 解析 go.mod 文件,返回模块路径。
+// 它会读取 go.mod 文件的内容,提取第一行的模块路径,
+// 去掉前后空白后返回。
 func parseGoModule() string {
 	content, err := os.ReadFile("go.mod")
 	if err != nil {

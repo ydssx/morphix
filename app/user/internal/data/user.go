@@ -102,23 +102,27 @@ func (r *userRepo) ListUser(ctx context.Context, cond *biz.ListUserCond) []model
 	if cond == nil {
 		cond = new(biz.ListUserCond)
 	}
-	model := models.NewUserModel(r.data.DB(ctx)).WithContext(ctx)
+
+	userModel := models.NewUserModel(r.data.DB(ctx)).WithContext(ctx)
+
 	if cond.Phone != "" {
-		model.PhoneNumberLike(cond.Phone)
+		userModel.PhoneNumberLike(cond.Phone)
 	}
+
 	if cond.Page == 0 {
 		cond.Page = 1
 	}
+
 	if cond.Limit == 0 {
 		cond.Limit = 10
 	}
 
-	users, _, _ := model.List(int(cond.Limit), (int(cond.Page)-1)*int(cond.Limit))
+	users, _, _ := userModel.List(int(cond.Limit), (int(cond.Page)-1)*int(cond.Limit))
 
 	return users
 }
 
-func (r *userRepo) AddUserPermission(ctx context.Context, userID int, permissionID int) error {
+func (r *userRepo) AddUserPermission(ctx context.Context, userID int64, permissionID ...int64) error {
 	return nil
 }
 
@@ -138,42 +142,60 @@ func (r *userRepo) DeleteUserRole(ctx context.Context, userID int, roleID int) e
 	return models.NewUserRoleModel(r.data.DB(ctx)).SetUserId(userID).SetRoleId(roleID).Delete()
 }
 
-// GetUserRole retrieves the roles associated with the given user ID.
-// It queries the user_roles table to get the role IDs for the user,
-// then queries the roles table to hydrate the role objects.
-// Returns a slice of Role structs and any error.
+// GetUserRole 根据用户ID获取用户角色
+// 从数据库中查询用户角色关系表,提取角色ID
+// 根据角色ID查询角色信息
+// 返回角色列表
 func (r *userRepo) GetUserRole(ctx context.Context, userID int) ([]models.Role, error) {
-	userRoles, _, err := models.NewUserRoleModel(r.data.DB(ctx)).SetUserId(userID).List(0, 0)
+	userRoles, err := r.getUserRoles(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	var roles []models.Role
+
+	roleIDs := extractRoleIDs(userRoles)
+	roles, err := r.getRoles(ctx, roleIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return roles, nil
+}
+
+func (r *userRepo) getUserRoles(ctx context.Context, userID int) ([]models.UserRole, error) {
+	return models.NewUserRoleModel(r.data.DB(ctx)).WithContext(ctx).SetUserId(userID).ListAll()
+}
+
+func extractRoleIDs(userRoles []models.UserRole) []int {
 	var roleIDs []int
 	for _, userRole := range userRoles {
 		roleIDs = append(roleIDs, userRole.RoleId)
 	}
-	roles, err = models.NewRoleModel(r.data.DB(ctx)).SetIds(roleIDs...).ListAll()
-	if err != nil {
-		return nil, err
-	}
-	return roles, nil
+	return roleIDs
 }
 
-func (r *userRepo) DeleteUserPermission(ctx context.Context, userID int, permissionID int) error {
+func (r *userRepo) getRoles(ctx context.Context, roleIDs []int) ([]models.Role, error) {
+	return models.NewRoleModel(r.data.DB(ctx)).SetIds(roleIDs...).ListAll()
+}
+
+func (r *userRepo) DeleteUserPermission(ctx context.Context, userID int64, permissionID ...int64) error {
 	return nil
 }
 
 func (r *userRepo) ListRole(ctx context.Context, cond *biz.ListRoleCond) []models.Role {
 	if cond == nil {
-		cond = new(biz.ListRoleCond)
+		cond = &biz.ListRoleCond{}
 	}
+
 	model := models.NewRoleModel(r.data.DB(ctx)).WithContext(ctx)
+
 	if cond.Name != "" {
 		model.NameLike(cond.Name)
 	}
+
 	if cond.Page == 0 {
 		cond.Page = 1
 	}
+
 	if cond.Limit == 0 {
 		cond.Limit = 10
 	}

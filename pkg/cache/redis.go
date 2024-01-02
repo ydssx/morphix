@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/ydssx/morphix/pkg/errors"
 )
 
 type RedisCache struct {
@@ -27,10 +28,10 @@ func (c *RedisCache) Get(key string, result interface{}) error {
 		return fmt.Errorf("key %s not found", key)
 	}
 	if err != nil {
-		return err
+		return errors.Wrap(err, "get redis key error")
 	}
 	err = json.Unmarshal([]byte(val), &result)
-	return err
+	return errors.Wrap(err, "unmarshal redis value error")
 }
 
 // Set 将指定的key/value对设置到redis中,并设置过期时间
@@ -39,14 +40,14 @@ func (c *RedisCache) Get(key string, result interface{}) error {
 func (c *RedisCache) Set(key string, value interface{}, expire time.Duration) error {
 	data, err := json.Marshal(value)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "marshal value error")
 	}
 
 	randomExpire := expire + time.Duration(rand.Int63n(int64(time.Second)))
 
 	err = c.client.Set(context.Background(), key, string(data), randomExpire).Err()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "set redis key error")
 	}
 	return nil
 }
@@ -58,6 +59,8 @@ func (c *RedisCache) Delete(key string) error {
 	return err
 }
 
+// Clear 清空 Redis 数据库中的所有 key。
+// 如果清空数据库失败,返回错误。
 func (c *RedisCache) Clear() error {
 	err := c.client.FlushDB(context.Background()).Err()
 	if err != nil {

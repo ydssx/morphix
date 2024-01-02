@@ -32,6 +32,8 @@ func (c *MemoryCache) Get(key string) (interface{}, bool) {
 	return value, ok
 }
 
+// Delete removes the value associated with the given key from the cache.
+// It locks the cache during deletion to prevent concurrent map writes.
 func (c *MemoryCache) Delete(key string) {
 	c.Lock()
 	defer c.Unlock()
