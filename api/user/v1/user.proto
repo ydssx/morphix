@@ -38,7 +38,7 @@ service UserService {
       body: "*"
     };
   }
-
+  // 用户重置密码
   rpc ResetPassword(ResetPasswordRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/users/resetPassword"
@@ -84,7 +84,7 @@ service UserService {
   rpc GetUser(GetUserRequest) returns (User) {
     option (google.api.http) = {get: "/api/user/{user_id}"};
   }
-
+  // 获取用户权限
   rpc GetUserPermission(GetUserPermissionRequest) returns (UserPermissionListResponse) {
     option (google.api.http) = {get: "/api/user/{user_id}/permissions"};
   }
@@ -96,7 +96,8 @@ message User {
   string password = 3;
   string email = 4;
   string phone = 5;
-  // 其他个人信息字段...
+  string avatar = 6;
+  string nickname = 7;
 }
 
 message RegistrationRequest {
@@ -113,12 +114,18 @@ message RegistrationRequest {
   string phone = 4;
   // 短信验证码
   string sms_code = 5;
+  // 注册类型
+  enum RegisterType {
+    SMS = 0; // 通过短信验证码注册
+    PASSWORD = 1; // 通过用户名密码注册
+  }
+  RegisterType register_type = 6;
 }
 
 message LoginRequest {
-  string username = 1;
-  string password = 2;
-  string phone_number = 3;
+  string username = 1; // 用户名
+  string password = 2; // 密码
+  string phone_number = 3; // 手机号
 }
 
 message LogoutRequest {
@@ -139,7 +146,7 @@ message UpdateProfileRequest {
 
 message ResetPasswordRequest {
   string username = 1;
-  string verification_code = 2;
+  string verification_code = 2 [(validate.rules).string.len = 6];
   string new_password = 3;
 }
 
@@ -165,13 +172,17 @@ message UserListRequest {
 
 message ManageUserPermissionRequest {
   int64 user_id = 1;
-  repeated string roles = 2;
-  repeated string permissions = 3;
+  repeated int64 role_ids = 2;
+  repeated int64 permission_ids = 3;
   enum Mode {
-    ADD = 0; // 新增
-    REMOVE = 1; // 删除
-    UPDATE = 2; // 更新
-    REPLACE = 3; // 替换
+    USER_PERMISSION_ADD = 0;
+    USER_PERMISSION_DELETE = 1;
+    USER_PERMISSION_UPDATE = 2;
+    USER_PERMISSION_REPLACE = 3;
+    ROLE_PERMISSION_ADD = 4;
+    ROLE_PERMISSION_DELETE = 5;
+    ROLE_PERMISSION_UPDATE = 6;
+    ROLE_PERMISSION_REPLACE = 7;
   }
   Mode mode = 4;
 }

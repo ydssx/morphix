@@ -21,6 +21,11 @@ func NewJobService(cli *asynq.Client, ipt *asynq.Inspector) *JobService {
 	return &JobService{cli: cli, ipt: ipt}
 }
 
+// Enqueue 将任务添加到队列中。
+// 它接受 EnqueueRequest 并返回 EnqueueResponse。
+// 它会根据请求设置 asynq 选项,如重试次数、延迟执行时间等。
+// 然后使用 asynq client 将任务信息提交到队列。
+// 如果成功,返回任务 ID;如果失败,返回错误。
 func (j *JobService) Enqueue(ctx context.Context, req *jobv1.EnqueueRequest) (*jobv1.EnqueueResponse, error) {
 	opts := []asynq.Option{asynq.MaxRetry(0)}
 

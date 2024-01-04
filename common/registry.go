@@ -13,6 +13,9 @@ var (
 	once     sync.Once
 )
 
+// NewEtcdRegistry 创建一个新的 etcd 注册中心客户端。
+// 如果配置了用户名和密码,会进行认证。
+// 它实现了 kratos/contrib/registry 接口。
 func NewEtcdRegistry(c *conf.Etcd) *etcd.Registry {
 	once.Do(func() {
 		client, err := etcdclient.New(etcdclient.Config{

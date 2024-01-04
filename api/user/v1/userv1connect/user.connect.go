@@ -76,6 +76,7 @@ type UserServiceClient interface {
 	Login(context.Context, *connect_go.Request[v1.LoginRequest]) (*connect_go.Response[v1.AuthenticationResponse], error)
 	Logout(context.Context, *connect_go.Request[v1.LogoutRequest]) (*connect_go.Response[emptypb.Empty], error)
 	UpdateProfile(context.Context, *connect_go.Request[v1.UpdateProfileRequest]) (*connect_go.Response[v1.User], error)
+	// 用户重置密码
 	ResetPassword(context.Context, *connect_go.Request[v1.ResetPasswordRequest]) (*connect_go.Response[emptypb.Empty], error)
 	Authenticate(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[v1.AuthenticationResponse], error)
 	Authorize(context.Context, *connect_go.Request[v1.AuthorizationRequest]) (*connect_go.Response[emptypb.Empty], error)
@@ -84,6 +85,7 @@ type UserServiceClient interface {
 	LogActivity(context.Context, *connect_go.Request[v1.LogEntry]) (*connect_go.Response[emptypb.Empty], error)
 	GetUserActivity(context.Context, *connect_go.Request[v1.GetUserActivityRequest]) (*connect_go.Response[v1.UserActivityListResponse], error)
 	GetUser(context.Context, *connect_go.Request[v1.GetUserRequest]) (*connect_go.Response[v1.User], error)
+	// 获取用户权限
 	GetUserPermission(context.Context, *connect_go.Request[v1.GetUserPermissionRequest]) (*connect_go.Response[v1.UserPermissionListResponse], error)
 }
 
@@ -255,6 +257,7 @@ type UserServiceHandler interface {
 	Login(context.Context, *connect_go.Request[v1.LoginRequest]) (*connect_go.Response[v1.AuthenticationResponse], error)
 	Logout(context.Context, *connect_go.Request[v1.LogoutRequest]) (*connect_go.Response[emptypb.Empty], error)
 	UpdateProfile(context.Context, *connect_go.Request[v1.UpdateProfileRequest]) (*connect_go.Response[v1.User], error)
+	// 用户重置密码
 	ResetPassword(context.Context, *connect_go.Request[v1.ResetPasswordRequest]) (*connect_go.Response[emptypb.Empty], error)
 	Authenticate(context.Context, *connect_go.Request[emptypb.Empty]) (*connect_go.Response[v1.AuthenticationResponse], error)
 	Authorize(context.Context, *connect_go.Request[v1.AuthorizationRequest]) (*connect_go.Response[emptypb.Empty], error)
@@ -263,6 +266,7 @@ type UserServiceHandler interface {
 	LogActivity(context.Context, *connect_go.Request[v1.LogEntry]) (*connect_go.Response[emptypb.Empty], error)
 	GetUserActivity(context.Context, *connect_go.Request[v1.GetUserActivityRequest]) (*connect_go.Response[v1.UserActivityListResponse], error)
 	GetUser(context.Context, *connect_go.Request[v1.GetUserRequest]) (*connect_go.Response[v1.User], error)
+	// 获取用户权限
 	GetUserPermission(context.Context, *connect_go.Request[v1.GetUserPermissionRequest]) (*connect_go.Response[v1.UserPermissionListResponse], error)
 }
 

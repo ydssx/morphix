@@ -98,6 +98,10 @@ func (r *userRepo) CreateUser(ctx context.Context, user *models.User) (userId in
 	return int(userInfo.ID), nil
 }
 
+// ListUser 根据条件查询用户列表
+// ctx 上下文
+// cond 查询条件
+// 返回用户列表
 func (r *userRepo) ListUser(ctx context.Context, cond *biz.ListUserCond) []models.User {
 	if cond == nil {
 		cond = new(biz.ListUserCond)
@@ -126,8 +130,44 @@ func (r *userRepo) AddUserPermission(ctx context.Context, userID int64, permissi
 	return nil
 }
 
+// GetUserPermission 根据用户ID获取用户权限
+// 1. 根据用户ID获取用户角色关系列表
+// 2. 提取角色ID列表
+// 3. 根据角色ID列表查询角色权限关系列表
+// 4. 提取权限ID列表
+// 5. 根据权限ID列表查询权限信息
+// 6. 返回权限列表
 func (r *userRepo) GetUserPermission(ctx context.Context, userID int) ([]models.Permission, error) {
-	return nil, nil
+	userRoles, err := r.getUserRoles(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	roleIDs := make([]int, len(userRoles))
+	for i, userRole := range userRoles {
+		roleIDs[i] = userRole.RoleId
+	}
+
+	rolePermissions, err := r.getRolePermissions(ctx, roleIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	permissionIDs := make([]int, len(rolePermissions))
+	for i, rolePermission := range rolePermissions {
+		permissionIDs[i] = rolePermission.PermissionId
+	}
+
+	permissions := models.NewPermissionModel(r.data.DB(ctx)).SetId(permissionIDs...).List()
+	return permissions, nil
+}
+
+// getRolePermissions 根据角色ID列表查询角色权限关系
+//
+// 从数据库中查询角色权限关系表,提取指定角色ID列表对应的权限信息
+// 返回角色权限关系列表
+func (r *userRepo) getRolePermissions(ctx context.Context, roleIDs []int) ([]models.RolePermission, error) {
+	return models.NewRolePermissionModel(r.data.DB(ctx)).SetRoleIds(roleIDs...).List(), nil
 }
 
 func (r *userRepo) GetUserPermissionByRole(ctx context.Context, roleID int) ([]models.Permission, error) {
@@ -213,6 +253,8 @@ func (r *userRepo) CreateUserActivity(ctx context.Context, userActivity *models.
 	return nil
 }
 
+// GetUserActivity retrieves a page of user activity records for the given user ID.
+// The page and limit parameters control pagination.
 func (repo *userRepo) GetUserActivity(ctx context.Context, userID int, page, limit int64) ([]models.UserActivity, error) {
 	// Create a slice to store the user activities
 	var activities []models.UserActivity
@@ -221,7 +263,7 @@ func (repo *userRepo) GetUserActivity(ctx context.Context, userID int, page, lim
 	findOptions := options.Find().
 		SetSkip((page - 1) * limit).
 		SetLimit(limit).
-		SetSort(bson.D{{"create_at", -1}, {"_id", -1}})
+		SetSort(bson.D{{Key: "create_at", Value: -1}, {Key: "_id", Value: -1}})
 
 	// Perform the query
 	cursor, err := repo.data.collection.Find(ctx, bson.M{"user_id": userID}, findOptions)

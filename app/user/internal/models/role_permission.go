@@ -26,6 +26,11 @@ func (m *rolePermissionModel) SetRoleId(roleId uint) *rolePermissionModel {
 	return m
 }
 
+func (m *rolePermissionModel) SetRoleIds(roleIds ...int) *rolePermissionModel {
+	m.db = m.db.Where("role_id in (?)", roleIds)
+	return m
+}
+
 func (m *rolePermissionModel) SetPermissionId(permissionId uint) *rolePermissionModel {
 	m.db = m.db.Where("permission_id = ?", permissionId)
 	return m
@@ -78,6 +83,6 @@ func (m *rolePermissionModel) PluckPermissionID() (permissionIDs []uint) {
 	return
 }
 
- func (m *rolePermissionModel) Delete() error {
- 	return m.db.Delete(&RolePermission{}).Error
- }
+func (m *rolePermissionModel) Delete() error {
+	return m.db.Delete(&RolePermission{}).Error
+}

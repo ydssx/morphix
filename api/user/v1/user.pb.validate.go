@@ -66,6 +66,10 @@ func (m *User) validate(all bool) error {
 
 	// no validation rules for Phone
 
+	// no validation rules for Avatar
+
+	// no validation rules for Nickname
+
 	if len(errors) > 0 {
 		return UserMultiError(errors)
 	}
@@ -193,6 +197,8 @@ func (m *RegistrationRequest) validate(all bool) error {
 	// no validation rules for Phone
 
 	// no validation rules for SmsCode
+
+	// no validation rules for RegisterType
 
 	if len(errors) > 0 {
 		return RegistrationRequestMultiError(errors)
@@ -755,7 +761,17 @@ func (m *ResetPasswordRequest) validate(all bool) error {
 
 	// no validation rules for Username
 
-	// no validation rules for VerificationCode
+	if utf8.RuneCountInString(m.GetVerificationCode()) != 6 {
+		err := ResetPasswordRequestValidationError{
+			field:  "VerificationCode",
+			reason: "value length must be 6 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+
+	}
 
 	// no validation rules for NewPassword
 

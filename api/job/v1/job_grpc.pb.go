@@ -27,6 +27,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type JobServiceClient interface {
+	// Enqueue a job
 	Enqueue(ctx context.Context, in *EnqueueRequest, opts ...grpc.CallOption) (*EnqueueResponse, error)
 	QueryTasks(ctx context.Context, in *QueryTasksRequest, opts ...grpc.CallOption) (*QueryTasksResponse, error)
 }
@@ -61,6 +62,7 @@ func (c *jobServiceClient) QueryTasks(ctx context.Context, in *QueryTasksRequest
 // All implementations should embed UnimplementedJobServiceServer
 // for forward compatibility
 type JobServiceServer interface {
+	// Enqueue a job
 	Enqueue(context.Context, *EnqueueRequest) (*EnqueueResponse, error)
 	QueryTasks(context.Context, *QueryTasksRequest) (*QueryTasksResponse, error)
 }

@@ -76,10 +76,10 @@ type EnqueueRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	JobType   JobType                `protobuf:"varint,1,opt,name=job_type,json=jobType,proto3,enum=job.v1.JobType" json:"job_type,omitempty"`
-	Payload   []byte                 `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
-	RetryTime int64                  `protobuf:"varint,3,opt,name=retry_time,json=retryTime,proto3" json:"retry_time,omitempty"`
-	ProcessAt *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=process_at,json=processAt,proto3" json:"process_at,omitempty"`
+	JobType   JobType                `protobuf:"varint,1,opt,name=job_type,json=jobType,proto3,enum=job.v1.JobType" json:"job_type,omitempty"` // 任务类型
+	Payload   []byte                 `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`                                     // 任务参数
+	RetryTime int64                  `protobuf:"varint,3,opt,name=retry_time,json=retryTime,proto3" json:"retry_time,omitempty"`               // 重试次数
+	ProcessAt *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=process_at,json=processAt,proto3" json:"process_at,omitempty"`                // 任务执行时间
 	ProcessIn *durationpb.Duration   `protobuf:"bytes,5,opt,name=process_in,json=processIn,proto3" json:"process_in,omitempty"`
 	Deadline  *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=deadline,proto3" json:"deadline,omitempty"`
 	// 任务完成后保留时间

@@ -41,6 +41,7 @@ const (
 
 // JobServiceClient is a client for the job.v1.JobService service.
 type JobServiceClient interface {
+	// Enqueue a job
 	Enqueue(context.Context, *connect_go.Request[v1.EnqueueRequest]) (*connect_go.Response[v1.EnqueueResponse], error)
 	QueryTasks(context.Context, *connect_go.Request[v1.QueryTasksRequest]) (*connect_go.Response[v1.QueryTasksResponse], error)
 }
@@ -86,6 +87,7 @@ func (c *jobServiceClient) QueryTasks(ctx context.Context, req *connect_go.Reque
 
 // JobServiceHandler is an implementation of the job.v1.JobService service.
 type JobServiceHandler interface {
+	// Enqueue a job
 	Enqueue(context.Context, *connect_go.Request[v1.EnqueueRequest]) (*connect_go.Response[v1.EnqueueResponse], error)
 	QueryTasks(context.Context, *connect_go.Request[v1.QueryTasksRequest]) (*connect_go.Response[v1.QueryTasksResponse], error)
 }

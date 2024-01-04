@@ -19,18 +19,27 @@ import (
 	"google.golang.org/grpc/keepalive"
 )
 
+// NewSMSClient 创建一个 SMS 服务的客户端连接。
+// 接收配置参数 c,使用 etcd 注册中心和配置的 SmsRpcClient 来创建一个 gRPC 连接,
+// 然后用这个连接生成一个 smsv1.SMSServiceClient 返回。
 func NewSMSClient(c *conf.Bootstrap) smsv1.SMSServiceClient {
 	conn := createConn(c.Etcd, c.ClientSet.SmsRpcClient)
 
 	return smsv1.NewSMSServiceClient(conn)
 }
 
+// NewUserClient 创建一个 User 服务的客户端连接。
+// 接收配置参数 c,使用 etcd 注册中心和配置的 UserRpcClient 来创建一个 gRPC 连接,
+// 然后用这个连接生成一个 userv1.UserServiceClient 返回。
 func NewUserClient(c *conf.Bootstrap) userv1.UserServiceClient {
 	conn := createConn(c.Etcd, c.ClientSet.UserRpcClient)
 
 	return userv1.NewUserServiceClient(conn)
 }
 
+// NewJobClient 创建一个 Job 服务的客户端连接。
+// 接收配置参数 c,使用 etcd 注册中心和配置的 JobRpcClient 来创建一个 gRPC 连接,
+// 然后用这个连接生成一个 jobv1.JobServiceClient 返回。
 func NewJobClient(c *conf.Bootstrap) jobv1.JobServiceClient {
 	conn := createConn(c.Etcd, c.ClientSet.JobRpcClient)
 
@@ -43,6 +52,10 @@ func createConn(etcdConf *conf.Etcd, rpcCliConf *conf.ClientConf) *grpc.ClientCo
 	return CreateClientConn(context.Background(), rpcCliConf, r)
 }
 
+// CreateClientConn 使用给定的配置创建一个 gRPC 客户端连接。
+// 接收上下文,客户端配置和服务发现注册中心作为参数。
+// 使用 kgrpc 封装的 gRPC dial 函数建立连接,配置 interceptor、超时、发现等信息。
+// 返回建立的 gRPC 客户端连接。如果发生错误会 panic。
 func CreateClientConn(ctx context.Context, rpcCliConf *conf.ClientConf, r *etcd.Registry) *grpc.ClientConn {
 	conn, err := kgrpc.DialInsecure(ctx,
 		kgrpc.WithEndpoint(rpcCliConf.Addr),

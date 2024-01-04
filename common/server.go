@@ -6,6 +6,8 @@ import (
 	"github.com/ydssx/morphix/pkg/interceptors"
 )
 
+// NewGRPCServer 创建一个新的 gRPC 服务器。它接受一个 server 配置,并使用拦截器、地址、超时等选项来初始化 gRPC 服务器。
+// 返回初始化后的 gRPC 服务器实例。
 func NewGRPCServer(server *conf.Server) *grpc.Server {
 	opts := []grpc.ServerOption{
 		grpc.UnaryInterceptor(

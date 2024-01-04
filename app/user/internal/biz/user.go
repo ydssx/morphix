@@ -2,7 +2,6 @@ package biz
 
 import (
 	"context"
-	"errors"
 	"strconv"
 	"time"
 
@@ -133,7 +132,7 @@ func (uc *UserUseCase) registerBySMS(ctx context.Context, req *userv1.Registrati
 	}); err != nil {
 		return nil, err
 	} else if !checkResult.Status {
-		return nil, errors.New("failed to check SMS verification code")
+		return nil, status.Error(codes.FailedPrecondition, "SMS verification code expired or invalid")
 	}
 
 	// Create user object
@@ -286,7 +285,7 @@ func (uc *UserUseCase) ResetPassword(ctx context.Context, req *userv1.ResetPassw
 
 	// If SMS verification fails, return an error
 	if !checkResult.Status {
-		return errors.New("failed to check SMS verification code")
+		return status.Error(codes.FailedPrecondition, "验证码错误")
 	}
 
 	// Get the user by username
@@ -354,7 +353,15 @@ func (uc *UserUseCase) Authorize(ctx context.Context, req *userv1.AuthorizationR
 func (uc *UserUseCase) GetUserList(ctx context.Context, req *userv1.UserListRequest) (res *userv1.UserListResponse, err error) {
 	res = new(userv1.UserListResponse)
 
-	// TODO:ADD logic here and delete this line.
+	users := uc.repo.ListUser(ctx, &ListUserCond{Page: req.Page, Limit: req.Limit})
+	for _, user := range users {
+		res.Users = append(res.Users, &userv1.User{
+			Id:       int64(user.ID),
+			Username: user.Username,
+			Email:    user.Email,
+			Phone:    user.Phone,
+		})
+	}
 
 	return
 }
@@ -378,7 +385,7 @@ func (uc *UserUseCase) ManageUserPermission(ctx context.Context, req *userv1.Man
 		}
 		err = uc.repo.AddUserPermission(ctx, req.UserId, req.PermissionIds...)
 	default:
-		return nil, errors.New("invalid action")
+		return nil, status.Error(codes.InvalidArgument, "invalid mode")
 	}
 	if err != nil {
 		return nil, err

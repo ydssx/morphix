@@ -45,6 +45,7 @@ type UserServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*AuthenticationResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*User, error)
+	// 用户重置密码
 	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Authenticate(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AuthenticationResponse, error)
 	Authorize(ctx context.Context, in *AuthorizationRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -53,6 +54,7 @@ type UserServiceClient interface {
 	LogActivity(ctx context.Context, in *LogEntry, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetUserActivity(ctx context.Context, in *GetUserActivityRequest, opts ...grpc.CallOption) (*UserActivityListResponse, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
+	// 获取用户权限
 	GetUserPermission(ctx context.Context, in *GetUserPermissionRequest, opts ...grpc.CallOption) (*UserPermissionListResponse, error)
 }
 
@@ -191,6 +193,7 @@ type UserServiceServer interface {
 	Login(context.Context, *LoginRequest) (*AuthenticationResponse, error)
 	Logout(context.Context, *LogoutRequest) (*emptypb.Empty, error)
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*User, error)
+	// 用户重置密码
 	ResetPassword(context.Context, *ResetPasswordRequest) (*emptypb.Empty, error)
 	Authenticate(context.Context, *emptypb.Empty) (*AuthenticationResponse, error)
 	Authorize(context.Context, *AuthorizationRequest) (*emptypb.Empty, error)
@@ -199,6 +202,7 @@ type UserServiceServer interface {
 	LogActivity(context.Context, *LogEntry) (*emptypb.Empty, error)
 	GetUserActivity(context.Context, *GetUserActivityRequest) (*UserActivityListResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*User, error)
+	// 获取用户权限
 	GetUserPermission(context.Context, *GetUserPermissionRequest) (*UserPermissionListResponse, error)
 }
 
