@@ -6,6 +6,7 @@ import (
 	aiartv1 "github.com/ydssx/morphix/api/aiart/v1"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
+
 // Transaction is a transaction interface.
 type Transaction interface {
 	// InTx executes f in a transaction.
@@ -13,6 +14,8 @@ type Transaction interface {
 	// If f returns nil, the transaction will be committed.
 	InTx(context.Context, func(ctx context.Context) error) error
 }
+
+type AiartRepo interface{}
 
 type AiartUseCase struct{}
 
@@ -23,8 +26,6 @@ func NewAiartUseCase() *AiartUseCase {
 // 生成图像
 func (uc *AiartUseCase) GenerateImage(ctx context.Context, req *aiartv1.GenerateImageRequest) (res *aiartv1.GenerateImageResponse, err error) {
 	res = new(aiartv1.GenerateImageResponse)
-
-	// TODO:ADD logic here and delete this line.
 
 	return
 }

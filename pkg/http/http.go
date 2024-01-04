@@ -160,12 +160,16 @@ func (r *Request) addQueryParams(req *resty.Request) {
 	}
 }
 
+// setContentType 设置请求的 Content-Type 头。
+// 如果 Request.contentType 不为空,则使用其值设置 Content-Type 头。
 func (r *Request) setContentType(req *resty.Request) {
 	if r.contentType != "" {
 		req.SetHeader("Content-Type", r.contentType)
 	}
 }
 
+// handleResponse 处理 HTTP 响应。它会检查响应状态码,如果状态码表示错误,则返回错误。
+// 它还会尝试解析响应体到 result 参数。如果解析失败,也会返回错误。
 func (r *Request) handleResponse(resp *resty.Response, result interface{}) (err error) {
 	if resp.StatusCode() >= http.StatusBadRequest {
 		return fmt.Errorf("request failed with status code %d", resp.StatusCode())

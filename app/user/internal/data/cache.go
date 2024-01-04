@@ -66,7 +66,10 @@ func (u *UserRepoCacheDecorator) GetUserByID(ctx context.Context, id uint) (data
 	return
 }
 
-// UpdateUser updates the user in the database and invalidates the cache.
+// UpdateUser 更新用户数据,并删除与该用户相关的缓存
+// 如果更新用户失败,返回错误
+// 如果删除缓存失败,记录错误日志但不影响函数返回
+// 成功更新用户后返回 nil
 func (u *UserRepoCacheDecorator) UpdateUser(ctx context.Context, updatedUser *models.User) error {
 	if err := u.userRepo.UpdateUser(ctx, updatedUser); err != nil {
 		return err

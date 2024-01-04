@@ -9,6 +9,9 @@
       "name": "ArtService"
     },
     {
+      "name": "ChatService"
+    },
+    {
       "name": "JobService"
     },
     {
@@ -108,6 +111,38 @@
         ]
       }
     },
+    "/api/user/{userId}/permissions": {
+      "get": {
+        "summary": "获取用户权限",
+        "operationId": "UserService_GetUserPermission",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userv1UserPermissionListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
     "/api/users": {
       "get": {
         "operationId": "UserService_GetUserList",
@@ -126,6 +161,51 @@
           }
         },
         "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/users/activity": {
+      "get": {
+        "operationId": "UserService_GetUserActivity",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userv1UserActivityListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
           {
             "name": "page",
             "in": "query",
@@ -410,6 +490,7 @@
     },
     "/api/users/resetPassword": {
       "post": {
+        "summary": "用户重置密码",
         "operationId": "UserService_ResetPassword",
         "responses": {
           "200": {
@@ -952,6 +1033,38 @@
         ]
       }
     },
+    "/api/v1/quotes": {
+      "get": {
+        "summary": "获取报价列表",
+        "operationId": "QuoteService_GetQuotes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/quoteGetQuotesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "productId",
+            "description": "可选的查询条件，例如产品ID、日期范围等",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "QuoteService"
+        ]
+      }
+    },
     "/api/v1/sms/send": {
       "post": {
         "summary": "发送短信",
@@ -1049,6 +1162,38 @@
         ]
       }
     },
+    "/v1/images/image_to_image": {
+      "post": {
+        "operationId": "ArtService_ImageToImage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/aiartv1ImageToImageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/aiartv1ImageToImageRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ArtService"
+        ]
+      }
+    },
     "/v1/images/{imageId}": {
       "get": {
         "summary": "获取已生成的图像",
@@ -1082,6 +1227,29 @@
     }
   },
   "definitions": {
+    "GenerateImageRequestImageGenerationMode": {
+      "type": "string",
+      "enum": [
+        "GENERATE_MODE_DEFAULT",
+        "GENERATE_MODE_GUIDANCE"
+      ],
+      "default": "GENERATE_MODE_DEFAULT",
+      "title": "- GENERATE_MODE_DEFAULT: 默认模式\n - GENERATE_MODE_GUIDANCE: 指导模式"
+    },
+    "ManageUserPermissionRequestMode": {
+      "type": "string",
+      "enum": [
+        "USER_PERMISSION_ADD",
+        "USER_PERMISSION_DELETE",
+        "USER_PERMISSION_UPDATE",
+        "USER_PERMISSION_REPLACE",
+        "ROLE_PERMISSION_ADD",
+        "ROLE_PERMISSION_DELETE",
+        "ROLE_PERMISSION_UPDATE",
+        "ROLE_PERMISSION_REPLACE"
+      ],
+      "default": "USER_PERMISSION_ADD"
+    },
     "QueryTasksResponseTaskInfo": {
       "type": "object",
       "properties": {
@@ -1096,6 +1264,16 @@
           "type": "string"
         }
       }
+    },
+    "RegistrationRequestRegisterType": {
+      "type": "string",
+      "enum": [
+        "SMS",
+        "PASSWORD"
+      ],
+      "default": "SMS",
+      "description": "- SMS: 通过短信验证码注册\n - PASSWORD: 通过用户名密码注册",
+      "title": "注册类型"
     },
     "aiartv1GenerateImageRequest": {
       "type": "object",
@@ -1120,11 +1298,33 @@
           "title": "指导尺度"
         },
         "generationParameters": {
-          "$ref": "#/definitions/aiartv1GenerationParameters",
+          "$ref": "#/definitions/aiartv1GenerateImageRequestGenerationParameters",
           "title": "其他生成参数"
+        },
+        "imageGenerationMode": {
+          "$ref": "#/definitions/GenerateImageRequestImageGenerationMode",
+          "title": "图像生成模式"
         }
       },
       "title": "图像生成请求"
+    },
+    "aiartv1GenerateImageRequestGenerationParameters": {
+      "type": "object",
+      "properties": {
+        "modelName": {
+          "type": "string",
+          "title": "模型名称"
+        },
+        "samplingSteps": {
+          "type": "integer",
+          "format": "int32",
+          "title": "采样步数"
+        },
+        "samplingMethod": {
+          "type": "string",
+          "title": "采样方法"
+        }
+      }
     },
     "aiartv1GenerateImageResponse": {
       "type": "object",
@@ -1142,9 +1342,13 @@
         "PENDING",
         "RUNNING",
         "COMPLETED",
-        "FAILED"
+        "FAILED",
+        "CANCELED",
+        "TIMEOUT",
+        "UNKNOWN"
       ],
-      "default": "PENDING"
+      "default": "PENDING",
+      "title": "- PENDING: 待处理\n - RUNNING: 处理中\n - COMPLETED: 处理完成\n - FAILED: 处理失败\n - CANCELED: 处理取消\n - TIMEOUT: 处理超时\n - UNKNOWN: 未知状态"
     },
     "aiartv1GenerateStatusResponse": {
       "type": "object",
@@ -1154,25 +1358,6 @@
         }
       },
       "title": "生成状态响应"
-    },
-    "aiartv1GenerationParameters": {
-      "type": "object",
-      "properties": {
-        "modelName": {
-          "type": "string",
-          "title": "模型名称"
-        },
-        "samplingSteps": {
-          "type": "integer",
-          "format": "int32",
-          "title": "采样步数"
-        },
-        "samplingMethod": {
-          "type": "string",
-          "title": "采样方法"
-        }
-      },
-      "title": "生成参数"
     },
     "aiartv1GetGeneratedImageResponse": {
       "type": "object",
@@ -1197,6 +1382,72 @@
         }
       },
       "title": "模型信息响应"
+    },
+    "aiartv1ImageToImageRequest": {
+      "type": "object",
+      "properties": {
+        "originalImage": {
+          "type": "string",
+          "format": "byte",
+          "title": "原始图像数据"
+        },
+        "prompt": {
+          "type": "string",
+          "title": "生成提示文本"
+        },
+        "imageSize": {
+          "type": "integer",
+          "format": "int32",
+          "title": "图像大小"
+        },
+        "guidanceScale": {
+          "type": "number",
+          "format": "double",
+          "title": "指导尺度"
+        },
+        "samplingSteps": {
+          "type": "integer",
+          "format": "int32",
+          "title": "采样步数"
+        },
+        "samplingMethod": {
+          "type": "string",
+          "title": "采样方法"
+        }
+      }
+    },
+    "aiartv1ImageToImageResponse": {
+      "type": "object",
+      "properties": {
+        "imageId": {
+          "type": "string",
+          "title": "生成的图像ID"
+        }
+      }
+    },
+    "chatChatMessage": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "messageText": {
+          "type": "string"
+        }
+      },
+      "title": "客户端和服务器之间的聊天消息"
+    },
+    "chatServerMessage": {
+      "type": "object",
+      "properties": {
+        "senderId": {
+          "type": "string"
+        },
+        "messageText": {
+          "type": "string"
+        }
+      },
+      "title": "服务器发送的消息"
     },
     "mediav1VideoPlaybackResponse": {
       "type": "object",
@@ -1845,14 +2096,24 @@
       "type": "object",
       "properties": {
         "userId": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "action": {
-          "type": "string"
+          "type": "string",
+          "title": "操作 例如: login, logout"
         },
         "timestamp": {
           "type": "string",
-          "description": "其他日志信息字段..."
+          "title": "时间戳"
+        },
+        "resource": {
+          "type": "string",
+          "title": "资源 例如: /api/users"
+        },
+        "message": {
+          "type": "string",
+          "title": "消息 例如: 登录成功"
         }
       }
     },
@@ -1860,13 +2121,16 @@
       "type": "object",
       "properties": {
         "username": {
-          "type": "string"
+          "type": "string",
+          "title": "用户名"
         },
         "password": {
-          "type": "string"
+          "type": "string",
+          "title": "密码"
         },
         "phoneNumber": {
-          "type": "string"
+          "type": "string",
+          "title": "手机号"
         }
       }
     },
@@ -1874,7 +2138,8 @@
       "type": "object",
       "properties": {
         "userId": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -1882,19 +2147,25 @@
       "type": "object",
       "properties": {
         "userId": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
-        "roles": {
+        "roleIds": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "format": "int64"
           }
         },
-        "permissions": {
+        "permissionIds": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "format": "int64"
           }
+        },
+        "mode": {
+          "$ref": "#/definitions/ManageUserPermissionRequestMode"
         }
       }
     },
@@ -1920,6 +2191,9 @@
         "smsCode": {
           "type": "string",
           "title": "短信验证码"
+        },
+        "registerType": {
+          "$ref": "#/definitions/RegistrationRequestRegisterType"
         }
       }
     },
@@ -1944,8 +2218,10 @@
           "type": "string"
         },
         "phone": {
-          "type": "string",
-          "description": "其他需要更新的个人信息字段..."
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
         }
       }
     },
@@ -1966,8 +2242,46 @@
           "type": "string"
         },
         "phone": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "nickname": {
+          "type": "string"
+        }
+      }
+    },
+    "userv1UserActivity": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "id": {
           "type": "string",
-          "description": "其他个人信息字段..."
+          "format": "int64"
+        }
+      }
+    },
+    "userv1UserActivityListResponse": {
+      "type": "object",
+      "properties": {
+        "activity": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/userv1UserActivity"
+          }
         }
       }
     },
@@ -1979,6 +2293,41 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/userv1User"
+          }
+        }
+      }
+    },
+    "userv1UserPermission": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "type": "string",
+          "title": "资源 例如: /api/users"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "权限 例如: GET, POST, PUT, DELETE"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "角色 例如: admin, user"
+        }
+      }
+    },
+    "userv1UserPermissionListResponse": {
+      "type": "object",
+      "properties": {
+        "permission": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/userv1UserPermission"
           }
         }
       }

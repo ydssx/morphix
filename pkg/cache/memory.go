@@ -40,6 +40,8 @@ func (c *MemoryCache) Delete(key string) {
 	delete(c.data, key)
 }
 
+// Clear 清空缓存中的所有键值对。
+// 它在清空期间加锁,以防止并发的 map 写入。
 func (c *MemoryCache) Clear() {
 	c.Lock()
 	defer c.Unlock()

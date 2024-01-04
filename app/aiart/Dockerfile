@@ -1,4 +1,4 @@
-FROM golang:1.19.2-alpine AS builder
+FROM golang:1.21.4-alpine3.18 AS builder
 
 ENV GOPROXY=https://goproxy.cn
 
@@ -18,6 +18,6 @@ WORKDIR /usr/src/app/
 
 COPY --from=builder /bin ./
 
-EXPOSE 9005
+EXPOSE 9968
 
 CMD [ "./aiart","-f","/etc/morphix/config.yaml" ]

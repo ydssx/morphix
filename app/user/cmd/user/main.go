@@ -39,6 +39,10 @@ func main() {
 	}
 }
 
+// newApp 创建一个新的 Kratos 应用程序实例。它接收 gRPC server 和配置对象作为参数。
+// 该函数首先创建服务发现注册表。然后初始化 trace 和 metric 提供者。
+// 最后使用提供的参数创建并返回一个 Kratos 应用程序实例。该实例中包含了服务名、元数据、
+// gRPC server、注册表、启动前后钩子等信息。
 func newApp(gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
 	r := common.NewEtcdRegistry(c.Etcd)
 
