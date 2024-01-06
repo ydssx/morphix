@@ -35,3 +35,10 @@ type authKey struct{}
 func NewContext(ctx context.Context, c *jwt.Claims) context.Context {
 	return context.WithValue(ctx, authKey{}, c)
 }
+
+func GetClaims(ctx context.Context) *jwt.Claims {
+	if c, ok := ctx.Value(authKey{}).(*jwt.Claims); ok {
+		return c
+	}
+	return nil
+}

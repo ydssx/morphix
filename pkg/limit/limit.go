@@ -49,6 +49,9 @@ func NewRedisLimiter(rdb *redis.Client) *RedisLimiter {
 	return &RedisLimiter{redis_rate.NewLimiter(rdb)}
 }
 
+// Limit 检查给定的context中的限流key,如果允许则返回nil,否则返回错误。
+// 它会从context中提取key,然后使用Allow方法检查key的限流状态。
+// 如果允许,则返回nil,否则返回一个rate limited的错误。
 func (l *RedisLimiter) Limit(ctx context.Context) error {
 	key := LimitKeyFromCtx(ctx).(string)
 	if l.Allow(key) {

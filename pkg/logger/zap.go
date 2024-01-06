@@ -10,12 +10,12 @@ import (
 )
 
 func NewZapLogger() *zap.Logger {
-	encoderConfig := zap.NewProductionEncoderConfig()
-	encoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05")
-	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
-	encoderConfig.MessageKey = ""
+	cfg := zap.NewProductionEncoderConfig()
+	cfg.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05")
+	cfg.EncodeLevel = zapcore.CapitalLevelEncoder
+	cfg.MessageKey = ""
 
-	core := zapcore.NewCore(zapcore.NewJSONEncoder(encoderConfig), zapcore.Lock(os.Stdout), zap.DebugLevel)
+	core := zapcore.NewCore(zapcore.NewJSONEncoder(cfg), zapcore.Lock(os.Stdout), zap.InfoLevel)
 
 	logger := zap.New(core)
 	return logger

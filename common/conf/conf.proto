@@ -90,8 +90,11 @@ message ClientConf {
 // 服务端配置
 message ServerConf {
   string name = 1;
-  Server server = 2;
-  Data data = 3;
+  bool enable_registry = 2;
+  Server server = 3;
+  Data data = 4;
+  bool enable_tracing = 5;
+  bool enable_metric = 6;
 }
 
 message RedisCluster {

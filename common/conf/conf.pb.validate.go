@@ -1869,6 +1869,8 @@ func (m *ServerConf) validate(all bool) error {
 
 	// no validation rules for Name
 
+	// no validation rules for EnableRegistry
+
 	if all {
 		switch v := interface{}(m.GetServer()).(type) {
 		case interface{ ValidateAll() error }:
@@ -1926,6 +1928,10 @@ func (m *ServerConf) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for EnableTracing
+
+	// no validation rules for EnableMetric
 
 	if len(errors) > 0 {
 		return ServerConfMultiError(errors)

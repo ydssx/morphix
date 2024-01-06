@@ -24,8 +24,10 @@ import (
 func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
 	aiartUseCase := biz.NewAiartUseCase()
 	artService := service.NewArtService(aiartUseCase)
+	httpServer := server.NewHTTPServer(bootstrap, artService)
 	grpcServer := server.NewGRPCServer(bootstrap, artService)
-	app := newApp(grpcServer, bootstrap)
+	v := server.NewServer(httpServer, grpcServer)
+	app := newApp(bootstrap, v...)
 	return app, func() {
 	}, nil
 }
