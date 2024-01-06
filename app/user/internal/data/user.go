@@ -171,7 +171,22 @@ func (r *userRepo) getRolePermissions(ctx context.Context, roleIDs []int) ([]mod
 }
 
 func (r *userRepo) GetUserPermissionByRole(ctx context.Context, roleID int) ([]models.Permission, error) {
-	return nil, nil
+	rolePermissions, err := r.getRolePermissions(ctx, []int{roleID})
+	if err != nil {
+		return nil, err
+	}
+
+	permissionIDs := extractPermissionIDs(rolePermissions)
+	permissions := models.NewPermissionModel(r.data.DB(ctx)).SetId(permissionIDs...).List()
+	return permissions, nil
+}
+
+func extractPermissionIDs(rolePermissions []models.RolePermission) []int {
+	permissionIDs := make([]int, len(rolePermissions))
+	for i, rolePermission := range rolePermissions {
+		permissionIDs[i] = rolePermission.PermissionId
+	}
+	return permissionIDs
 }
 
 func (r *userRepo) AddUserRole(ctx context.Context, userID int, roleID int) error {
@@ -221,6 +236,12 @@ func (r *userRepo) DeleteUserPermission(ctx context.Context, userID int64, permi
 	return nil
 }
 
+// ListRole 根据条件查询角色列表
+// cond 是查询条件,包含名称、分页等信息
+// 如果 cond 为空,使用默认值
+// 使用模型查询数据库
+// 对查询进行分页处理
+// 返回角色列表
 func (r *userRepo) ListRole(ctx context.Context, cond *biz.ListRoleCond) []models.Role {
 	if cond == nil {
 		cond = &biz.ListRoleCond{}

@@ -33,6 +33,7 @@ func (s *UserService) UpdateProfile(ctx context.Context, req *userv1.UpdateProfi
 	return s.uc.UpdateProfile(ctx, req)
 }
 
+// 用户重置密码
 func (s *UserService) ResetPassword(ctx context.Context, req *userv1.ResetPasswordRequest) (*emptypb.Empty, error) {
 	if err := s.uc.ResetPassword(ctx, req); err != nil {
 		return nil, err
@@ -46,9 +47,7 @@ func (s *UserService) GetUserList(ctx context.Context, req *userv1.UserListReque
 }
 
 func (s *UserService) ManageUserPermission(ctx context.Context, req *userv1.ManageUserPermissionRequest) (*userv1.User, error) {
-	// 在这里实现管理用户权限逻辑
-	// 使用 s.userRepository 进行数据库操作
-	return nil, nil
+	return s.uc.ManageUserPermission(ctx, req)
 }
 
 func (s *UserService) GetUser(ctx context.Context, req *userv1.GetUserRequest) (*userv1.User, error) {
@@ -70,3 +69,8 @@ func (s *UserService) Authorize(ctx context.Context, req *userv1.AuthorizationRe
 func (s *UserService) LogActivity(ctx context.Context, req *userv1.LogEntry) (res *emptypb.Empty, err error) {
 	return s.uc.LogActivity(ctx, req)
 }
+
+func (s *UserService) GetUserActivity(ctx context.Context, req *userv1.GetUserActivityRequest) (res *userv1.UserActivityListResponse, err error) {
+	return s.uc.GetUserActivity(ctx, req)
+}
+

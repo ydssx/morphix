@@ -40,8 +40,10 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	jobServiceClient := common.NewJobClient(bootstrap)
 	userUseCase := biz.NewUserUseCase(bizUserRepo, logger, smsServiceClient, transaction, jobServiceClient)
 	userService := service.NewUserService(userUseCase)
+	httpServer := server.NewHTTPServer(bootstrap, userService)
 	grpcServer := server.NewGRPCServer(bootstrap, userService)
-	app := newApp(grpcServer, bootstrap)
+	v := server.NewServer(httpServer, grpcServer)
+	app := newApp(bootstrap, v...)
 	return app, func() {
 		cleanup()
 	}, nil

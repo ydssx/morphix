@@ -5,8 +5,7 @@ import (
 	"flag"
 
 	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/log"
-	"github.com/go-kratos/kratos/v2/transport/grpc"
+	"github.com/go-kratos/kratos/v2/transport"
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/logger"
@@ -39,28 +38,29 @@ func main() {
 	}
 }
 
-// newApp 创建一个新的 Kratos 应用程序实例。它接收 gRPC server 和配置对象作为参数。
-// 该函数首先创建服务发现注册表。然后初始化 trace 和 metric 提供者。
-// 最后使用提供的参数创建并返回一个 Kratos 应用程序实例。该实例中包含了服务名、元数据、
-// gRPC server、注册表、启动前后钩子等信息。
-func newApp(gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
-	r := common.NewEtcdRegistry(c.Etcd)
-
-	tp, _ := provider.InitTraceProvider(c.Otelcol.Addr, c.ServiceSet.User.Name)
-
-	mp := provider.InitMeterProvider(c.Otelcol.Addr)
-
-	return kratos.New(
+func newApp(c *conf.Bootstrap, srv ...transport.Server) *kratos.App {
+	options := []kratos.Option{
 		kratos.Name(c.ServiceSet.User.Name),
 		kratos.Metadata(map[string]string{}),
-		kratos.Server(gs),
-		kratos.Registrar(r),
-		kratos.BeforeStart(func(_ context.Context) error {
-			log.Infow("app.version", "1.0.0")
+		kratos.Server(srv...),
+		kratos.BeforeStart(func(ctx context.Context) error {
+			logger.Infof(ctx, "service %s is starting...", c.ServiceSet.User.Name)
 			return nil
 		}),
-		kratos.AfterStop(tp.Shutdown),
-		kratos.AfterStop(mp.Shutdown),
-	)
-}
+	}
 
+	if c.ServiceSet.User.EnableRegistry {
+		registry := common.NewEtcdRegistry(c.Etcd)
+		options = append(options, kratos.Registrar(registry))
+	}
+	if c.ServiceSet.User.EnableTracing {
+		traceProvider, _ := provider.InitTraceProvider(c.Otelcol.Addr, c.ServiceSet.User.Name)
+		options = append(options, kratos.AfterStop(traceProvider.Shutdown))
+	}
+	if c.ServiceSet.User.EnableMetric {
+		meterProvider := provider.InitMeterProvider(c.Otelcol.Addr)
+		options = append(options, kratos.AfterStop(meterProvider.Shutdown))
+	}
+
+	return kratos.New(options...)
+}
