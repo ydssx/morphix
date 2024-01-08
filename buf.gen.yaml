@@ -27,11 +27,15 @@ plugins:
     opt:
       - paths=source_relative
 
+  - plugin: go-http
+    out: .
+    opt:
+      - paths=source_relative
+
   - plugin: buf.build/grpc-ecosystem/openapiv2
     out: docs
     opt:
       - allow_merge=true
-    
   # - plugin: openapi
   #   out: docs
   #   opt:

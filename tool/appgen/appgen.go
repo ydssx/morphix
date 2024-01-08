@@ -6,6 +6,8 @@ import (
 	"flag"
 	"fmt"
 	"go/format"
+	"go/parser"
+	"go/token"
 	"log"
 	"os"
 	"os/exec"
@@ -14,9 +16,10 @@ import (
 	"text/template"
 
 	"github.com/cheggaaa/pb/v3"
+	"github.com/dave/dst"
+	"github.com/dave/dst/decorator"
 	"github.com/emicklei/proto"
 	"github.com/fatih/color"
-	apigen "github.com/ydssx/api-gen/gen"
 	"github.com/ydssx/morphix/pkg/util"
 )
 
@@ -36,6 +39,9 @@ var (
 	//go:embed template/server/grpc.tpl
 	grpcFile string
 
+	//go:embed template/server/http.tpl
+	httpFile string
+
 	//go:embed template/service/service.tpl
 	serviceFile string
 
@@ -53,8 +59,8 @@ var (
 )
 
 var (
-	appName   = flag.String("app", "aiart", "app name")
-	protoFile = flag.String("proto", "../../api/aiart/v1/aiart.proto", "proto file")
+	appName   = flag.String("app", "user", "app name")
+	protoFile = flag.String("proto", "../../api/user/v1/user.proto", "proto file")
 	port      = flag.Int("port", 0, "app service port")
 )
 
@@ -109,6 +115,7 @@ func gen(appName, protoFile string, port int) {
 	mkFile(data, cmdDir+"/wire.go", wireFile)
 	mkFile(data, serverDir+"/server.go", serverFile)
 	mkFile(data, serverDir+"/grpc.go", grpcFile)
+	mkFile(data, serverDir+"/http.go", httpFile)
 	mkFile(data, serviceDir+"/service.go", serviceSetFile)
 	mkFile(data, serviceDir+"/"+appName+".go", serviceFile)
 	mkFile(data, bizDir+"/biz.go", bizSetFile)
@@ -168,7 +175,7 @@ func mkFile(data map[string]interface{}, outFile string, text string) error {
 	if fileExists(outFile) {
 		// If the file has the same name as the application, write the code to the file
 		if strings.HasSuffix(outFile, *appName+".go") {
-			apigen.WriteDecl(outFile, string(codes))
+			WriteDecl(outFile, string(codes))
 		}
 		return nil
 	}
@@ -202,6 +209,9 @@ type MethInfo struct {
 	StreamsReturns bool   // 是否为流式返回
 }
 
+// parseProto 解析指定的 proto 文件,提取服务、方法等信息,返回 ServiceInfo 结构。
+// 它会打开并解析 proto 文件,通过 proto.Walk 遍历语法树,提取 package、service、rpc 等信息,
+// 并填充到返回的 ServiceInfo 结构中。
 func parseProto(protoFile string) (info ServiceInfo) {
 	// Open the proto file
 	reader, err := os.Open(protoFile)
@@ -310,4 +320,81 @@ func parseGoModule() string {
 	}
 	x := strings.Split(string(content), "\n")[0]
 	return strings.TrimSpace(strings.Split(x, " ")[1])
+}
+
+func WriteDecl(filename, decl string) {
+	// 解析文件
+	fset := token.NewFileSet()
+	file, err := decorator.ParseFile(fset, filename, nil, parser.ParseComments)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if !strings.Contains(decl, "package ") {
+		decl = "package main\n" + decl
+	}
+
+	// 将新函数的源代码解析为语法树
+	funcAST, err := decorator.ParseFile(fset, "", decl, parser.ParseComments)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var funcs []*dst.FuncDecl
+	for _, v := range funcAST.Decls {
+		if f, ok := v.(*dst.FuncDecl); ok {
+			funcs = append(funcs, f)
+		}
+	}
+
+	for _, newFunc := range funcs {
+
+		index, _ := isFunctionExists(file, newFunc.Name.Name)
+		if index >= 0 {
+			// 如果函数名重复，可以选择跳过添加或者进行替换
+			fmt.Println("Function", newFunc.Name.Name, "already exists. Updating comments...")
+			// file.Decls[index].Decorations().Start = newFunc.Decs.Start
+			file.Decls[index].Decorations().End = newFunc.Decs.End
+			file.Decls[index].Decorations().After = newFunc.Decs.After
+			file.Decls[index].Decorations().Before = newFunc.Decs.Before
+		} else {
+			file.Decls = append(file.Decls, newFunc)
+			fmt.Print(color.GreenString("New function ["))
+			color.New(color.FgHiGreen, color.Bold).Print(newFunc.Name.Name)
+			color.Green("] will be added to %s.\n", filename)
+		}
+	}
+	if err := reWrite(filename, file); err != nil {
+		log.Fatal(err)
+	}
+
+	// fileAppend(filename, decl)
+	return
+}
+
+// 检查函数名是否存在
+func isFunctionExists(file *dst.File, functionName string) (index int, exist bool) {
+	for i, decl := range file.Decls {
+		if fn, ok := decl.(*dst.FuncDecl); ok && fn.Name.Name == functionName {
+			return i, true
+		}
+	}
+	return -1, false
+}
+
+func reWrite(filename string, file *dst.File) error {
+	outputFile, err := os.OpenFile(filename, os.O_WRONLY|os.O_TRUNC, 0o644)
+	if err != nil {
+		fmt.Println("Failed to create file:", err)
+		return err
+	}
+	defer outputFile.Close()
+
+	err = decorator.Fprint(outputFile, file)
+	if err != nil {
+		fmt.Println("Failed to write file:", err)
+		return err
+	}
+	// fmt.Printf("File %s updated.\n", filename)
+	return nil
 }

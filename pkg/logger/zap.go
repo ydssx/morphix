@@ -39,6 +39,11 @@ func NewLogger(zlog *zap.Logger) *Logger {
 }
 
 func (l *Logger) Log(level log.Level, keyvals ...interface{}) error {
+	for i, v := range keyvals {
+		if r, ok := v.([]interface{}); ok {
+			keyvals = append(keyvals[:i], r...)
+		}
+	}
 	if len(keyvals) == 0 || len(keyvals)%2 != 0 {
 		l.Zlog.Warn("Keyvalues must appear in pairs", zap.Any("keyvalues", keyvals))
 		return nil

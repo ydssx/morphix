@@ -696,14 +696,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "status": {
-                  "$ref": "#/definitions/orderv1OrderStatus",
-                  "title": "新的订单状态"
-                }
-              },
-              "title": "更新订单状态请求消息"
+              "$ref": "#/definitions/OrderServiceUpdateOrderStatusBody"
             }
           }
         ],
@@ -838,18 +831,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "amount": {
-                  "type": "number",
-                  "format": "double"
-                },
-                "currency": {
-                  "type": "string",
-                  "description": "其他字段..."
-                }
-              },
-              "title": "退款请求"
+              "$ref": "#/definitions/PaymentServiceRefundBody"
             }
           }
         ],
@@ -1003,28 +985,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "title": "产品名称"
-                },
-                "description": {
-                  "type": "string",
-                  "title": "产品描述"
-                },
-                "price": {
-                  "type": "number",
-                  "format": "float",
-                  "title": "产品价格"
-                },
-                "stock": {
-                  "type": "integer",
-                  "format": "int32",
-                  "title": "库存数量"
-                }
-              },
-              "title": "更新产品请求"
+              "$ref": "#/definitions/ProductServiceUpdateProductBody"
             }
           }
         ],
@@ -1249,6 +1210,54 @@
         "ROLE_PERMISSION_REPLACE"
       ],
       "default": "USER_PERMISSION_ADD"
+    },
+    "OrderServiceUpdateOrderStatusBody": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/orderv1OrderStatus",
+          "title": "新的订单状态"
+        }
+      },
+      "title": "更新订单状态请求消息"
+    },
+    "PaymentServiceRefundBody": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number",
+          "format": "double"
+        },
+        "currency": {
+          "type": "string",
+          "description": "其他字段..."
+        }
+      },
+      "title": "退款请求"
+    },
+    "ProductServiceUpdateProductBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "产品名称"
+        },
+        "description": {
+          "type": "string",
+          "title": "产品描述"
+        },
+        "price": {
+          "type": "number",
+          "format": "float",
+          "title": "产品价格"
+        },
+        "stock": {
+          "type": "integer",
+          "format": "int32",
+          "title": "库存数量"
+        }
+      },
+      "title": "更新产品请求"
     },
     "QueryTasksResponseTaskInfo": {
       "type": "object",
