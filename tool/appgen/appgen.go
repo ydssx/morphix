@@ -322,6 +322,10 @@ func parseGoModule() string {
 	return strings.TrimSpace(strings.Split(x, " ")[1])
 }
 
+// WriteDecl 将给定的函数声明代码添加到指定的 Go 源文件中。
+// 它会解析源文件和函数声明代码,找到函数声明,
+// 检查函数是否已存在,如果存在则更新注释,如果不存在则追加函数。
+// 最后使用 decorator 包重新写入源文件。
 func WriteDecl(filename, decl string) {
 	// 解析文件
 	fset := token.NewFileSet()
@@ -350,18 +354,13 @@ func WriteDecl(filename, decl string) {
 	for _, newFunc := range funcs {
 
 		index, _ := isFunctionExists(file, newFunc.Name.Name)
-		if index >= 0 {
-			// 如果函数名重复，可以选择跳过添加或者进行替换
-			fmt.Println("Function", newFunc.Name.Name, "already exists. Updating comments...")
-			// file.Decls[index].Decorations().Start = newFunc.Decs.Start
-			file.Decls[index].Decorations().End = newFunc.Decs.End
-			file.Decls[index].Decorations().After = newFunc.Decs.After
-			file.Decls[index].Decorations().Before = newFunc.Decs.Before
-		} else {
+		if index < 0 {
 			file.Decls = append(file.Decls, newFunc)
 			fmt.Print(color.GreenString("New function ["))
 			color.New(color.FgHiGreen, color.Bold).Print(newFunc.Name.Name)
 			color.Green("] will be added to %s.\n", filename)
+		} else {
+			file.Decls[index].Decorations().After = newFunc.Decs.After
 		}
 	}
 	if err := reWrite(filename, file); err != nil {
@@ -395,6 +394,6 @@ func reWrite(filename string, file *dst.File) error {
 		fmt.Println("Failed to write file:", err)
 		return err
 	}
-	// fmt.Printf("File %s updated.\n", filename)
+
 	return nil
 }
