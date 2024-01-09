@@ -71,17 +71,18 @@ type Transaction interface {
 	InTx(context.Context, func(ctx context.Context) error) error
 }
 
-type ListUserCond struct {
-	Page  int64
-	Limit int64
-	Phone string
-}
-
-type ListRoleCond struct {
-	Page  int64
-	Limit int64
-	Name  string
-}
+type (
+	ListUserCond struct {
+		Page  int64
+		Limit int64
+		Phone string
+	}
+	ListRoleCond struct {
+		Page  int64  // 页码
+		Limit int64  // 条数
+		Name  string // 角色名称
+	}
+)
 
 type UserUseCase struct {
 	repo   UserRepo
