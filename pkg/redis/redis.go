@@ -10,13 +10,13 @@ import (
 )
 
 // NewRedis 连接Redis并返回Client对象
-func NewRedis(opt *redis.Options) *redis.Client {
+func NewRedis(opt *redis.Options) (*redis.Client, error) {
 	cli := redis.NewClient(opt)
 	_, err := cli.Ping(context.Background()).Result()
 	if err != nil {
-		panic("redis connect error: " + err.Error())
+		return nil, errors.Wrap(err, "redis connect failed")
 	}
-	return cli
+	return cli, nil
 }
 
 // NewRedisLock 创建Redis的锁Client对象

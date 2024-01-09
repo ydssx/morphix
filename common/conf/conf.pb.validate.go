@@ -2641,6 +2641,8 @@ func (m *Server_HTTP) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for Disabled
+
 	if len(errors) > 0 {
 		return Server_HTTPMultiError(errors)
 	}
@@ -2772,6 +2774,8 @@ func (m *Server_GRPC) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for Disabled
 
 	if len(errors) > 0 {
 		return Server_GRPCMultiError(errors)

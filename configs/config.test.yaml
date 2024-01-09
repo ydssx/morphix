@@ -88,6 +88,13 @@ serviceSet:
         read_timeout: 2s
         write_timeout: 2s
         dial_timeout: 5s
+      mongo:
+        addr: mongodb.default:27017
+        username:
+        password: ${MONGO_PASSWORD}
+        read_timeout: 2s
+        write_timeout: 2s
+        dial_timeout: 5s
 
   # sms服务配置
   sms:

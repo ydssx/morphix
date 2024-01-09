@@ -91,7 +91,9 @@ func NewRedisCluster(c *conf.Bootstrap) *goredis.ClusterClient {
 	})
 }
 
-func NewRedisClient(c *conf.Bootstrap) *goredis.Client {
+// NewRedisClient 使用给定的配置初始化一个 Redis 客户端。如果初始化失败会返回错误。
+// 这主要用于初始化全局的 Redis 客户端。
+func NewRedisClient(c *conf.Bootstrap) (*goredis.Client, error) {
 	clientConf := c.Redis
 	return redis.NewRedis(&goredis.Options{
 		Addr:         clientConf.Addr,
@@ -101,6 +103,18 @@ func NewRedisClient(c *conf.Bootstrap) *goredis.Client {
 		DialTimeout:  clientConf.DialTimeout.AsDuration(),
 		WriteTimeout: clientConf.WriteTimeout.AsDuration(),
 	})
+}
+
+// MustNewRedisClient 使用给定的配置初始化一个 Redis 客户端。
+// 如果初始化失败会 panic。
+// 这主要用于初始化全局的 Redis 客户端。
+func MustNewRedisClient(c *conf.Bootstrap) *goredis.Client {
+	client, err := NewRedisClient(c)
+	if err != nil {
+		panic(err)
+	}
+
+	return client
 }
 
 func NewNatsConn(c *conf.Bootstrap) (conn *nats.Conn, cleanup func(), err error) {

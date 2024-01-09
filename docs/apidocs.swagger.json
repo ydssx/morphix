@@ -1209,7 +1209,8 @@
         "ROLE_PERMISSION_UPDATE",
         "ROLE_PERMISSION_REPLACE"
       ],
-      "default": "USER_PERMISSION_ADD"
+      "default": "USER_PERMISSION_ADD",
+      "title": "- USER_PERMISSION_ADD: 增加用户权限\n - USER_PERMISSION_DELETE: 删除用户权限\n - USER_PERMISSION_UPDATE: 更新用户权限\n - USER_PERMISSION_REPLACE: 替换用户权限\n - ROLE_PERMISSION_ADD: 增加角色权限\n - ROLE_PERMISSION_DELETE: 删除角色权限\n - ROLE_PERMISSION_UPDATE: 更新角色权限\n - ROLE_PERMISSION_REPLACE: 替换角色权限"
     },
     "OrderServiceUpdateOrderStatusBody": {
       "type": "object",
@@ -2080,7 +2081,8 @@
           "type": "string"
         },
         "token": {
-          "type": "string"
+          "type": "string",
+          "title": "认证令牌"
         }
       }
     },
@@ -2174,7 +2176,8 @@
           }
         },
         "mode": {
-          "$ref": "#/definitions/ManageUserPermissionRequestMode"
+          "$ref": "#/definitions/ManageUserPermissionRequestMode",
+          "title": "操作模式"
         }
       }
     },
@@ -2210,13 +2213,16 @@
       "type": "object",
       "properties": {
         "username": {
-          "type": "string"
+          "type": "string",
+          "title": "用户名"
         },
         "verificationCode": {
-          "type": "string"
+          "type": "string",
+          "title": "验证码"
         },
         "newPassword": {
-          "type": "string"
+          "type": "string",
+          "title": "新密码"
         }
       }
     },
@@ -2268,10 +2274,12 @@
           "type": "string"
         },
         "action": {
-          "type": "string"
+          "type": "string",
+          "title": "操作 例如: login, logout"
         },
         "resource": {
-          "type": "string"
+          "type": "string",
+          "title": "资源 例如: /api/users"
         },
         "message": {
           "type": "string"
