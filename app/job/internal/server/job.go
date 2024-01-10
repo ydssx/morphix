@@ -40,6 +40,9 @@ func NewJobServer(c *conf.Bootstrap, clientSet *common.ServiceClientSet) *JobSer
 	return &JobServer{sr: server, mux: mux, sd: scheduler}
 }
 
+// Start 启动 JobServer,包括启动调度器和服务器。
+// 使用 concurrent.Group 同时启动调度器和服务器,如果任一启动失败则立即返回错误。
+// 这样可以保证整个 JobServer 要么完全启动成功,要么完全失败。
 func (j *JobServer) Start(ctx context.Context) error {
 	group := concurrent.NewGroup(ctx, concurrent.WithFastFail(true))
 	err := group.Run(
@@ -49,6 +52,8 @@ func (j *JobServer) Start(ctx context.Context) error {
 	return err
 }
 
+// Stop 停止 JobServer,包括停止调度器和服务器。
+// 依次调用服务器和调度器的 Shutdown 方法进行优雅停止。
 func (j *JobServer) Stop(_ context.Context) error {
 	j.sr.Stop()
 	j.sr.Shutdown()

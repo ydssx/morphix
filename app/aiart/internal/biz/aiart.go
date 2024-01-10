@@ -56,3 +56,11 @@ func (uc *AiartUseCase) GetModelInfo(ctx context.Context, req *emptypb.Empty) (r
 
 	return
 }
+
+func (uc *AiartUseCase) ImageToImage(ctx context.Context, req *aiartv1.ImageToImageRequest) (res *aiartv1.ImageToImageResponse, err error) {
+	res = new(aiartv1.ImageToImageResponse)
+
+	// TODO:ADD logic here and delete this line.
+
+	return
+}

@@ -57,6 +57,11 @@ func (j *JobService) Enqueue(ctx context.Context, req *jobv1.EnqueueRequest) (*j
 	return &jobv1.EnqueueResponse{TaskId: taskInfo.ID}, nil
 }
 
+// QueryTasks 根据任务 ID 查询任务详情。
+// 它接受 QueryTasksRequest 并返回 QueryTasksResponse。
+// 对于每个任务 ID,它会从 asynq Inspector 获取任务详情。
+// 然后将任务 ID、状态和结果组装到响应中返回。
+// 如果查询失败,返回错误。
 func (j *JobService) QueryTasks(ctx context.Context, req *jobv1.QueryTasksRequest) (resp *jobv1.QueryTasksResponse, err error) {
 	resp = new(jobv1.QueryTasksResponse)
 	for _, taskId := range req.TaskIds {

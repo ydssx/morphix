@@ -64,7 +64,7 @@ func NewTransaction(d *Data) biz.Transaction {
 	return d
 }
 
-func NewRedisCLient(c *conf.Bootstrap) *goredis.Client {
+func NewRedisCLient(c *conf.Bootstrap) (*goredis.Client, error) {
 	redisConf := c.ServiceSet.Aiart.Data.Redis
 	return redis.NewRedis(&goredis.Options{
 		Addr:         redisConf.Addr,
@@ -76,11 +76,10 @@ func NewRedisCLient(c *conf.Bootstrap) *goredis.Client {
 	})
 }
 
-func NewMysqlDB(c *conf.Bootstrap) *gorm.DB {
+func NewMysqlDB(c *conf.Bootstrap) (*gorm.DB, error) {
 	return mysql.NewDB(c.ServiceSet.Aiart.Data.Database.Source)
 }
 
 func NewRedisCache(client *goredis.Client) cache.Cache {
 	return cache.NewRedisCache(client)
 }
-

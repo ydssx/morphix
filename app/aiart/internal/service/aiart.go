@@ -37,3 +37,7 @@ func (s *ArtService) GetGeneratedImage(ctx context.Context, req *aiartv1.GetGene
 func (s *ArtService) GetModelInfo(ctx context.Context, req *emptypb.Empty) (res *aiartv1.GetModelInfoResponse, err error) {
 	return s.uc.GetModelInfo(ctx, req)
 }
+
+func (s *ArtService) ImageToImage(ctx context.Context, req *aiartv1.ImageToImageRequest) (res *aiartv1.ImageToImageResponse, err error) {
+	return s.uc.ImageToImage(ctx, req)
+}

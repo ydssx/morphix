@@ -38,6 +38,9 @@ func main() {
 	}
 }
 
+// newApp 创建一个新的 Kratos 应用程序实例。它接收配置和服务器作为参数,
+// 并根据配置来注册服务发现、追踪和指标中间件。
+// 返回构建好的 Kratos 应用程序实例。
 func newApp(c *conf.Bootstrap, srv ...transport.Server) *kratos.App {
 	options := []kratos.Option{
 		kratos.Name(c.ServiceSet.User.Name),

@@ -29,7 +29,7 @@ type registerFn func(ctx context.Context, mux *gwruntime.ServeMux, conn *grpc.Cl
 var handlers = make(map[*conf.ClientConf]registerFn)
 
 // registerRPCHandler registers RPC handlers for all configured RPC clients.
-// It maps each RPC client in the Bootstrap config to the appropriate 
+// It maps each RPC client in the Bootstrap config to the appropriate
 // register handler function for that API. This allows the gateway to set
 // up RPC proxying for each configured downstream service.
 func registerRPCHandler(c *conf.Bootstrap) {
@@ -58,7 +58,7 @@ func NewHTTPServer(ctx context.Context, c *conf.Bootstrap) *khttp.Server {
 func newGinHandler(ctx context.Context, conf *conf.Bootstrap) *gin.Engine {
 	server := gin.New()
 	server.ContextWithFallback = true
-	redisClient := common.NewRedisClient(conf)
+	redisClient := common.MustNewRedisClient(conf)
 	server.Use(
 		gin.Logger(),
 		ginprom.PromMiddleware(nil),

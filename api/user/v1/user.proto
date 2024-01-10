@@ -145,14 +145,14 @@ message UpdateProfileRequest {
 }
 
 message ResetPasswordRequest {
-  string username = 1;
-  string verification_code = 2 [(validate.rules).string.len = 6];
-  string new_password = 3;
+  string username = 1; // 用户名
+  string verification_code = 2 [(validate.rules).string.len = 6]; // 验证码
+  string new_password = 3; // 新密码
 }
 
 message AuthenticationResponse {
   string user_id = 1;
-  string token = 2;
+  string token = 2; // 认证令牌
 }
 
 message AuthorizationRequest {
@@ -175,16 +175,16 @@ message ManageUserPermissionRequest {
   repeated int64 role_ids = 2;
   repeated int64 permission_ids = 3;
   enum Mode {
-    USER_PERMISSION_ADD = 0;
-    USER_PERMISSION_DELETE = 1;
-    USER_PERMISSION_UPDATE = 2;
-    USER_PERMISSION_REPLACE = 3;
-    ROLE_PERMISSION_ADD = 4;
-    ROLE_PERMISSION_DELETE = 5;
-    ROLE_PERMISSION_UPDATE = 6;
-    ROLE_PERMISSION_REPLACE = 7;
+    USER_PERMISSION_ADD = 0; // 增加用户权限
+    USER_PERMISSION_DELETE = 1; // 删除用户权限
+    USER_PERMISSION_UPDATE = 2; // 更新用户权限
+    USER_PERMISSION_REPLACE = 3; // 替换用户权限
+    ROLE_PERMISSION_ADD = 4; // 增加角色权限
+    ROLE_PERMISSION_DELETE = 5; // 删除角色权限
+    ROLE_PERMISSION_UPDATE = 6; // 更新角色权限
+    ROLE_PERMISSION_REPLACE = 7; // 替换角色权限
   }
-  Mode mode = 4;
+  Mode mode = 4; // 操作模式
 }
 
 message LogEntry {
@@ -225,8 +225,8 @@ message GetUserActivityRequest {
 
 message UserActivity {
   string timestamp = 1;
-  string action = 2;
-  string resource = 3;
+  string action = 2; // 操作 例如: login, logout
+  string resource = 3; // 资源 例如: /api/users
   string message = 4;
   int64 id = 5;
 }

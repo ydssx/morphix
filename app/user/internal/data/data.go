@@ -42,7 +42,7 @@ func NewData(logger log.Logger, rdb *goredis.Client, db *gorm.DB, collection *mo
 	cleanup := func() {
 		log.NewHelper(logger).Info("closing the data resources")
 		err := collection.Database().Client().Disconnect(context.Background())
-		if err!= nil {
+		if err != nil {
 			log.NewHelper(logger).Error("close mongodb client failed", err)
 		}
 	}
@@ -73,7 +73,7 @@ func NewTransaction(d *Data) biz.Transaction {
 	return d
 }
 
-func NewRedisCLient(c *conf.Bootstrap) *goredis.Client {
+func NewRedisCLient(c *conf.Bootstrap) (*goredis.Client, error) {
 	redisConf := c.ServiceSet.User.Data.Redis
 	return redis.NewRedis(&goredis.Options{
 		Addr:         redisConf.Addr,
@@ -85,7 +85,7 @@ func NewRedisCLient(c *conf.Bootstrap) *goredis.Client {
 	})
 }
 
-func NewMysqlDB(c *conf.Bootstrap) *gorm.DB {
+func NewMysqlDB(c *conf.Bootstrap) (*gorm.DB, error) {
 	return mysql.NewDB(c.ServiceSet.User.Data.Database.Source)
 }
 

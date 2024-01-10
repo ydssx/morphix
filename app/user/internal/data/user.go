@@ -28,6 +28,7 @@ func (r *userRepo) DeleteRolePermission(ctx context.Context, roleID int, permiss
 	return models.NewRolePermissionModel(r.data.DB(ctx)).SetRoleId(uint(roleID)).SetPermissionId(uint(permissionID)).Delete()
 }
 
+// GetRolePermission 根据角色ID获取权限列表
 func (r *userRepo) GetRolePermission(ctx context.Context, roleID int) ([]models.Permission, error) {
 	rolePermissionModel := models.NewRolePermissionModel(r.data.DB(ctx)).SetRoleId(uint(roleID)).List()
 
@@ -170,6 +171,11 @@ func (r *userRepo) getRolePermissions(ctx context.Context, roleIDs []int) ([]mod
 	return models.NewRolePermissionModel(r.data.DB(ctx)).SetRoleIds(roleIDs...).List(), nil
 }
 
+// GetUserPermissionByRole 根据角色ID获取权限列表
+// 1. 根据角色ID获取角色权限关系列表
+// 2. 提取权限ID列表
+// 3. 根据权限ID列表查询权限信息
+// 4. 返回权限列表
 func (r *userRepo) GetUserPermissionByRole(ctx context.Context, roleID int) ([]models.Permission, error) {
 	rolePermissions, err := r.getRolePermissions(ctx, []int{roleID})
 	if err != nil {

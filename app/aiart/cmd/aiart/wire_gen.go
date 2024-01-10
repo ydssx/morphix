@@ -26,7 +26,10 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	artService := service.NewArtService(aiartUseCase)
 	httpServer := server.NewHTTPServer(bootstrap, artService)
 	grpcServer := server.NewGRPCServer(bootstrap, artService)
-	v := server.NewServer(httpServer, grpcServer)
+	v, err := server.NewServer(httpServer, grpcServer, bootstrap)
+	if err != nil {
+		return nil, nil, err
+	}
 	app := newApp(bootstrap, v...)
 	return app, func() {
 	}, nil

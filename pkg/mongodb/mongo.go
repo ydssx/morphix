@@ -9,6 +9,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+// InitMongoDB 初始化一个 MongoDB 连接。
+// url 是 MongoDB 的连接字符串。
+// 返回一个 MongoDB 客户端实例和一个清理函数用于断开连接。
+// 如果连接失败会 panic。
 func InitMongoDB(url string) (*mongo.Client, func()) {
 	ctx := context.Background()
 	cli, err := mongo.Connect(ctx, options.Client().ApplyURI(url), options.Client().SetMaxPoolSize(100), options.Client().SetMaxConnIdleTime(10*time.Second))

@@ -73,14 +73,14 @@ func (RegistrationRequest_RegisterType) EnumDescriptor() ([]byte, []int) {
 type ManageUserPermissionRequest_Mode int32
 
 const (
-	ManageUserPermissionRequest_USER_PERMISSION_ADD     ManageUserPermissionRequest_Mode = 0
-	ManageUserPermissionRequest_USER_PERMISSION_DELETE  ManageUserPermissionRequest_Mode = 1
-	ManageUserPermissionRequest_USER_PERMISSION_UPDATE  ManageUserPermissionRequest_Mode = 2
-	ManageUserPermissionRequest_USER_PERMISSION_REPLACE ManageUserPermissionRequest_Mode = 3
-	ManageUserPermissionRequest_ROLE_PERMISSION_ADD     ManageUserPermissionRequest_Mode = 4
-	ManageUserPermissionRequest_ROLE_PERMISSION_DELETE  ManageUserPermissionRequest_Mode = 5
-	ManageUserPermissionRequest_ROLE_PERMISSION_UPDATE  ManageUserPermissionRequest_Mode = 6
-	ManageUserPermissionRequest_ROLE_PERMISSION_REPLACE ManageUserPermissionRequest_Mode = 7
+	ManageUserPermissionRequest_USER_PERMISSION_ADD     ManageUserPermissionRequest_Mode = 0 // 增加用户权限
+	ManageUserPermissionRequest_USER_PERMISSION_DELETE  ManageUserPermissionRequest_Mode = 1 // 删除用户权限
+	ManageUserPermissionRequest_USER_PERMISSION_UPDATE  ManageUserPermissionRequest_Mode = 2 // 更新用户权限
+	ManageUserPermissionRequest_USER_PERMISSION_REPLACE ManageUserPermissionRequest_Mode = 3 // 替换用户权限
+	ManageUserPermissionRequest_ROLE_PERMISSION_ADD     ManageUserPermissionRequest_Mode = 4 // 增加角色权限
+	ManageUserPermissionRequest_ROLE_PERMISSION_DELETE  ManageUserPermissionRequest_Mode = 5 // 删除角色权限
+	ManageUserPermissionRequest_ROLE_PERMISSION_UPDATE  ManageUserPermissionRequest_Mode = 6 // 更新角色权限
+	ManageUserPermissionRequest_ROLE_PERMISSION_REPLACE ManageUserPermissionRequest_Mode = 7 // 替换角色权限
 )
 
 // Enum value maps for ManageUserPermissionRequest_Mode.
@@ -499,9 +499,9 @@ type ResetPasswordRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Username         string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	VerificationCode string `protobuf:"bytes,2,opt,name=verification_code,json=verificationCode,proto3" json:"verification_code,omitempty"`
-	NewPassword      string `protobuf:"bytes,3,opt,name=new_password,json=newPassword,proto3" json:"new_password,omitempty"`
+	Username         string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`                                         // 用户名
+	VerificationCode string `protobuf:"bytes,2,opt,name=verification_code,json=verificationCode,proto3" json:"verification_code,omitempty"` // 验证码
+	NewPassword      string `protobuf:"bytes,3,opt,name=new_password,json=newPassword,proto3" json:"new_password,omitempty"`                // 新密码
 }
 
 func (x *ResetPasswordRequest) Reset() {
@@ -563,7 +563,7 @@ type AuthenticationResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Token  string `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	Token  string `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"` // 认证令牌
 }
 
 func (x *AuthenticationResponse) Reset() {
@@ -785,7 +785,7 @@ type ManageUserPermissionRequest struct {
 	UserId        int64                            `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	RoleIds       []int64                          `protobuf:"varint,2,rep,packed,name=role_ids,json=roleIds,proto3" json:"role_ids,omitempty"`
 	PermissionIds []int64                          `protobuf:"varint,3,rep,packed,name=permission_ids,json=permissionIds,proto3" json:"permission_ids,omitempty"`
-	Mode          ManageUserPermissionRequest_Mode `protobuf:"varint,4,opt,name=mode,proto3,enum=userv1.ManageUserPermissionRequest_Mode" json:"mode,omitempty"`
+	Mode          ManageUserPermissionRequest_Mode `protobuf:"varint,4,opt,name=mode,proto3,enum=userv1.ManageUserPermissionRequest_Mode" json:"mode,omitempty"` // 操作模式
 }
 
 func (x *ManageUserPermissionRequest) Reset() {
@@ -1247,8 +1247,8 @@ type UserActivity struct {
 	unknownFields protoimpl.UnknownFields
 
 	Timestamp string `protobuf:"bytes,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Action    string `protobuf:"bytes,2,opt,name=action,proto3" json:"action,omitempty"`
-	Resource  string `protobuf:"bytes,3,opt,name=resource,proto3" json:"resource,omitempty"`
+	Action    string `protobuf:"bytes,2,opt,name=action,proto3" json:"action,omitempty"`     // 操作 例如: login, logout
+	Resource  string `protobuf:"bytes,3,opt,name=resource,proto3" json:"resource,omitempty"` // 资源 例如: /api/users
 	Message   string `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
 	Id        int64  `protobuf:"varint,5,opt,name=id,proto3" json:"id,omitempty"`
 }
