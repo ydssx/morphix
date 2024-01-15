@@ -17,7 +17,7 @@ func InitMongoDB(url string) (*mongo.Client, func()) {
 	ctx := context.Background()
 	cli, err := mongo.Connect(ctx, options.Client().ApplyURI(url), options.Client().SetMaxPoolSize(100), options.Client().SetMaxConnIdleTime(10*time.Second))
 	if err != nil {
-		panic(err)
+		panic("failed to connect to MongoDB: " + err.Error())
 	}
 
 	cleanup := func() { cli.Disconnect(ctx) }
@@ -25,7 +25,7 @@ func InitMongoDB(url string) (*mongo.Client, func()) {
 	err = cli.Ping(ctx, readpref.Primary())
 	if err != nil {
 		cleanup()
-		panic(err)
+		panic("failed to ping MongoDB: " + err.Error())
 	}
 
 	return cli, cleanup

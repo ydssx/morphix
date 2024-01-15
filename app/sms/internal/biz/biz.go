@@ -11,7 +11,7 @@ import (
 // ProviderSet is biz providers.
 var ProviderSet = wire.NewSet(NewSmsUseCase, NewSmsRedisClient)
 
-func NewSmsRedisClient(c *conf.Bootstrap) *goredis.Client {
+func NewSmsRedisClient(c *conf.Bootstrap) (*goredis.Client, error) {
 	redisConf := c.ServiceSet.Sms.Data.Redis
 	return redis.NewRedis(&goredis.Options{
 		Addr:         redisConf.Addr,

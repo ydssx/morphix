@@ -14,6 +14,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type SmsRepo interface {
+}
+
 type SmsUseCase struct {
 	rdb *redis.Client
 }

@@ -37,7 +37,18 @@ type Data struct {
 
 type contextTxKey struct{}
 
-// NewData .
+// NewData returns a new instance of Data along with a cleanup function and error (if any).
+//
+// It takes the following parameters:
+//  - logger: an instance of log.Logger used for logging
+//  - rdb: a pointer to a goredis.Client used for Redis operations
+//  - db: a pointer to a gorm.DB used for database operations
+//  - collection: a pointer to a mongo.Collection used for MongoDB operations
+//
+// It returns the following:
+//  - data: an instance of Data containing the initialized Redis, database, and MongoDB clients
+//  - cleanup: a cleanup function that can be used to close the MongoDB client and perform any necessary cleanup tasks
+//  - error: an error, if any, encountered during the initialization process
 func NewData(logger log.Logger, rdb *goredis.Client, db *gorm.DB, collection *mongo.Collection) (*Data, func(), error) {
 	cleanup := func() {
 		log.NewHelper(logger).Info("closing the data resources")

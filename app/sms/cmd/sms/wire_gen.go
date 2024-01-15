@@ -22,7 +22,10 @@ import (
 // Injectors from wire.go:
 
 func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
-	client := biz.NewSmsRedisClient(bootstrap)
+	client, err := biz.NewSmsRedisClient(bootstrap)
+	if err != nil {
+		return nil, nil, err
+	}
 	smsUseCase := biz.NewSmsUseCase(client)
 	smsService := service.NewSMSService(smsUseCase)
 	grpcServer := server.NewGRPCServer(bootstrap, smsService)

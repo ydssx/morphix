@@ -89,7 +89,7 @@ type UserUseCase struct {
 	log    *log.Helper
 	sms    smsv1.SMSServiceClient
 	tm     Transaction
-	jobCli jobv1.JobServiceClient
+	jobCli jobv1.JobServiceClient // 异步任务客户端
 }
 
 func NewUserUseCase(userRepo UserRepo, logger log.Logger, smsClient smsv1.SMSServiceClient, transaction Transaction, jobClient jobv1.JobServiceClient) *UserUseCase {
@@ -442,6 +442,5 @@ func (uc *UserUseCase) GetUserActivity(ctx context.Context, req *userv1.GetUserA
 			Timestamp: timestamp,
 		})
 	}
-
 	return res, nil
 }
