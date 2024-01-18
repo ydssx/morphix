@@ -87,8 +87,8 @@ type (
 type UserUseCase struct {
 	repo   UserRepo
 	log    *log.Helper
-	sms    smsv1.SMSServiceClient
-	tm     Transaction
+	sms    smsv1.SMSServiceClient // 短信服务客户端
+	tm     Transaction            // 事务管理器
 	jobCli jobv1.JobServiceClient // 异步任务客户端
 }
 
@@ -273,7 +273,7 @@ func (uc *UserUseCase) GetUser(ctx context.Context, req *userv1.GetUserRequest) 
 // ResetPassword resets the password for a user after verifying the SMS verification code.
 // It checks the verification code status via SMS service, gets the user by username,
 // and updates the user's password in the repository.
-func (uc *UserUseCase) ResetPassword(ctx context.Context, req *userv1.ResetPasswordRequest) error {
+func (uc *UserUseCase) ResetPassword(ctx context.Context, req *userv1.ResetPasswordRequest) (*emptypb.Empty, error) {
 	// Check the SMS status for verification code
 	checkResult, err := uc.sms.CheckSMSStatus(ctx, &smsv1.QuerySMSStatusRequest{
 		MobileNumber: "",
@@ -281,27 +281,31 @@ func (uc *UserUseCase) ResetPassword(ctx context.Context, req *userv1.ResetPassw
 		Scene:        smsv1.SmsScene_USER_RESET_PASSWORD,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// If SMS verification fails, return an error
 	if !checkResult.Status {
-		return status.Error(codes.FailedPrecondition, "验证码错误")
+		return nil, status.Error(codes.FailedPrecondition, "验证码错误")
 	}
 
 	// Get the user by username
 	user, err := uc.repo.GetUserByName(ctx, req.Username)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Update the user's password
-	return uc.repo.UpdateUser(ctx, &models.User{
+	err = uc.repo.UpdateUser(ctx, &models.User{
 		BaseModel: models.BaseModel{
 			ID: user.ID,
 		},
 		Password: util.MD5(req.NewPassword),
 	})
+	if err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
 }
 
 // UpdateProfile updates the email and phone number for the authenticated user.

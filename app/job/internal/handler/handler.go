@@ -17,17 +17,24 @@ type jobHandler func(ctx context.Context, t *asynq.Task) error
 
 var (
 	// 定时任务注册
-	cronJobMap = map[string]jobv1.JobType{
+	CronJobMap = map[string]jobv1.JobType{
 		"@every 5s":   jobv1.JobType_TEST_CRON_JOB,
 		"*/1 * * * *": jobv1.JobType_TEST_CRON_JOB,
 	}
 
 	// 任务处理函数注册
-	jobHandlerMap = map[jobv1.JobType]jobHandler{
+	JobHandlerMap = map[jobv1.JobType]jobHandler{
 		jobv1.JobType_TEST_JOB:      TestJobHandler,
 		jobv1.JobType_TEST_CRON_JOB: TestCronJobHandler,
 	}
 )
+
+func ValidateTask(jobType jobv1.JobType) error {
+	if _, ok := JobHandlerMap[jobType]; !ok {
+		return fmt.Errorf("the cron job [%s] does not have any registered handlers", jobType.String())
+	}
+	return nil
+}
 
 // =======================================================
 //

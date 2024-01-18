@@ -35,11 +35,7 @@ func (s *UserService) UpdateProfile(ctx context.Context, req *userv1.UpdateProfi
 
 // 用户重置密码
 func (s *UserService) ResetPassword(ctx context.Context, req *userv1.ResetPasswordRequest) (*emptypb.Empty, error) {
-	if err := s.uc.ResetPassword(ctx, req); err != nil {
-		return nil, err
-	}
-
-	return &emptypb.Empty{}, nil
+	return s.uc.ResetPassword(ctx, req)
 }
 
 func (s *UserService) GetUserList(ctx context.Context, req *userv1.UserListRequest) (*userv1.UserListResponse, error) {
@@ -73,4 +69,3 @@ func (s *UserService) LogActivity(ctx context.Context, req *userv1.LogEntry) (re
 func (s *UserService) GetUserActivity(ctx context.Context, req *userv1.GetUserActivityRequest) (res *userv1.UserActivityListResponse, err error) {
 	return s.uc.GetUserActivity(ctx, req)
 }
-
