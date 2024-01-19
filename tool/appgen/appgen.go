@@ -102,12 +102,13 @@ func gen(appName, protoFile string, port int) {
 		}
 	}
 	bar.Finish()
-	serviceInfo := parseProto(protoFile)
+	serviceInfo, supportHttp := parseProto(protoFile)
 	data := map[string]interface{}{
 		"port":        port,
 		"appName":     appName,
 		"serviceInfo": serviceInfo,
 		"module":      parseGoModule(),
+		"supportHttp": supportHttp,
 	}
 
 	mkFile(data, baseDir+"/Dockerfile", Dockerfile)
@@ -212,7 +213,7 @@ type MethInfo struct {
 // parseProto 解析指定的 proto 文件,提取服务、方法等信息,返回 ServiceInfo 结构。
 // 它会打开并解析 proto 文件,通过 proto.Walk 遍历语法树,提取 package、service、rpc 等信息,
 // 并填充到返回的 ServiceInfo 结构中。
-func parseProto(protoFile string) (info ServiceInfo) {
+func parseProto(protoFile string) (info ServiceInfo, supportHttp bool) {
 	// Open the proto file
 	reader, err := os.Open(protoFile)
 	if err != nil {

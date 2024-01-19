@@ -6,7 +6,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
 	goredis "github.com/redis/go-redis/v9"
-	"github.com/ydssx/morphix/app/{{.appName}}/internal/biz"
+	"github.com/ydssx/morphix/app/order/internal/biz"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/cache"
 	"github.com/ydssx/morphix/pkg/mysql"
@@ -21,6 +21,7 @@ var ProviderSet = wire.NewSet(
 	NewRedisCache,
 	NewMysqlDB,
 	NewTransaction,
+	NewOrderRepo,
 )
 
 // Data .
@@ -59,7 +60,7 @@ func NewTransaction(d *Data) biz.Transaction {
 }
 
 func NewRedisCLient(c *conf.Bootstrap) (*goredis.Client, error) {
-	redisConf := c.ServiceSet.{{.appName | Title}}.Data.Redis
+	redisConf := c.ServiceSet.Order.Data.Redis
 	return redis.NewRedis(&goredis.Options{
 		Addr:         redisConf.Addr,
 		Password:     redisConf.Password,
@@ -71,7 +72,7 @@ func NewRedisCLient(c *conf.Bootstrap) (*goredis.Client, error) {
 }
 
 func NewMysqlDB(c *conf.Bootstrap) (*gorm.DB, error) {
-	return mysql.NewDB(c.ServiceSet.{{.appName | Title}}.Data.Database.Source)
+	return mysql.NewDB(c.ServiceSet.Order.Data.Database.Source)
 }
 
 func NewRedisCache(client *goredis.Client) cache.Cache {

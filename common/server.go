@@ -2,6 +2,9 @@ package common
 
 import (
 	"github.com/go-kratos/kratos/v2/middleware/logging"
+	"github.com/go-kratos/kratos/v2/middleware/ratelimit"
+	"github.com/go-kratos/kratos/v2/middleware/recovery"
+	"github.com/go-kratos/kratos/v2/middleware/validate"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/ydssx/morphix/common/conf"
@@ -49,8 +52,11 @@ func NewHTTPServer(server *conf.Server) *http.Server {
 	opts := []http.ServerOption{
 		http.Middleware(
 			logging.Server(logger.DefaultLogger),
+			validate.Validator(),
 			kratos.AuthServer(),
 			kratos.MetricServer(),
+			recovery.Recovery(),
+			ratelimit.Server(),
 		),
 	}
 	if server.Http.Addr != "" {

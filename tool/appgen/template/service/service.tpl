@@ -9,6 +9,8 @@ import (
 	{{end }}
 )
 
+var _ = context.Background
+
 type {{.serviceInfo.Name}} struct {
 	uc *biz.{{.appName | Title}}UseCase
 

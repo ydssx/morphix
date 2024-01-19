@@ -47,8 +47,33 @@ func Fatalf(ctx context.Context, format string, msg ...interface{}) {
 	log.Log(log.LevelFatal, append(kv, logTraceID(ctx)...))
 }
 
+func Fatal(ctx context.Context, msg ...interface{}) {
+	kv := []interface{}{log.DefaultMessageKey, fmt.Sprint(msg...)}
+	log.Log(log.LevelFatal, append(kv, logTraceID(ctx)...))
+}
+
 func Log(ctx context.Context, level log.Level, msg string, keyvals ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, msg}
 	kv = append(kv, logTraceID(ctx)...)
 	log.Log(level, append(kv, keyvals...))
+}
+
+func Debug(ctx context.Context, msg ...interface{}) {
+	kv := []interface{}{log.DefaultMessageKey, fmt.Sprint(msg...)}
+	log.Log(log.LevelDebug, append(kv, logTraceID(ctx)...))
+}
+
+func Debugf(ctx context.Context, format string, msg ...interface{}) {
+	kv := []interface{}{log.DefaultMessageKey, fmt.Sprintf(format, msg...)}
+	log.Log(log.LevelDebug, append(kv, logTraceID(ctx)...))
+}
+
+func Warn(ctx context.Context, msg ...interface{}) {
+	kv := []interface{}{log.DefaultMessageKey, fmt.Sprint(msg...)}
+	log.Log(log.LevelWarn, append(kv, logTraceID(ctx)...))
+}
+
+func Warnf(ctx context.Context, format string, msg ...interface{}) {
+	kv := []interface{}{log.DefaultMessageKey, fmt.Sprintf(format, msg...)}
+	log.Log(log.LevelWarn, append(kv, logTraceID(ctx)...))
 }

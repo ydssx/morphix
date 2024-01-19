@@ -11,7 +11,7 @@ var natsConn *nats.Conn
 func InitNats(url string) (conn *nats.Conn, cleanup func(), err error) {
 	natsConn, err = nats.Connect(url, nats.Timeout(time.Second*5))
 	if err != nil {
-		panic(err)
+		panic("failed to connect to NATS: " + err.Error())
 	}
 	cleanup = func() {
 		err = natsConn.Drain()

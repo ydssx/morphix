@@ -59,6 +59,9 @@ func authCtx(ctx context.Context) (context.Context, error) {
 	return parseToken(ctx)
 }
 
+// parseToken 解析传入的 context 中的 token,验证其有效性。
+// 如果 token 验证失败,返回错误。
+// 如果验证成功,使用提取的 claims 生成新的 context 并返回。
 func parseToken(ctx context.Context) (context.Context, error) {
 	token, err := auth.AuthFromMD(ctx, "bearer")
 	if err != nil {

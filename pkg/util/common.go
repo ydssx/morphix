@@ -11,6 +11,9 @@ import (
 	"regexp"
 	"strconv"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/bwmarrin/snowflake"
 )
 
 // IsPhoneNumber checks if the given string is a valid phone number.
@@ -388,3 +391,16 @@ func GetEnv(key, fallback string) string {
 	return fallback
 }
 
+func GetUUID() string {
+	return uuid.New().String()
+}
+
+// GenerateOrderNumber 生成订单号
+func GenerateOrderNumber() (string, error) {
+    node, err := snowflake.NewNode(1) // 1 是节点ID
+    if err != nil {
+        return "", err
+    }
+    id := node.Generate()
+    return id.String(), nil
+}

@@ -9,10 +9,10 @@ import (
 // table orders
 type Order struct {
 	BaseModel
-	OrderId int     `json:"order_id" gorm:"column:order_id;primaryKey;not null"` // 订单ID
-	UserId  int     `json:"user_id" gorm:"column:user_id;default:NULL"`          // 客户ID
-	Amount  float64 `json:"amount" gorm:"column:amount;default:NULL"`            // 订单金额
-	Status  string  `json:"status" gorm:"column:status;default:NULL"`            // 订单状态
+	OrderNumber string  `json:"order_number" gorm:"column:order_number;not null"` // 订单号
+	UserId      int     `json:"user_id" gorm:"column:user_id;not null"`           // 客户ID
+	Amount      float64 `json:"amount" gorm:"column:amount;not null"`             // 订单金额
+	Status      string  `json:"status" gorm:"column:status;default:PENDING"`             // 订单状态
 }
 
 type orderModel DB

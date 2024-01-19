@@ -12,7 +12,7 @@ import (
 type HttpClient interface {
 	Get(url string, result interface{}) error
 	Post(url string, payload interface{}, result interface{}) error
-	}
+}
 
 // Request represents a HTTP request
 type Request struct {
@@ -85,8 +85,9 @@ func (r *Request) WithContentType(contentType string) *Request {
 
 // Get performs a GET request to the specified URL and stores the response in the provided result variable.
 //
-//  - url: the URL to send the GET request to.
-//  - result: a pointer to a variable that will store the response data.
+//   - url: the URL to send the GET request to.
+//   - result: a pointer to a variable that will store the response data.
+//
 // error: an error that occurred during the request, if any.
 // Return type: error, returns any error that occurred during the request.
 func (r *Request) Get(url string, result interface{}) error {
@@ -104,12 +105,12 @@ func (r *Request) Get(url string, result interface{}) error {
 // Post sends a POST request to the specified URL with the given payload and stores the response in the provided result.
 //
 // Parameters:
-//  - url: The URL to send the request to.
-//  - payload: The data to send in the request body.
-//  - result: A pointer to the variable where the response will be stored.
+//   - url: The URL to send the request to.
+//   - payload: The data to send in the request body.
+//   - result: A pointer to the variable where the response will be stored.
 //
 // Returns:
-//  - error: An error if there was a problem sending the request or handling the response.
+//   - error: An error if there was a problem sending the request or handling the response.
 func (r *Request) Post(url string, payload interface{}, result interface{}) error {
 	req := r.client.R()
 	r.addHeaders(req)
