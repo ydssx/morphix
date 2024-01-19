@@ -33,7 +33,7 @@ message OrderItem {
 
 // 创建订单请求消息
 message CreateOrderRequest {
-  int32 customer_id = 1; // 客户ID
+  int64 customer_id = 1; // 客户ID
   repeated OrderItem items = 2; // 订单商品列表
 }
 
@@ -73,8 +73,10 @@ message DeleteOrderResponse {}
 
 // 查询订单列表请求消息
 message ListOrdersRequest {
-  int32 customer_id = 1; // 可选：根据客户ID筛选订单列表
+  int64 customer_id = 1; // 可选：根据客户ID筛选订单列表
   OrderStatus status = 2; // 可选：根据订单状态筛选订单列表
+  int32 page_size = 3; // 可选：每页订单数量
+  int32 page = 4; // 可选：页码
 }
 
 // 查询订单列表响应消息

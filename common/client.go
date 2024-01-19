@@ -9,6 +9,7 @@ import (
 	"github.com/nats-io/nats.go"
 	goredis "github.com/redis/go-redis/v9"
 	jobv1 "github.com/ydssx/morphix/api/job/v1"
+	productv1 "github.com/ydssx/morphix/api/product/v1"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/common/conf"
@@ -46,6 +47,15 @@ func NewJobClient(c *conf.Bootstrap) jobv1.JobServiceClient {
 	return jobv1.NewJobServiceClient(conn)
 }
 
+func NewProductClient(c *conf.Bootstrap) productv1.ProductServiceClient {
+	conn := createConn(c.Etcd, c.ClientSet.JobRpcClient)
+
+	return productv1.NewProductServiceClient(conn)
+}
+
+// createConn 使用给定的 etcd 配置和 RPC 客户端配置创建一个 gRPC 连接。
+// 它会新建一个 etcd 注册中心,然后使用这个注册中心和上下文来调用 CreateClientConn
+// 来实际创建连接。最后返回建立的 gRPC 客户端连接。
 func createConn(etcdConf *conf.Etcd, rpcCliConf *conf.ClientConf) *grpc.ClientConn {
 	r := NewEtcdRegistry(etcdConf)
 

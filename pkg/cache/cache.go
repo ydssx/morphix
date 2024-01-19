@@ -1,6 +1,8 @@
 package cache
 
-import "time"
+import (
+	"time"
+)
 
 type Cache interface {
 	Get(key string, result interface{}) error

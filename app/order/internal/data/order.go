@@ -12,12 +12,13 @@ type OrderRepo struct {
 }
 
 // CreateOrder implements biz.OrderRepo.
-func (*OrderRepo) CreateOrder(ctx context.Context, order model.Order) (orderID int64, err error) {
-	panic("unimplemented")
+func (o *OrderRepo) CreateOrder(ctx context.Context, order model.Order) (orderID int64, err error) {
+	orderID, err = model.NewOrderModel(o.data.DB(ctx)).Create(order)
+	return
 }
 
 // CreateOrderItem implements biz.OrderRepo.
-func (*OrderRepo) CreateOrderItem(ctx context.Context, orderItem ...model.OrderItem) (err error) {
+func (o *OrderRepo) CreateOrderItem(ctx context.Context, orderItem ...model.OrderItem) (err error) {
 	panic("unimplemented")
 }
 

@@ -522,6 +522,40 @@
         ]
       }
     },
+    "/api/v1/chat/send": {
+      "post": {
+        "summary": "客户端到服务器的流，用于发送消息",
+        "operationId": "ChatService_SendMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chatServerMessage"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": " (streaming inputs)",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chatClientMessage"
+            }
+          }
+        ],
+        "tags": [
+          "ChatService"
+        ]
+      }
+    },
     "/api/v1/orders": {
       "get": {
         "summary": "查询订单列表",
@@ -546,8 +580,8 @@
             "description": "可选：根据客户ID筛选订单列表",
             "in": "query",
             "required": false,
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "format": "int64"
           },
           {
             "name": "status",
@@ -562,6 +596,22 @@
               "CANCELED"
             ],
             "default": "PENDING"
+          },
+          {
+            "name": "pageSize",
+            "description": "可选：每页订单数量",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "page",
+            "description": "可选：页码",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -858,6 +908,43 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "pageSize",
+            "description": "每页产品数量",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "页码",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "name",
+            "description": "产品名称",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "productIds",
+            "description": "产品ID",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
         "tags": [
           "ProductService"
         ]
@@ -1447,6 +1534,18 @@
       },
       "title": "客户端和服务器之间的聊天消息"
     },
+    "chatClientMessage": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "messageText": {
+          "type": "string"
+        }
+      },
+      "title": "客户端发送的消息"
+    },
     "chatServerMessage": {
       "type": "object",
       "properties": {
@@ -1506,8 +1605,8 @@
       "type": "object",
       "properties": {
         "customerId": {
-          "type": "integer",
-          "format": "int32",
+          "type": "string",
+          "format": "int64",
           "title": "客户ID"
         },
         "items": {
@@ -1769,6 +1868,7 @@
       "properties": {
         "id": {
           "type": "string",
+          "format": "int64",
           "title": "产品ID"
         },
         "name": {

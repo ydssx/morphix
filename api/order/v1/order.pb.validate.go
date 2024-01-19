@@ -1251,6 +1251,10 @@ func (m *ListOrdersRequest) validate(all bool) error {
 
 	// no validation rules for Status
 
+	// no validation rules for PageSize
+
+	// no validation rules for Page
+
 	if len(errors) > 0 {
 		return ListOrdersRequestMultiError(errors)
 	}

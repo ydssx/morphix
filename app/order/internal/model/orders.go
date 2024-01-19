@@ -12,7 +12,7 @@ type Order struct {
 	OrderNumber string  `json:"order_number" gorm:"column:order_number;not null"` // 订单号
 	UserId      int     `json:"user_id" gorm:"column:user_id;not null"`           // 客户ID
 	Amount      float64 `json:"amount" gorm:"column:amount;not null"`             // 订单金额
-	Status      string  `json:"status" gorm:"column:status;default:PENDING"`             // 订单状态
+	Status      string  `json:"status" gorm:"column:status;default:PENDING"`      // 订单状态
 }
 
 type orderModel DB
@@ -42,8 +42,9 @@ func (m *orderModel) WithContext(ctx context.Context) *orderModel {
 	return m
 }
 
-func (m *orderModel) Create(order Order) error {
-	return m.db.Create(&order).Error
+func (m *orderModel) Create(order Order) (int64, error) {
+	err := m.db.Create(&order).Error
+	return int64(order.ID), err
 }
 
 func (m *orderModel) Updates(values interface{}) error {
