@@ -41,6 +41,8 @@ const (
 	// OrderServiceUpdateOrderStatusProcedure is the fully-qualified name of the OrderService's
 	// UpdateOrderStatus RPC.
 	OrderServiceUpdateOrderStatusProcedure = "/orderv1.OrderService/UpdateOrderStatus"
+	// OrderServicePayOrderProcedure is the fully-qualified name of the OrderService's PayOrder RPC.
+	OrderServicePayOrderProcedure = "/orderv1.OrderService/PayOrder"
 	// OrderServiceDeleteOrderProcedure is the fully-qualified name of the OrderService's DeleteOrder
 	// RPC.
 	OrderServiceDeleteOrderProcedure = "/orderv1.OrderService/DeleteOrder"
@@ -56,6 +58,8 @@ type OrderServiceClient interface {
 	GetOrder(context.Context, *connect_go.Request[v1.GetOrderRequest]) (*connect_go.Response[v1.GetOrderResponse], error)
 	// 更新订单状态
 	UpdateOrderStatus(context.Context, *connect_go.Request[v1.UpdateOrderStatusRequest]) (*connect_go.Response[v1.UpdateOrderStatusResponse], error)
+	// 支付订单
+	PayOrder(context.Context, *connect_go.Request[v1.PayOrderRequest]) (*connect_go.Response[v1.PayOrderResponse], error)
 	// 删除订单
 	DeleteOrder(context.Context, *connect_go.Request[v1.DeleteOrderRequest]) (*connect_go.Response[v1.DeleteOrderResponse], error)
 	// 查询订单列表
@@ -87,6 +91,11 @@ func NewOrderServiceClient(httpClient connect_go.HTTPClient, baseURL string, opt
 			baseURL+OrderServiceUpdateOrderStatusProcedure,
 			opts...,
 		),
+		payOrder: connect_go.NewClient[v1.PayOrderRequest, v1.PayOrderResponse](
+			httpClient,
+			baseURL+OrderServicePayOrderProcedure,
+			opts...,
+		),
 		deleteOrder: connect_go.NewClient[v1.DeleteOrderRequest, v1.DeleteOrderResponse](
 			httpClient,
 			baseURL+OrderServiceDeleteOrderProcedure,
@@ -105,6 +114,7 @@ type orderServiceClient struct {
 	createOrder       *connect_go.Client[v1.CreateOrderRequest, v1.CreateOrderResponse]
 	getOrder          *connect_go.Client[v1.GetOrderRequest, v1.GetOrderResponse]
 	updateOrderStatus *connect_go.Client[v1.UpdateOrderStatusRequest, v1.UpdateOrderStatusResponse]
+	payOrder          *connect_go.Client[v1.PayOrderRequest, v1.PayOrderResponse]
 	deleteOrder       *connect_go.Client[v1.DeleteOrderRequest, v1.DeleteOrderResponse]
 	listOrders        *connect_go.Client[v1.ListOrdersRequest, v1.ListOrdersResponse]
 }
@@ -122,6 +132,11 @@ func (c *orderServiceClient) GetOrder(ctx context.Context, req *connect_go.Reque
 // UpdateOrderStatus calls orderv1.OrderService.UpdateOrderStatus.
 func (c *orderServiceClient) UpdateOrderStatus(ctx context.Context, req *connect_go.Request[v1.UpdateOrderStatusRequest]) (*connect_go.Response[v1.UpdateOrderStatusResponse], error) {
 	return c.updateOrderStatus.CallUnary(ctx, req)
+}
+
+// PayOrder calls orderv1.OrderService.PayOrder.
+func (c *orderServiceClient) PayOrder(ctx context.Context, req *connect_go.Request[v1.PayOrderRequest]) (*connect_go.Response[v1.PayOrderResponse], error) {
+	return c.payOrder.CallUnary(ctx, req)
 }
 
 // DeleteOrder calls orderv1.OrderService.DeleteOrder.
@@ -142,6 +157,8 @@ type OrderServiceHandler interface {
 	GetOrder(context.Context, *connect_go.Request[v1.GetOrderRequest]) (*connect_go.Response[v1.GetOrderResponse], error)
 	// 更新订单状态
 	UpdateOrderStatus(context.Context, *connect_go.Request[v1.UpdateOrderStatusRequest]) (*connect_go.Response[v1.UpdateOrderStatusResponse], error)
+	// 支付订单
+	PayOrder(context.Context, *connect_go.Request[v1.PayOrderRequest]) (*connect_go.Response[v1.PayOrderResponse], error)
 	// 删除订单
 	DeleteOrder(context.Context, *connect_go.Request[v1.DeleteOrderRequest]) (*connect_go.Response[v1.DeleteOrderResponse], error)
 	// 查询订单列表
@@ -169,6 +186,11 @@ func NewOrderServiceHandler(svc OrderServiceHandler, opts ...connect_go.HandlerO
 		svc.UpdateOrderStatus,
 		opts...,
 	)
+	orderServicePayOrderHandler := connect_go.NewUnaryHandler(
+		OrderServicePayOrderProcedure,
+		svc.PayOrder,
+		opts...,
+	)
 	orderServiceDeleteOrderHandler := connect_go.NewUnaryHandler(
 		OrderServiceDeleteOrderProcedure,
 		svc.DeleteOrder,
@@ -187,6 +209,8 @@ func NewOrderServiceHandler(svc OrderServiceHandler, opts ...connect_go.HandlerO
 			orderServiceGetOrderHandler.ServeHTTP(w, r)
 		case OrderServiceUpdateOrderStatusProcedure:
 			orderServiceUpdateOrderStatusHandler.ServeHTTP(w, r)
+		case OrderServicePayOrderProcedure:
+			orderServicePayOrderHandler.ServeHTTP(w, r)
 		case OrderServiceDeleteOrderProcedure:
 			orderServiceDeleteOrderHandler.ServeHTTP(w, r)
 		case OrderServiceListOrdersProcedure:
@@ -210,6 +234,10 @@ func (UnimplementedOrderServiceHandler) GetOrder(context.Context, *connect_go.Re
 
 func (UnimplementedOrderServiceHandler) UpdateOrderStatus(context.Context, *connect_go.Request[v1.UpdateOrderStatusRequest]) (*connect_go.Response[v1.UpdateOrderStatusResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("orderv1.OrderService.UpdateOrderStatus is not implemented"))
+}
+
+func (UnimplementedOrderServiceHandler) PayOrder(context.Context, *connect_go.Request[v1.PayOrderRequest]) (*connect_go.Response[v1.PayOrderResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("orderv1.OrderService.PayOrder is not implemented"))
 }
 
 func (UnimplementedOrderServiceHandler) DeleteOrder(context.Context, *connect_go.Request[v1.DeleteOrderRequest]) (*connect_go.Response[v1.DeleteOrderResponse], error) {

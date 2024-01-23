@@ -6,6 +6,47 @@ import "google/api/annotations.proto";
 
 option go_package = "github.com/ydssx/morphix/api/order/v1;orderv1";
 
+// 订单管理服务接口
+service OrderService {
+  // 创建订单
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/orders"
+      body: "*"
+    };
+  }
+
+  // 查询订单
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse) {
+    option (google.api.http) = {get: "/api/v1/orders/{order_id}"};
+  }
+
+  // 更新订单状态
+  rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/orders/{order_id}/status"
+      body: "*"
+    };
+  }
+  // 支付订单
+  rpc PayOrder(PayOrderRequest) returns (PayOrderResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/orders/{order_id}/pay"
+      body: "*"
+    };
+  }
+
+  // 删除订单
+  rpc DeleteOrder(DeleteOrderRequest) returns (DeleteOrderResponse) {
+    option (google.api.http) = {delete: "/api/v1/orders/{order_id}"};
+  }
+
+  // 查询订单列表
+  rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse) {
+    option (google.api.http) = {get: "/api/v1/orders"};
+  }
+}
+
 // 订单消息
 message Order {
   int32 order_id = 1; // 订单ID
@@ -84,36 +125,11 @@ message ListOrdersResponse {
   repeated Order orders = 1; // 查询到的订单列表
 }
 
-// 订单管理服务接口
-service OrderService {
-  // 创建订单
-  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/orders"
-      body: "*"
-    };
-  }
+message PayOrderRequest {
+  int32 order_id = 1; // 订单ID
+  string payment_method = 2; // 支付方式
+}
 
-  // 查询订单
-  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse) {
-    option (google.api.http) = {get: "/api/v1/orders/{order_id}"};
-  }
-
-  // 更新订单状态
-  rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse) {
-    option (google.api.http) = {
-      put: "/api/v1/orders/{order_id}/status"
-      body: "*"
-    };
-  }
-
-  // 删除订单
-  rpc DeleteOrder(DeleteOrderRequest) returns (DeleteOrderResponse) {
-    option (google.api.http) = {delete: "/api/v1/orders/{order_id}"};
-  }
-
-  // 查询订单列表
-  rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse) {
-    option (google.api.http) = {get: "/api/v1/orders"};
-  }
+message PayOrderResponse {
+  string payment_url = 1; // 支付链接
 }

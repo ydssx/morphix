@@ -41,7 +41,7 @@ service ProductService {
 
 // 产品信息
 message Product {
-  string id = 1; // 产品ID
+  int64 id = 1; // 产品ID
   string name = 2; // 产品名称
   string description = 3; // 产品描述
   float price = 4; // 产品价格
@@ -62,11 +62,17 @@ message CreateProductResponse {
 }
 
 // 获取产品列表请求
-message GetProductsRequest {}
+message GetProductsRequest {
+  int64 page_size = 1; // 每页产品数量
+  int64 page = 2; // 页码
+  string name = 3; // 产品名称
+  repeated int64 product_ids = 4; // 产品ID
+}
 
 // 获取产品列表响应
 message GetProductsResponse {
   repeated Product products = 1; // 产品列表
+  int64 total = 2; // 产品总数
 }
 
 // 获取单个产品请求

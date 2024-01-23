@@ -23,6 +23,7 @@ const OperationOrderServiceCreateOrder = "/orderv1.OrderService/CreateOrder"
 const OperationOrderServiceDeleteOrder = "/orderv1.OrderService/DeleteOrder"
 const OperationOrderServiceGetOrder = "/orderv1.OrderService/GetOrder"
 const OperationOrderServiceListOrders = "/orderv1.OrderService/ListOrders"
+const OperationOrderServicePayOrder = "/orderv1.OrderService/PayOrder"
 const OperationOrderServiceUpdateOrderStatus = "/orderv1.OrderService/UpdateOrderStatus"
 
 type OrderServiceHTTPServer interface {
@@ -34,6 +35,8 @@ type OrderServiceHTTPServer interface {
 	GetOrder(context.Context, *GetOrderRequest) (*GetOrderResponse, error)
 	// ListOrders 查询订单列表
 	ListOrders(context.Context, *ListOrdersRequest) (*ListOrdersResponse, error)
+	// PayOrder 支付订单
+	PayOrder(context.Context, *PayOrderRequest) (*PayOrderResponse, error)
 	// UpdateOrderStatus 更新订单状态
 	UpdateOrderStatus(context.Context, *UpdateOrderStatusRequest) (*UpdateOrderStatusResponse, error)
 }
@@ -43,6 +46,7 @@ func RegisterOrderServiceHTTPServer(s *http.Server, srv OrderServiceHTTPServer) 
 	r.POST("/api/v1/orders", _OrderService_CreateOrder0_HTTP_Handler(srv))
 	r.GET("/api/v1/orders/{order_id}", _OrderService_GetOrder0_HTTP_Handler(srv))
 	r.PUT("/api/v1/orders/{order_id}/status", _OrderService_UpdateOrderStatus0_HTTP_Handler(srv))
+	r.POST("/api/v1/orders/{order_id}/pay", _OrderService_PayOrder0_HTTP_Handler(srv))
 	r.DELETE("/api/v1/orders/{order_id}", _OrderService_DeleteOrder0_HTTP_Handler(srv))
 	r.GET("/api/v1/orders", _OrderService_ListOrders0_HTTP_Handler(srv))
 }
@@ -116,6 +120,31 @@ func _OrderService_UpdateOrderStatus0_HTTP_Handler(srv OrderServiceHTTPServer) f
 	}
 }
 
+func _OrderService_PayOrder0_HTTP_Handler(srv OrderServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in PayOrderRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationOrderServicePayOrder)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.PayOrder(ctx, req.(*PayOrderRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*PayOrderResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _OrderService_DeleteOrder0_HTTP_Handler(srv OrderServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in DeleteOrderRequest
@@ -162,6 +191,7 @@ type OrderServiceHTTPClient interface {
 	DeleteOrder(ctx context.Context, req *DeleteOrderRequest, opts ...http.CallOption) (rsp *DeleteOrderResponse, err error)
 	GetOrder(ctx context.Context, req *GetOrderRequest, opts ...http.CallOption) (rsp *GetOrderResponse, err error)
 	ListOrders(ctx context.Context, req *ListOrdersRequest, opts ...http.CallOption) (rsp *ListOrdersResponse, err error)
+	PayOrder(ctx context.Context, req *PayOrderRequest, opts ...http.CallOption) (rsp *PayOrderResponse, err error)
 	UpdateOrderStatus(ctx context.Context, req *UpdateOrderStatusRequest, opts ...http.CallOption) (rsp *UpdateOrderStatusResponse, err error)
 }
 
@@ -219,6 +249,19 @@ func (c *OrderServiceHTTPClientImpl) ListOrders(ctx context.Context, in *ListOrd
 	opts = append(opts, http.Operation(OperationOrderServiceListOrders))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *OrderServiceHTTPClientImpl) PayOrder(ctx context.Context, in *PayOrderRequest, opts ...http.CallOption) (*PayOrderResponse, error) {
+	var out PayOrderResponse
+	pattern := "/api/v1/orders/{order_id}/pay"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationOrderServicePayOrder))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

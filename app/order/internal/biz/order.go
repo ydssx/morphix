@@ -4,6 +4,7 @@ import (
 	"context"
 
 	orderv1 "github.com/ydssx/morphix/api/order/v1"
+	paymentv1 "github.com/ydssx/morphix/api/payment/v1"
 	productv1 "github.com/ydssx/morphix/api/product/v1"
 	"github.com/ydssx/morphix/app/order/internal/model"
 	"github.com/ydssx/morphix/pkg/errors"
@@ -38,10 +39,11 @@ type OrderUseCase struct {
 	repo          OrderRepo
 	tx            Transaction
 	productClient productv1.ProductServiceClient
+	paymentClient paymentv1.PaymentServiceClient
 }
 
-func NewOrderUseCase(tx Transaction, repo OrderRepo, productClient productv1.ProductServiceClient) *OrderUseCase {
-	return &OrderUseCase{repo: repo, tx: tx, productClient: productClient}
+func NewOrderUseCase(tx Transaction, repo OrderRepo, productClient productv1.ProductServiceClient, paymentClient paymentv1.PaymentServiceClient) *OrderUseCase {
+	return &OrderUseCase{repo: repo, tx: tx, productClient: productClient, paymentClient: paymentClient}
 }
 
 // 创建订单
@@ -104,7 +106,6 @@ func (b *OrderUseCase) CreateOrder(ctx context.Context, req *orderv1.CreateOrder
 
 		return nil
 	})
-
 	return
 }
 

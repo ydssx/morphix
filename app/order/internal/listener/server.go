@@ -3,7 +3,6 @@ package listener
 import (
 	"context"
 
-	daprcommon "github.com/dapr/go-sdk/service/common"
 	"github.com/google/wire"
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/pkg/mq"
@@ -31,17 +30,4 @@ func (l *ListenerServer) Start(ctx context.Context) error {
 
 func (*ListenerServer) Stop(context.Context) error {
 	return nil
-}
-
-func RegisterListener(srv daprcommon.Service) {
-	for subject, handler := range daprSubjectHandlerMap {
-		sub := &daprcommon.Subscription{
-			PubsubName: "pubsub",
-			Topic:      subject.String(),
-		}
-		err := srv.AddTopicEventHandler(sub, handler)
-		if err != nil {
-			panic(err)
-		}
-	}
 }

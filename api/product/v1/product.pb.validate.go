@@ -379,6 +379,12 @@ func (m *GetProductsRequest) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for PageSize
+
+	// no validation rules for Page
+
+	// no validation rules for Name
+
 	if len(errors) > 0 {
 		return GetProductsRequestMultiError(errors)
 	}
@@ -514,6 +520,8 @@ func (m *GetProductsResponse) validate(all bool) error {
 		}
 
 	}
+
+	// no validation rules for Total
 
 	if len(errors) > 0 {
 		return GetProductsResponseMultiError(errors)
