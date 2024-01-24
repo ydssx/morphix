@@ -19,9 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	QuoteService_CreateQuote_FullMethodName = "/quote.QuoteService/CreateQuote"
-	QuoteService_GetQuotes_FullMethodName   = "/quote.QuoteService/GetQuotes"
-	QuoteService_GetQuote_FullMethodName    = "/quote.QuoteService/GetQuote"
+	QuoteService_CreateQuote_FullMethodName    = "/quote.QuoteService/CreateQuote"
+	QuoteService_GetQuotes_FullMethodName      = "/quote.QuoteService/GetQuotes"
+	QuoteService_GetQuote_FullMethodName       = "/quote.QuoteService/GetQuote"
+	QuoteService_GetUserCoupons_FullMethodName = "/quote.QuoteService/GetUserCoupons"
+	QuoteService_UseCoupon_FullMethodName      = "/quote.QuoteService/UseCoupon"
 )
 
 // QuoteServiceClient is the client API for QuoteService service.
@@ -34,6 +36,10 @@ type QuoteServiceClient interface {
 	GetQuotes(ctx context.Context, in *GetQuotesRequest, opts ...grpc.CallOption) (*GetQuotesResponse, error)
 	// 获取单个报价
 	GetQuote(ctx context.Context, in *GetQuoteRequest, opts ...grpc.CallOption) (*Quote, error)
+	// 获取用户拥有的优惠券列表
+	GetUserCoupons(ctx context.Context, in *GetUserCouponsRequest, opts ...grpc.CallOption) (*GetUserCouponsResponse, error)
+	// 使用优惠券
+	UseCoupon(ctx context.Context, in *UseCouponRequest, opts ...grpc.CallOption) (*UseCouponResponse, error)
 }
 
 type quoteServiceClient struct {
@@ -71,6 +77,24 @@ func (c *quoteServiceClient) GetQuote(ctx context.Context, in *GetQuoteRequest, 
 	return out, nil
 }
 
+func (c *quoteServiceClient) GetUserCoupons(ctx context.Context, in *GetUserCouponsRequest, opts ...grpc.CallOption) (*GetUserCouponsResponse, error) {
+	out := new(GetUserCouponsResponse)
+	err := c.cc.Invoke(ctx, QuoteService_GetUserCoupons_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *quoteServiceClient) UseCoupon(ctx context.Context, in *UseCouponRequest, opts ...grpc.CallOption) (*UseCouponResponse, error) {
+	out := new(UseCouponResponse)
+	err := c.cc.Invoke(ctx, QuoteService_UseCoupon_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QuoteServiceServer is the server API for QuoteService service.
 // All implementations should embed UnimplementedQuoteServiceServer
 // for forward compatibility
@@ -81,6 +105,10 @@ type QuoteServiceServer interface {
 	GetQuotes(context.Context, *GetQuotesRequest) (*GetQuotesResponse, error)
 	// 获取单个报价
 	GetQuote(context.Context, *GetQuoteRequest) (*Quote, error)
+	// 获取用户拥有的优惠券列表
+	GetUserCoupons(context.Context, *GetUserCouponsRequest) (*GetUserCouponsResponse, error)
+	// 使用优惠券
+	UseCoupon(context.Context, *UseCouponRequest) (*UseCouponResponse, error)
 }
 
 // UnimplementedQuoteServiceServer should be embedded to have forward compatible implementations.
@@ -95,6 +123,12 @@ func (UnimplementedQuoteServiceServer) GetQuotes(context.Context, *GetQuotesRequ
 }
 func (UnimplementedQuoteServiceServer) GetQuote(context.Context, *GetQuoteRequest) (*Quote, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetQuote not implemented")
+}
+func (UnimplementedQuoteServiceServer) GetUserCoupons(context.Context, *GetUserCouponsRequest) (*GetUserCouponsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserCoupons not implemented")
+}
+func (UnimplementedQuoteServiceServer) UseCoupon(context.Context, *UseCouponRequest) (*UseCouponResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UseCoupon not implemented")
 }
 
 // UnsafeQuoteServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -162,6 +196,42 @@ func _QuoteService_GetQuote_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _QuoteService_GetUserCoupons_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserCouponsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QuoteServiceServer).GetUserCoupons(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: QuoteService_GetUserCoupons_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QuoteServiceServer).GetUserCoupons(ctx, req.(*GetUserCouponsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _QuoteService_UseCoupon_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UseCouponRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QuoteServiceServer).UseCoupon(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: QuoteService_UseCoupon_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QuoteServiceServer).UseCoupon(ctx, req.(*UseCouponRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // QuoteService_ServiceDesc is the grpc.ServiceDesc for QuoteService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -181,134 +251,13 @@ var QuoteService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetQuote",
 			Handler:    _QuoteService_GetQuote_Handler,
 		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/quote/v1/quote.proto",
-}
-
-const (
-	CouponService_GetUserCoupons_FullMethodName = "/quote.CouponService/GetUserCoupons"
-	CouponService_UseCoupon_FullMethodName      = "/quote.CouponService/UseCoupon"
-)
-
-// CouponServiceClient is the client API for CouponService service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type CouponServiceClient interface {
-	// 获取用户拥有的优惠券列表
-	GetUserCoupons(ctx context.Context, in *GetUserCouponsRequest, opts ...grpc.CallOption) (*GetUserCouponsResponse, error)
-	// 使用优惠券
-	UseCoupon(ctx context.Context, in *UseCouponRequest, opts ...grpc.CallOption) (*UseCouponResponse, error)
-}
-
-type couponServiceClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewCouponServiceClient(cc grpc.ClientConnInterface) CouponServiceClient {
-	return &couponServiceClient{cc}
-}
-
-func (c *couponServiceClient) GetUserCoupons(ctx context.Context, in *GetUserCouponsRequest, opts ...grpc.CallOption) (*GetUserCouponsResponse, error) {
-	out := new(GetUserCouponsResponse)
-	err := c.cc.Invoke(ctx, CouponService_GetUserCoupons_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *couponServiceClient) UseCoupon(ctx context.Context, in *UseCouponRequest, opts ...grpc.CallOption) (*UseCouponResponse, error) {
-	out := new(UseCouponResponse)
-	err := c.cc.Invoke(ctx, CouponService_UseCoupon_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// CouponServiceServer is the server API for CouponService service.
-// All implementations should embed UnimplementedCouponServiceServer
-// for forward compatibility
-type CouponServiceServer interface {
-	// 获取用户拥有的优惠券列表
-	GetUserCoupons(context.Context, *GetUserCouponsRequest) (*GetUserCouponsResponse, error)
-	// 使用优惠券
-	UseCoupon(context.Context, *UseCouponRequest) (*UseCouponResponse, error)
-}
-
-// UnimplementedCouponServiceServer should be embedded to have forward compatible implementations.
-type UnimplementedCouponServiceServer struct {
-}
-
-func (UnimplementedCouponServiceServer) GetUserCoupons(context.Context, *GetUserCouponsRequest) (*GetUserCouponsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserCoupons not implemented")
-}
-func (UnimplementedCouponServiceServer) UseCoupon(context.Context, *UseCouponRequest) (*UseCouponResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UseCoupon not implemented")
-}
-
-// UnsafeCouponServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to CouponServiceServer will
-// result in compilation errors.
-type UnsafeCouponServiceServer interface {
-	mustEmbedUnimplementedCouponServiceServer()
-}
-
-func RegisterCouponServiceServer(s grpc.ServiceRegistrar, srv CouponServiceServer) {
-	s.RegisterService(&CouponService_ServiceDesc, srv)
-}
-
-func _CouponService_GetUserCoupons_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUserCouponsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CouponServiceServer).GetUserCoupons(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CouponService_GetUserCoupons_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CouponServiceServer).GetUserCoupons(ctx, req.(*GetUserCouponsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _CouponService_UseCoupon_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UseCouponRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CouponServiceServer).UseCoupon(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CouponService_UseCoupon_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CouponServiceServer).UseCoupon(ctx, req.(*UseCouponRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// CouponService_ServiceDesc is the grpc.ServiceDesc for CouponService service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var CouponService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "quote.CouponService",
-	HandlerType: (*CouponServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetUserCoupons",
-			Handler:    _CouponService_GetUserCoupons_Handler,
+			Handler:    _QuoteService_GetUserCoupons_Handler,
 		},
 		{
 			MethodName: "UseCoupon",
-			Handler:    _CouponService_UseCoupon_Handler,
+			Handler:    _QuoteService_UseCoupon_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

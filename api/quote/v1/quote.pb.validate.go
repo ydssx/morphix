@@ -541,7 +541,63 @@ func (m *GetQuotesRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for ProductId
+	if all {
+		switch v := interface{}(m.GetDateRangeStart()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetQuotesRequestValidationError{
+					field:  "DateRangeStart",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetQuotesRequestValidationError{
+					field:  "DateRangeStart",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDateRangeStart()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetQuotesRequestValidationError{
+				field:  "DateRangeStart",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDateRangeEnd()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetQuotesRequestValidationError{
+					field:  "DateRangeEnd",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetQuotesRequestValidationError{
+					field:  "DateRangeEnd",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDateRangeEnd()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetQuotesRequestValidationError{
+				field:  "DateRangeEnd",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return GetQuotesRequestMultiError(errors)
@@ -882,6 +938,66 @@ func (m *GetUserCouponsRequest) validate(all bool) error {
 	var errors []error
 
 	// no validation rules for UserId
+
+	// no validation rules for CouponStatus
+
+	if all {
+		switch v := interface{}(m.GetDateRangeStart()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetUserCouponsRequestValidationError{
+					field:  "DateRangeStart",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetUserCouponsRequestValidationError{
+					field:  "DateRangeStart",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDateRangeStart()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetUserCouponsRequestValidationError{
+				field:  "DateRangeStart",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDateRangeEnd()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetUserCouponsRequestValidationError{
+					field:  "DateRangeEnd",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetUserCouponsRequestValidationError{
+					field:  "DateRangeEnd",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDateRangeEnd()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetUserCouponsRequestValidationError{
+				field:  "DateRangeEnd",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return GetUserCouponsRequestMultiError(errors)

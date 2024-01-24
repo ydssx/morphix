@@ -28,6 +28,7 @@ service ArtService {
 
   // 获取模型信息
   rpc GetModelInfo(google.protobuf.Empty) returns (GetModelInfoResponse);
+
   rpc ImageToImage(ImageToImageRequest) returns (ImageToImageResponse) {
     option (google.api.http) = {
       post: "/v1/images/image_to_image"

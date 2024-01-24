@@ -6,19 +6,33 @@ import "google/api/annotations.proto";
 
 option go_package = "github.com/ydssx/morphix/api/payment/v1;paymentv1";
 
+// 支付方式
+enum PaymentMethod {
+  UNKNOWN = 0;
+  ALIPAY = 1;
+  WECHAT = 2;
+  PAYPAL = 3;
+}
+
+// 支付状态
+enum PaymentStatus {
+  PENDING = 0;
+  SUCCESS = 1;
+  FAILED = 2;
+}
+
 // 支付请求
 message MakePaymentRequest {
-  string order_id = 1;
+  int64 order_id = 1;
   double amount = 2;
   string currency = 3;
-  // 其他字段...
 }
 
 // 支付响应
 message PaymentResponse {
-  string order_id = 1;
+  int64 order_id = 1;
   string status = 2;
-  // 其他字段...
+  string payment_url = 3;
 }
 
 // 查询支付请求
@@ -32,14 +46,12 @@ message GetPaymentResponse {
   string order_id = 1;
   double amount = 2;
   string currency = 3;
-  string status = 4;
-  // 其他字段...
+  PaymentStatus status = 4;
 }
 
 // 取消支付请求
 message CancelPaymentRequest {
   int64 order_id = 1;
-  // 其他字段...
 }
 
 // 取消支付响应
@@ -53,14 +65,12 @@ message RefundRequest {
   string order_id = 1;
   double amount = 2;
   string currency = 3;
-  // 其他字段...
 }
 
 // 退款响应
 message RefundResponse {
   string order_id = 1;
   string status = 2;
-  // 其他字段...
 }
 
 // 定义支付服务接口

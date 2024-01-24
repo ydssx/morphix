@@ -18,6 +18,12 @@ service QuoteService {
 
   // 获取单个报价
   rpc GetQuote(GetQuoteRequest) returns (Quote);
+
+  // 获取用户拥有的优惠券列表
+  rpc GetUserCoupons(GetUserCouponsRequest) returns (GetUserCouponsResponse);
+
+  // 使用优惠券
+  rpc UseCoupon(UseCouponRequest) returns (UseCouponResponse);
 }
 
 // 折扣类型
@@ -36,8 +42,8 @@ message Coupon {
 
 // 报价
 message Quote {
-  string id = 1; // 报价ID
-  string product_id = 2; // 产品ID
+  int64 id = 1; // 报价ID
+  int64 product_id = 2; // 产品ID
   float base_price = 3; // 基础价格
   float final_price = 4; // 最终价格，包括折扣和优惠券
   google.protobuf.Timestamp date = 5; // 报价日期
@@ -60,7 +66,9 @@ message CreateQuoteResponse {
 // 获取报价列表请求
 message GetQuotesRequest {
   // 可选的查询条件，例如产品ID、日期范围等
-  string product_id = 1;
+  repeated int64 product_ids = 1;
+  google.protobuf.Timestamp date_range_start = 2;
+  google.protobuf.Timestamp date_range_end = 3;
 }
 
 // 获取报价列表响应
@@ -73,16 +81,12 @@ message GetQuoteRequest {
   string id = 1; // 报价ID
 }
 
-service CouponService {
-  // 获取用户拥有的优惠券列表
-  rpc GetUserCoupons(GetUserCouponsRequest) returns (GetUserCouponsResponse);
-
-  // 使用优惠券
-  rpc UseCoupon(UseCouponRequest) returns (UseCouponResponse);
-}
-
 message GetUserCouponsRequest {
   int32 user_id = 1; // 用户ID
+  // 可选的查询条件，例如优惠券状态、日期范围等
+  string coupon_status = 2;
+  google.protobuf.Timestamp date_range_start = 3;
+  google.protobuf.Timestamp date_range_end = 4;
 }
 
 message GetUserCouponsResponse {

@@ -6,6 +6,7 @@ import (
 	orderv1 "github.com/ydssx/morphix/api/order/v1"
 	paymentv1 "github.com/ydssx/morphix/api/payment/v1"
 	productv1 "github.com/ydssx/morphix/api/product/v1"
+	quotev1 "github.com/ydssx/morphix/api/quote/v1"
 	"github.com/ydssx/morphix/app/order/internal/model"
 	"github.com/ydssx/morphix/pkg/errors"
 	"github.com/ydssx/morphix/pkg/interceptors"
@@ -40,10 +41,23 @@ type OrderUseCase struct {
 	tx            Transaction
 	productClient productv1.ProductServiceClient
 	paymentClient paymentv1.PaymentServiceClient
+	quoteClient   quotev1.QuoteServiceClient
 }
 
-func NewOrderUseCase(tx Transaction, repo OrderRepo, productClient productv1.ProductServiceClient, paymentClient paymentv1.PaymentServiceClient) *OrderUseCase {
-	return &OrderUseCase{repo: repo, tx: tx, productClient: productClient, paymentClient: paymentClient}
+func NewOrderUseCase(
+	tx Transaction,
+	repo OrderRepo,
+	productClient productv1.ProductServiceClient,
+	paymentClient paymentv1.PaymentServiceClient,
+	quoteClient quotev1.QuoteServiceClient,
+) *OrderUseCase {
+	return &OrderUseCase{
+		repo:          repo,
+		tx:            tx,
+		productClient: productClient,
+		paymentClient: paymentClient,
+		quoteClient:   quoteClient,
+	}
 }
 
 // 创建订单
@@ -66,9 +80,26 @@ func (b *OrderUseCase) CreateOrder(ctx context.Context, req *orderv1.CreateOrder
 	if len(productResp.Products) != len(req.Items) {
 		return nil, errors.New("商品价格数量与请求数量不一致")
 	}
+
+	// 查询报价
+	quoteResp, err := b.quoteClient.GetQuotes(ctx, &quotev1.GetQuotesRequest{
+		ProductIds: productIds,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "查询报价失败")
+	}
+	quoteMap := make(map[int64]float64)
+	for _, quote := range quoteResp.Quotes {
+		quoteMap[quote.ProductId] = float64(quote.FinalPrice)
+	}
+
 	productPriceMap := make(map[int64]float64)
 	for _, product := range productResp.Products {
 		productPriceMap[product.Id] = float64(product.Price)
+		if _, ok := quoteMap[product.Id]; !ok {
+			return nil, errors.New("报价不存在")
+		}
+		productPriceMap[product.Id] = quoteMap[product.Id]
 	}
 
 	// 计算订单总价
@@ -137,3 +168,33 @@ func (b *OrderUseCase) ListOrders(ctx context.Context, req *orderv1.ListOrdersRe
 
 	return
 }
+
+// 支付订单
+func (uc *OrderUseCase) PayOrder(ctx context.Context, req *orderv1.PayOrderRequest) (res *orderv1.PayOrderResponse, err error) {
+	res = new(orderv1.PayOrderResponse)
+
+	order, err := uc.repo.GetOrder(ctx, int64(req.OrderId))
+	if err != nil {
+		return nil, errors.Wrap(err, "查询订单失败")
+	}
+	if order.Status != orderv1.OrderStatus_PENDING.String() {
+		return nil, errors.New("订单状态不正确")
+	}
+
+	// 调用支付系统接口，支付订单
+	paymentResp, err := uc.paymentClient.MakePayment(ctx, &paymentv1.MakePaymentRequest{
+		OrderId: int64(req.OrderId),
+		Amount:  order.Amount,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "调用支付系统接口，支付订单失败")
+	}
+	res.PaymentUrl = paymentResp.PaymentUrl
+
+	return
+}
+
+// func (uc *OrderUseCase) CancelOrder(ctx context.Context, req *orderv1.CancelOrderRequest) (res *orderv1.CancelOrderResponse, err error) {
+// 	res = new(orderv1.CancelOrderResponse)
+// 	return
+// }

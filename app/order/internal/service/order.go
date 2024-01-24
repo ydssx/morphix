@@ -41,3 +41,8 @@ func (s *OrderService) DeleteOrder(ctx context.Context, req *orderv1.DeleteOrder
 func (s *OrderService) ListOrders(ctx context.Context, req *orderv1.ListOrdersRequest) (res *orderv1.ListOrdersResponse, err error) {
 	return s.uc.ListOrders(ctx, req)
 }
+
+// 支付订单
+func (s *OrderService) PayOrder(ctx context.Context, req *orderv1.PayOrderRequest) (res *orderv1.PayOrderResponse, err error) {
+	return s.uc.PayOrder(ctx, req)
+}

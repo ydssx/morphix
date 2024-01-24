@@ -169,6 +169,8 @@ func (m *PaymentResponse) validate(all bool) error {
 
 	// no validation rules for Status
 
+	// no validation rules for PaymentUrl
+
 	if len(errors) > 0 {
 		return PaymentResponseMultiError(errors)
 	}
