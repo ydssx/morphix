@@ -41,7 +41,7 @@ func (p *PaymentService) MakePayment(ctx context.Context, req *paymentv1.MakePay
 	payload := event.PayloadPaymentCompleted{
 		UserId:  1,
 		Amount:  float32(req.Amount),
-		OrderId: req.OrderId,
+		// OrderId: "",
 	}
 	err := p.eventSink.OnMakePayment(ctx, &payload)
 	if err != nil {

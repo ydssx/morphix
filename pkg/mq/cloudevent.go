@@ -25,15 +25,15 @@ func NewCloudEvent(conn *nats.Conn) *CloudEvent {
 // PublishEvent 发布一个云事件到指定的主题。
 //
 // 参数:
-// - ctx: 上下文
-// - subject: 主题名称
-// - payload: 事件数据
-// - opts: 可选的发布选项
+//   - ctx: 上下文
+//   - subject: 主题名称
+//   - payload: 事件数据
+//   - opts: 可选的发布选项
 //
 // 返回错误信息:
-// - 如果创建 nats 协议失败
-// - 如果创建客户端失败
-// - 如果发送事件失败
+//   - 如果创建 nats 协议失败
+//   - 如果创建客户端失败
+//   - 如果发送事件失败
 //
 // 发布成功则返回 nil。
 func (c *CloudEvent) PublishEvent(ctx context.Context, subject string, payload interface{}, opts ...Option) error {

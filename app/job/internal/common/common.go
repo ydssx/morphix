@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/hibiken/asynq"
+	orderv1 "github.com/ydssx/morphix/api/order/v1"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/common"
@@ -39,6 +40,7 @@ func NewAsynqInspector(c *conf.Bootstrap) *asynq.Inspector {
 type ServiceClientSet struct {
 	smsv1.SMSServiceClient
 	userv1.UserServiceClient
+	orderv1.OrderServiceClient
 }
 
 // NewServiceClientSet creates a new ServiceClientSet instance.
@@ -48,6 +50,7 @@ func NewServiceClientSet(c *conf.Bootstrap) *ServiceClientSet {
 	return &ServiceClientSet{
 		common.NewSMSClient(c),
 		common.NewUserClient(c),
+		common.NewOrderClient(c),
 	}
 }
 

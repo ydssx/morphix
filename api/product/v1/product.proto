@@ -37,7 +37,51 @@ service ProductService {
   rpc DeleteProduct(DeleteProductRequest) returns (DeleteProductResponse) {
     option (google.api.http) = {delete: "/api/v1/products/{id}"};
   }
+
+  rpc GetProductStock(GetProductStockRequest) returns (GetProductStockResponse) {
+    option (google.api.http) = {get: "/api/v1/products/{id}/stock"};
+  }
+
+  rpc UpdateProductStock(UpdateProductStockRequest) returns (UpdateProductStockResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/products/{id}/stock"
+      body: "*"
+    };
+  }
+
+  // 获取产品库存
+  rpc GetProductsStock(GetProductsStockRequest) returns (GetProductsStockResponse) {
+    option (google.api.http) = {get: "/api/v1/products/stock"};
+  }
 }
+
+// 获取产品库存请求
+message GetProductsStockRequest {
+  repeated int64 ids = 1; // 产品ID列表
+}
+
+// 获取产品库存响应
+message GetProductsStockResponse {
+  map<int64, int32> stocks = 1; // 产品ID与库存的映射
+}
+
+// 获取单个产品库存请求
+message GetProductStockRequest {
+  int64 id = 1; // 产品ID
+}
+
+// 获取单个产品库存响应
+message GetProductStockResponse {
+  int32 stock = 1; // 库存数量
+}
+
+// 更新产品库存请求
+message UpdateProductStockRequest {
+  string id = 1; // 产品ID
+  int32 stock = 2; // 库存数量
+}
+
+message UpdateProductStockResponse {}
 
 // 产品信息
 message Product {

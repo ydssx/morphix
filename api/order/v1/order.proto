@@ -45,6 +45,14 @@ service OrderService {
   rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse) {
     option (google.api.http) = {get: "/api/v1/orders"};
   }
+
+  // 取消订单
+  rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/orders/{order_id}/cancel"
+      body: "*"
+    };
+  }
 }
 
 // 订单消息
@@ -133,3 +141,10 @@ message PayOrderRequest {
 message PayOrderResponse {
   string payment_url = 1; // 支付链接
 }
+
+message CancelOrderRequest {
+  int32 order_id = 1; // 订单ID
+  string reason = 2; // 取消原因
+}
+
+message CancelOrderResponse {}

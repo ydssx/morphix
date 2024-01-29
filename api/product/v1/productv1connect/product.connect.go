@@ -48,6 +48,15 @@ const (
 	// ProductServiceDeleteProductProcedure is the fully-qualified name of the ProductService's
 	// DeleteProduct RPC.
 	ProductServiceDeleteProductProcedure = "/productv1.ProductService/DeleteProduct"
+	// ProductServiceGetProductStockProcedure is the fully-qualified name of the ProductService's
+	// GetProductStock RPC.
+	ProductServiceGetProductStockProcedure = "/productv1.ProductService/GetProductStock"
+	// ProductServiceUpdateProductStockProcedure is the fully-qualified name of the ProductService's
+	// UpdateProductStock RPC.
+	ProductServiceUpdateProductStockProcedure = "/productv1.ProductService/UpdateProductStock"
+	// ProductServiceGetProductsStockProcedure is the fully-qualified name of the ProductService's
+	// GetProductsStock RPC.
+	ProductServiceGetProductsStockProcedure = "/productv1.ProductService/GetProductsStock"
 )
 
 // ProductServiceClient is a client for the productv1.ProductService service.
@@ -62,6 +71,10 @@ type ProductServiceClient interface {
 	UpdateProduct(context.Context, *connect_go.Request[v1.UpdateProductRequest]) (*connect_go.Response[v1.UpdateProductResponse], error)
 	// 删除产品
 	DeleteProduct(context.Context, *connect_go.Request[v1.DeleteProductRequest]) (*connect_go.Response[v1.DeleteProductResponse], error)
+	GetProductStock(context.Context, *connect_go.Request[v1.GetProductStockRequest]) (*connect_go.Response[v1.GetProductStockResponse], error)
+	UpdateProductStock(context.Context, *connect_go.Request[v1.UpdateProductStockRequest]) (*connect_go.Response[v1.UpdateProductStockResponse], error)
+	// 获取产品库存
+	GetProductsStock(context.Context, *connect_go.Request[v1.GetProductsStockRequest]) (*connect_go.Response[v1.GetProductsStockResponse], error)
 }
 
 // NewProductServiceClient constructs a client for the productv1.ProductService service. By default,
@@ -99,16 +112,34 @@ func NewProductServiceClient(httpClient connect_go.HTTPClient, baseURL string, o
 			baseURL+ProductServiceDeleteProductProcedure,
 			opts...,
 		),
+		getProductStock: connect_go.NewClient[v1.GetProductStockRequest, v1.GetProductStockResponse](
+			httpClient,
+			baseURL+ProductServiceGetProductStockProcedure,
+			opts...,
+		),
+		updateProductStock: connect_go.NewClient[v1.UpdateProductStockRequest, v1.UpdateProductStockResponse](
+			httpClient,
+			baseURL+ProductServiceUpdateProductStockProcedure,
+			opts...,
+		),
+		getProductsStock: connect_go.NewClient[v1.GetProductsStockRequest, v1.GetProductsStockResponse](
+			httpClient,
+			baseURL+ProductServiceGetProductsStockProcedure,
+			opts...,
+		),
 	}
 }
 
 // productServiceClient implements ProductServiceClient.
 type productServiceClient struct {
-	createProduct *connect_go.Client[v1.CreateProductRequest, v1.CreateProductResponse]
-	getProducts   *connect_go.Client[v1.GetProductsRequest, v1.GetProductsResponse]
-	getProduct    *connect_go.Client[v1.GetProductRequest, v1.Product]
-	updateProduct *connect_go.Client[v1.UpdateProductRequest, v1.UpdateProductResponse]
-	deleteProduct *connect_go.Client[v1.DeleteProductRequest, v1.DeleteProductResponse]
+	createProduct      *connect_go.Client[v1.CreateProductRequest, v1.CreateProductResponse]
+	getProducts        *connect_go.Client[v1.GetProductsRequest, v1.GetProductsResponse]
+	getProduct         *connect_go.Client[v1.GetProductRequest, v1.Product]
+	updateProduct      *connect_go.Client[v1.UpdateProductRequest, v1.UpdateProductResponse]
+	deleteProduct      *connect_go.Client[v1.DeleteProductRequest, v1.DeleteProductResponse]
+	getProductStock    *connect_go.Client[v1.GetProductStockRequest, v1.GetProductStockResponse]
+	updateProductStock *connect_go.Client[v1.UpdateProductStockRequest, v1.UpdateProductStockResponse]
+	getProductsStock   *connect_go.Client[v1.GetProductsStockRequest, v1.GetProductsStockResponse]
 }
 
 // CreateProduct calls productv1.ProductService.CreateProduct.
@@ -136,6 +167,21 @@ func (c *productServiceClient) DeleteProduct(ctx context.Context, req *connect_g
 	return c.deleteProduct.CallUnary(ctx, req)
 }
 
+// GetProductStock calls productv1.ProductService.GetProductStock.
+func (c *productServiceClient) GetProductStock(ctx context.Context, req *connect_go.Request[v1.GetProductStockRequest]) (*connect_go.Response[v1.GetProductStockResponse], error) {
+	return c.getProductStock.CallUnary(ctx, req)
+}
+
+// UpdateProductStock calls productv1.ProductService.UpdateProductStock.
+func (c *productServiceClient) UpdateProductStock(ctx context.Context, req *connect_go.Request[v1.UpdateProductStockRequest]) (*connect_go.Response[v1.UpdateProductStockResponse], error) {
+	return c.updateProductStock.CallUnary(ctx, req)
+}
+
+// GetProductsStock calls productv1.ProductService.GetProductsStock.
+func (c *productServiceClient) GetProductsStock(ctx context.Context, req *connect_go.Request[v1.GetProductsStockRequest]) (*connect_go.Response[v1.GetProductsStockResponse], error) {
+	return c.getProductsStock.CallUnary(ctx, req)
+}
+
 // ProductServiceHandler is an implementation of the productv1.ProductService service.
 type ProductServiceHandler interface {
 	// 创建产品
@@ -148,6 +194,10 @@ type ProductServiceHandler interface {
 	UpdateProduct(context.Context, *connect_go.Request[v1.UpdateProductRequest]) (*connect_go.Response[v1.UpdateProductResponse], error)
 	// 删除产品
 	DeleteProduct(context.Context, *connect_go.Request[v1.DeleteProductRequest]) (*connect_go.Response[v1.DeleteProductResponse], error)
+	GetProductStock(context.Context, *connect_go.Request[v1.GetProductStockRequest]) (*connect_go.Response[v1.GetProductStockResponse], error)
+	UpdateProductStock(context.Context, *connect_go.Request[v1.UpdateProductStockRequest]) (*connect_go.Response[v1.UpdateProductStockResponse], error)
+	// 获取产品库存
+	GetProductsStock(context.Context, *connect_go.Request[v1.GetProductsStockRequest]) (*connect_go.Response[v1.GetProductsStockResponse], error)
 }
 
 // NewProductServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -181,6 +231,21 @@ func NewProductServiceHandler(svc ProductServiceHandler, opts ...connect_go.Hand
 		svc.DeleteProduct,
 		opts...,
 	)
+	productServiceGetProductStockHandler := connect_go.NewUnaryHandler(
+		ProductServiceGetProductStockProcedure,
+		svc.GetProductStock,
+		opts...,
+	)
+	productServiceUpdateProductStockHandler := connect_go.NewUnaryHandler(
+		ProductServiceUpdateProductStockProcedure,
+		svc.UpdateProductStock,
+		opts...,
+	)
+	productServiceGetProductsStockHandler := connect_go.NewUnaryHandler(
+		ProductServiceGetProductsStockProcedure,
+		svc.GetProductsStock,
+		opts...,
+	)
 	return "/productv1.ProductService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ProductServiceCreateProductProcedure:
@@ -193,6 +258,12 @@ func NewProductServiceHandler(svc ProductServiceHandler, opts ...connect_go.Hand
 			productServiceUpdateProductHandler.ServeHTTP(w, r)
 		case ProductServiceDeleteProductProcedure:
 			productServiceDeleteProductHandler.ServeHTTP(w, r)
+		case ProductServiceGetProductStockProcedure:
+			productServiceGetProductStockHandler.ServeHTTP(w, r)
+		case ProductServiceUpdateProductStockProcedure:
+			productServiceUpdateProductStockHandler.ServeHTTP(w, r)
+		case ProductServiceGetProductsStockProcedure:
+			productServiceGetProductsStockHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -220,4 +291,16 @@ func (UnimplementedProductServiceHandler) UpdateProduct(context.Context, *connec
 
 func (UnimplementedProductServiceHandler) DeleteProduct(context.Context, *connect_go.Request[v1.DeleteProductRequest]) (*connect_go.Response[v1.DeleteProductResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("productv1.ProductService.DeleteProduct is not implemented"))
+}
+
+func (UnimplementedProductServiceHandler) GetProductStock(context.Context, *connect_go.Request[v1.GetProductStockRequest]) (*connect_go.Response[v1.GetProductStockResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("productv1.ProductService.GetProductStock is not implemented"))
+}
+
+func (UnimplementedProductServiceHandler) UpdateProductStock(context.Context, *connect_go.Request[v1.UpdateProductStockRequest]) (*connect_go.Response[v1.UpdateProductStockResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("productv1.ProductService.UpdateProductStock is not implemented"))
+}
+
+func (UnimplementedProductServiceHandler) GetProductsStock(context.Context, *connect_go.Request[v1.GetProductsStockRequest]) (*connect_go.Response[v1.GetProductsStockResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("productv1.ProductService.GetProductsStock is not implemented"))
 }

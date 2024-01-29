@@ -2,7 +2,9 @@ package biz
 
 import (
 	"context"
+	"time"
 
+	jobv1 "github.com/ydssx/morphix/api/job/v1"
 	orderv1 "github.com/ydssx/morphix/api/order/v1"
 	paymentv1 "github.com/ydssx/morphix/api/payment/v1"
 	productv1 "github.com/ydssx/morphix/api/product/v1"
@@ -11,6 +13,7 @@ import (
 	"github.com/ydssx/morphix/pkg/errors"
 	"github.com/ydssx/morphix/pkg/interceptors"
 	"github.com/ydssx/morphix/pkg/util"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Transaction interface {
@@ -20,7 +23,7 @@ type Transaction interface {
 type OrderRepo interface {
 	CreateOrder(ctx context.Context, order model.Order) (orderID int64, err error)
 	GetOrder(ctx context.Context, orderID int64) (order *model.Order, err error)
-	UpdateOrderStatus(ctx context.Context, orderID int64, status int32) (err error)
+	UpdateOrderStatus(ctx context.Context, orderID int64, status string) (err error)
 	DeleteOrder(ctx context.Context, orderID int64) (err error)
 	DeleteOrders(ctx context.Context, orderIDs []int64) (err error)
 	ListOrders(ctx context.Context, cond *ListOrderCond) (orders []*model.Order, total int64, err error)
@@ -42,6 +45,7 @@ type OrderUseCase struct {
 	productClient productv1.ProductServiceClient
 	paymentClient paymentv1.PaymentServiceClient
 	quoteClient   quotev1.QuoteServiceClient
+	jobClient     jobv1.JobServiceClient
 }
 
 func NewOrderUseCase(
@@ -50,6 +54,7 @@ func NewOrderUseCase(
 	productClient productv1.ProductServiceClient,
 	paymentClient paymentv1.PaymentServiceClient,
 	quoteClient quotev1.QuoteServiceClient,
+	jobClient jobv1.JobServiceClient,
 ) *OrderUseCase {
 	return &OrderUseCase{
 		repo:          repo,
@@ -57,6 +62,7 @@ func NewOrderUseCase(
 		productClient: productClient,
 		paymentClient: paymentClient,
 		quoteClient:   quoteClient,
+		jobClient:     jobClient,
 	}
 }
 
@@ -68,6 +74,17 @@ func (b *OrderUseCase) CreateOrder(ctx context.Context, req *orderv1.CreateOrder
 	var productIds []int64
 	for _, item := range req.Items {
 		productIds = append(productIds, int64(item.ProductId))
+	}
+
+	// 查询商品库存
+	productStockResp, err := b.productClient.GetProductsStock(ctx, &productv1.GetProductsStockRequest{Ids: productIds})
+	if err != nil {
+		return nil, errors.Wrap(err, "查询商品库存失败")
+	}
+	for _, item := range req.Items {
+		if productStockResp.Stocks[int64(item.ProductId)] < int32(item.Quantity) {
+			return nil, errors.Errorf("商品库存不足 [%d]", item.ProductId)
+		}
 	}
 
 	// 查询商品价格
@@ -108,15 +125,15 @@ func (b *OrderUseCase) CreateOrder(ctx context.Context, req *orderv1.CreateOrder
 		totalPrice += productPriceMap[int64(item.ProductId)] * float64(item.Quantity)
 	}
 
+	orderNum, err := util.GenerateOrderNumber()
+	if err != nil {
+		return nil, errors.Wrap(err, "生成订单号失败")
+	}
 	err = b.tx.InTx(ctx, func(ctx context.Context) error {
-		orderNum, err := util.GenerateOrderNumber()
-		if err != nil {
-			return errors.Wrap(err, "生成订单号失败")
-		}
 		order := model.Order{OrderNumber: orderNum, UserId: int(claim.Uid), Amount: totalPrice}
 		orderID, err := b.repo.CreateOrder(ctx, order)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "创建订单失败")
 		}
 
 		// 创建订单项
@@ -137,6 +154,20 @@ func (b *OrderUseCase) CreateOrder(ctx context.Context, req *orderv1.CreateOrder
 
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	// 订单超时自动取消
+	_, err = b.jobClient.Enqueue(ctx, &jobv1.EnqueueRequest{
+		JobType:   jobv1.JobType_ORDER_TIMEOUT,
+		Payload:   []byte(orderNum),
+		ProcessAt: timestamppb.New(time.Now().Add(time.Minute * 10)),
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "创建订单超时任务失败")
+	}
+
 	return
 }
 
@@ -150,7 +181,10 @@ func (b *OrderUseCase) GetOrder(ctx context.Context, req *orderv1.GetOrderReques
 func (b *OrderUseCase) UpdateOrderStatus(ctx context.Context, req *orderv1.UpdateOrderStatusRequest) (res *orderv1.UpdateOrderStatusResponse, err error) {
 	res = new(orderv1.UpdateOrderStatusResponse)
 
-	// TODO:ADD logic here and delete this line.
+	err = b.repo.UpdateOrderStatus(ctx, int64(req.OrderId), req.Status.String())
+	if err != nil {
+		return nil, errors.Wrap(err, "更新订单状态失败")
+	}
 
 	return
 }
@@ -194,7 +228,11 @@ func (uc *OrderUseCase) PayOrder(ctx context.Context, req *orderv1.PayOrderReque
 	return
 }
 
-// func (uc *OrderUseCase) CancelOrder(ctx context.Context, req *orderv1.CancelOrderRequest) (res *orderv1.CancelOrderResponse, err error) {
-// 	res = new(orderv1.CancelOrderResponse)
-// 	return
-// }
+// 取消订单
+func (uc *OrderUseCase) CancelOrder(ctx context.Context, req *orderv1.CancelOrderRequest) (res *orderv1.CancelOrderResponse, err error) {
+	res = new(orderv1.CancelOrderResponse)
+
+	// TODO:ADD logic here and delete this line.
+
+	return
+}

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ydssx/morphix/pkg/errors"
+	"github.com/ydssx/morphix/pkg/logger"
 	"go.uber.org/zap/zapcore"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -28,7 +29,7 @@ func NewDB(dsn string) (*gorm.DB, error) {
 	}
 	sqlDB.SetMaxIdleConns(100)
 	sqlDB.SetMaxOpenConns(100)
-	
+	logger.Info(context.Background(), "init mysql success")
 	return db, nil
 }
 

@@ -19,9 +19,11 @@ func init() {
 	flag.StringVar(&flagconf, "f", "../../../../configs/config.yaml", "config path, eg: -conf config.yaml")
 }
 
+// main是程序的入口点。它会解析命令行参数,加载配置,初始化应用程序,并启动应用程序。
+// 如果在启动过程中发生错误,它会panic。
 func main() {
 	flag.Parse()
-	
+
 	var config conf.Bootstrap
 	closeConfig := conf.MustLoad(&config, flagconf)
 	defer closeConfig()

@@ -48,6 +48,9 @@ const (
 	OrderServiceDeleteOrderProcedure = "/orderv1.OrderService/DeleteOrder"
 	// OrderServiceListOrdersProcedure is the fully-qualified name of the OrderService's ListOrders RPC.
 	OrderServiceListOrdersProcedure = "/orderv1.OrderService/ListOrders"
+	// OrderServiceCancelOrderProcedure is the fully-qualified name of the OrderService's CancelOrder
+	// RPC.
+	OrderServiceCancelOrderProcedure = "/orderv1.OrderService/CancelOrder"
 )
 
 // OrderServiceClient is a client for the orderv1.OrderService service.
@@ -64,6 +67,8 @@ type OrderServiceClient interface {
 	DeleteOrder(context.Context, *connect_go.Request[v1.DeleteOrderRequest]) (*connect_go.Response[v1.DeleteOrderResponse], error)
 	// 查询订单列表
 	ListOrders(context.Context, *connect_go.Request[v1.ListOrdersRequest]) (*connect_go.Response[v1.ListOrdersResponse], error)
+	// 取消订单
+	CancelOrder(context.Context, *connect_go.Request[v1.CancelOrderRequest]) (*connect_go.Response[v1.CancelOrderResponse], error)
 }
 
 // NewOrderServiceClient constructs a client for the orderv1.OrderService service. By default, it
@@ -106,6 +111,11 @@ func NewOrderServiceClient(httpClient connect_go.HTTPClient, baseURL string, opt
 			baseURL+OrderServiceListOrdersProcedure,
 			opts...,
 		),
+		cancelOrder: connect_go.NewClient[v1.CancelOrderRequest, v1.CancelOrderResponse](
+			httpClient,
+			baseURL+OrderServiceCancelOrderProcedure,
+			opts...,
+		),
 	}
 }
 
@@ -117,6 +127,7 @@ type orderServiceClient struct {
 	payOrder          *connect_go.Client[v1.PayOrderRequest, v1.PayOrderResponse]
 	deleteOrder       *connect_go.Client[v1.DeleteOrderRequest, v1.DeleteOrderResponse]
 	listOrders        *connect_go.Client[v1.ListOrdersRequest, v1.ListOrdersResponse]
+	cancelOrder       *connect_go.Client[v1.CancelOrderRequest, v1.CancelOrderResponse]
 }
 
 // CreateOrder calls orderv1.OrderService.CreateOrder.
@@ -149,6 +160,11 @@ func (c *orderServiceClient) ListOrders(ctx context.Context, req *connect_go.Req
 	return c.listOrders.CallUnary(ctx, req)
 }
 
+// CancelOrder calls orderv1.OrderService.CancelOrder.
+func (c *orderServiceClient) CancelOrder(ctx context.Context, req *connect_go.Request[v1.CancelOrderRequest]) (*connect_go.Response[v1.CancelOrderResponse], error) {
+	return c.cancelOrder.CallUnary(ctx, req)
+}
+
 // OrderServiceHandler is an implementation of the orderv1.OrderService service.
 type OrderServiceHandler interface {
 	// 创建订单
@@ -163,6 +179,8 @@ type OrderServiceHandler interface {
 	DeleteOrder(context.Context, *connect_go.Request[v1.DeleteOrderRequest]) (*connect_go.Response[v1.DeleteOrderResponse], error)
 	// 查询订单列表
 	ListOrders(context.Context, *connect_go.Request[v1.ListOrdersRequest]) (*connect_go.Response[v1.ListOrdersResponse], error)
+	// 取消订单
+	CancelOrder(context.Context, *connect_go.Request[v1.CancelOrderRequest]) (*connect_go.Response[v1.CancelOrderResponse], error)
 }
 
 // NewOrderServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -201,6 +219,11 @@ func NewOrderServiceHandler(svc OrderServiceHandler, opts ...connect_go.HandlerO
 		svc.ListOrders,
 		opts...,
 	)
+	orderServiceCancelOrderHandler := connect_go.NewUnaryHandler(
+		OrderServiceCancelOrderProcedure,
+		svc.CancelOrder,
+		opts...,
+	)
 	return "/orderv1.OrderService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case OrderServiceCreateOrderProcedure:
@@ -215,6 +238,8 @@ func NewOrderServiceHandler(svc OrderServiceHandler, opts ...connect_go.HandlerO
 			orderServiceDeleteOrderHandler.ServeHTTP(w, r)
 		case OrderServiceListOrdersProcedure:
 			orderServiceListOrdersHandler.ServeHTTP(w, r)
+		case OrderServiceCancelOrderProcedure:
+			orderServiceCancelOrderHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -246,4 +271,8 @@ func (UnimplementedOrderServiceHandler) DeleteOrder(context.Context, *connect_go
 
 func (UnimplementedOrderServiceHandler) ListOrders(context.Context, *connect_go.Request[v1.ListOrdersRequest]) (*connect_go.Response[v1.ListOrdersResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("orderv1.OrderService.ListOrders is not implemented"))
+}
+
+func (UnimplementedOrderServiceHandler) CancelOrder(context.Context, *connect_go.Request[v1.CancelOrderRequest]) (*connect_go.Response[v1.CancelOrderResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("orderv1.OrderService.CancelOrder is not implemented"))
 }

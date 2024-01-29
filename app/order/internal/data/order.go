@@ -38,13 +38,14 @@ func (*OrderRepo) GetOrder(ctx context.Context, orderID int64) (order *model.Ord
 }
 
 // ListOrders implements biz.OrderRepo.
-func (*OrderRepo) ListOrders(ctx context.Context, cond *biz.ListOrderCond) (orders []*model.Order, total int64, err error) {
-	panic("unimplemented")
+func (r *OrderRepo) ListOrders(ctx context.Context, cond *biz.ListOrderCond) (orders []*model.Order, total int64, err error) {
+	return
 }
 
 // UpdateOrderStatus implements biz.OrderRepo.
-func (*OrderRepo) UpdateOrderStatus(ctx context.Context, orderID int64, status int32) (err error) {
-	panic("unimplemented")
+func (r *OrderRepo) UpdateOrderStatus(ctx context.Context, orderID int64, status string) (err error) {
+	err = model.NewOrderModel(r.data.DB(ctx)).SetIds(orderID).Updates(model.Order{Status: status})
+	return
 }
 
 func NewOrderRepo(data *Data) biz.OrderRepo {

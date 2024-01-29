@@ -19,11 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ProductService_CreateProduct_FullMethodName = "/productv1.ProductService/CreateProduct"
-	ProductService_GetProducts_FullMethodName   = "/productv1.ProductService/GetProducts"
-	ProductService_GetProduct_FullMethodName    = "/productv1.ProductService/GetProduct"
-	ProductService_UpdateProduct_FullMethodName = "/productv1.ProductService/UpdateProduct"
-	ProductService_DeleteProduct_FullMethodName = "/productv1.ProductService/DeleteProduct"
+	ProductService_CreateProduct_FullMethodName      = "/productv1.ProductService/CreateProduct"
+	ProductService_GetProducts_FullMethodName        = "/productv1.ProductService/GetProducts"
+	ProductService_GetProduct_FullMethodName         = "/productv1.ProductService/GetProduct"
+	ProductService_UpdateProduct_FullMethodName      = "/productv1.ProductService/UpdateProduct"
+	ProductService_DeleteProduct_FullMethodName      = "/productv1.ProductService/DeleteProduct"
+	ProductService_GetProductStock_FullMethodName    = "/productv1.ProductService/GetProductStock"
+	ProductService_UpdateProductStock_FullMethodName = "/productv1.ProductService/UpdateProductStock"
+	ProductService_GetProductsStock_FullMethodName   = "/productv1.ProductService/GetProductsStock"
 )
 
 // ProductServiceClient is the client API for ProductService service.
@@ -40,6 +43,10 @@ type ProductServiceClient interface {
 	UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*UpdateProductResponse, error)
 	// 删除产品
 	DeleteProduct(ctx context.Context, in *DeleteProductRequest, opts ...grpc.CallOption) (*DeleteProductResponse, error)
+	GetProductStock(ctx context.Context, in *GetProductStockRequest, opts ...grpc.CallOption) (*GetProductStockResponse, error)
+	UpdateProductStock(ctx context.Context, in *UpdateProductStockRequest, opts ...grpc.CallOption) (*UpdateProductStockResponse, error)
+	// 获取产品库存
+	GetProductsStock(ctx context.Context, in *GetProductsStockRequest, opts ...grpc.CallOption) (*GetProductsStockResponse, error)
 }
 
 type productServiceClient struct {
@@ -95,6 +102,33 @@ func (c *productServiceClient) DeleteProduct(ctx context.Context, in *DeleteProd
 	return out, nil
 }
 
+func (c *productServiceClient) GetProductStock(ctx context.Context, in *GetProductStockRequest, opts ...grpc.CallOption) (*GetProductStockResponse, error) {
+	out := new(GetProductStockResponse)
+	err := c.cc.Invoke(ctx, ProductService_GetProductStock_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productServiceClient) UpdateProductStock(ctx context.Context, in *UpdateProductStockRequest, opts ...grpc.CallOption) (*UpdateProductStockResponse, error) {
+	out := new(UpdateProductStockResponse)
+	err := c.cc.Invoke(ctx, ProductService_UpdateProductStock_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productServiceClient) GetProductsStock(ctx context.Context, in *GetProductsStockRequest, opts ...grpc.CallOption) (*GetProductsStockResponse, error) {
+	out := new(GetProductsStockResponse)
+	err := c.cc.Invoke(ctx, ProductService_GetProductsStock_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProductServiceServer is the server API for ProductService service.
 // All implementations should embed UnimplementedProductServiceServer
 // for forward compatibility
@@ -109,6 +143,10 @@ type ProductServiceServer interface {
 	UpdateProduct(context.Context, *UpdateProductRequest) (*UpdateProductResponse, error)
 	// 删除产品
 	DeleteProduct(context.Context, *DeleteProductRequest) (*DeleteProductResponse, error)
+	GetProductStock(context.Context, *GetProductStockRequest) (*GetProductStockResponse, error)
+	UpdateProductStock(context.Context, *UpdateProductStockRequest) (*UpdateProductStockResponse, error)
+	// 获取产品库存
+	GetProductsStock(context.Context, *GetProductsStockRequest) (*GetProductsStockResponse, error)
 }
 
 // UnimplementedProductServiceServer should be embedded to have forward compatible implementations.
@@ -129,6 +167,15 @@ func (UnimplementedProductServiceServer) UpdateProduct(context.Context, *UpdateP
 }
 func (UnimplementedProductServiceServer) DeleteProduct(context.Context, *DeleteProductRequest) (*DeleteProductResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteProduct not implemented")
+}
+func (UnimplementedProductServiceServer) GetProductStock(context.Context, *GetProductStockRequest) (*GetProductStockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProductStock not implemented")
+}
+func (UnimplementedProductServiceServer) UpdateProductStock(context.Context, *UpdateProductStockRequest) (*UpdateProductStockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateProductStock not implemented")
+}
+func (UnimplementedProductServiceServer) GetProductsStock(context.Context, *GetProductsStockRequest) (*GetProductsStockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProductsStock not implemented")
 }
 
 // UnsafeProductServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -232,6 +279,60 @@ func _ProductService_DeleteProduct_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProductService_GetProductStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProductStockRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).GetProductStock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_GetProductStock_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).GetProductStock(ctx, req.(*GetProductStockRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductService_UpdateProductStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateProductStockRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).UpdateProductStock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_UpdateProductStock_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).UpdateProductStock(ctx, req.(*UpdateProductStockRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductService_GetProductsStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProductsStockRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServiceServer).GetProductsStock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProductService_GetProductsStock_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServiceServer).GetProductsStock(ctx, req.(*GetProductsStockRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProductService_ServiceDesc is the grpc.ServiceDesc for ProductService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -258,6 +359,18 @@ var ProductService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteProduct",
 			Handler:    _ProductService_DeleteProduct_Handler,
+		},
+		{
+			MethodName: "GetProductStock",
+			Handler:    _ProductService_GetProductStock_Handler,
+		},
+		{
+			MethodName: "UpdateProductStock",
+			Handler:    _ProductService_UpdateProductStock_Handler,
+		},
+		{
+			MethodName: "GetProductsStock",
+			Handler:    _ProductService_GetProductsStock_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

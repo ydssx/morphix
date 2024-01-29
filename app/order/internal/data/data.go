@@ -24,7 +24,6 @@ var ProviderSet = wire.NewSet(
 	NewOrderRepo,
 )
 
-// Data .
 type Data struct {
 	rdb *goredis.Client
 	db  *gorm.DB

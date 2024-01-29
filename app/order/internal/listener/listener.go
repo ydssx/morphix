@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/dapr/go-sdk/service/common"
+	orderv1 "github.com/ydssx/morphix/api/order/v1"
 	"github.com/ydssx/morphix/common/event"
 	"github.com/ydssx/morphix/pkg/logger"
 	"github.com/ydssx/morphix/pkg/mq"
@@ -16,10 +16,6 @@ var subjectHandlerMap = map[event.Subject]mq.EventHandler{
 	event.Subject_CancelPayment:    updateOrderStatus,
 }
 
-var daprSubjectHandlerMap = map[event.Subject]common.TopicEventHandler{
-	event.Subject_PaymentCompleted: updateOrder,
-}
-
 func updateOrderStatus(ctx context.Context, e cloudevents.Event) error {
 	fmt.Printf("Got Event Context: %+v\n", e.Context)
 	data := &event.PayloadPaymentCompleted{}
@@ -28,15 +24,10 @@ func updateOrderStatus(ctx context.Context, e cloudevents.Event) error {
 	}
 	logger.Infof(ctx, "Got Data: %+v\n", data)
 
-	return nil
-}
-
-func updateOrder(ctx context.Context, e *common.TopicEvent) (retry bool, err error) {
-	data := &event.PayloadPaymentCompleted{}
-	if err := e.Struct(data); err != nil {
-		logger.Infof(ctx, "Got Data Error: %s\n", err.Error())
+	if _, err := GetUcFromContext(ctx).UpdateOrderStatus(ctx, &orderv1.UpdateOrderStatusRequest{OrderId: int32(data.OrderId), Status: orderv1.OrderStatus_COMPLETED}); err != nil {
+		logger.Errorf(ctx, "UpdateOrderStatus Error: %s\n", err.Error())
+		return err
 	}
-	logger.Infof(ctx, "Got Data: %+v\n", data)
 
-	return false, nil
+	return nil
 }

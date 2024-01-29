@@ -91,11 +91,21 @@ func authHandler(c *gin.Context) {
 	util.OKWithData(c, auth)
 }
 
+// newGateway returns a new instance of http.Handler that acts as a gateway for handling RPC requests.
+//
+// It takes a context.Context object and a *conf.Bootstrap object as parameters.
+// The context.Context object represents the current execution context of the function.
+// The *conf.Bootstrap object contains the configuration settings for the bootstrap process.
+//
+// The function registers the RPC handler using the provided bootstrap configuration.
+// It creates a gwruntime.ServeMux with metadata and an Etcd registry.
+// It then iterates through the handlers and creates a client connection for each handler.
+// Finally, it returns the created gwruntime.ServeMux as an http.Handler.
 func newGateway(ctx context.Context, c *conf.Bootstrap) http.Handler {
 	registerRPCHandler(c)
 
 	withMeta := gwruntime.WithMetadata(func(ctx context.Context, r *http.Request) metadata.MD {
-		return metadata.New(map[string]string{"external-request": "true"})
+		return metadata.New(map[string]string{"external-request": "true", "request-id": util.GetUUID()})
 	})
 
 	r := common.NewEtcdRegistry(c.Etcd)

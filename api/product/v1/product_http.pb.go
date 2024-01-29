@@ -22,8 +22,11 @@ const _ = http.SupportPackageIsVersion1
 const OperationProductServiceCreateProduct = "/productv1.ProductService/CreateProduct"
 const OperationProductServiceDeleteProduct = "/productv1.ProductService/DeleteProduct"
 const OperationProductServiceGetProduct = "/productv1.ProductService/GetProduct"
+const OperationProductServiceGetProductStock = "/productv1.ProductService/GetProductStock"
 const OperationProductServiceGetProducts = "/productv1.ProductService/GetProducts"
+const OperationProductServiceGetProductsStock = "/productv1.ProductService/GetProductsStock"
 const OperationProductServiceUpdateProduct = "/productv1.ProductService/UpdateProduct"
+const OperationProductServiceUpdateProductStock = "/productv1.ProductService/UpdateProductStock"
 
 type ProductServiceHTTPServer interface {
 	// CreateProduct 创建产品
@@ -32,10 +35,14 @@ type ProductServiceHTTPServer interface {
 	DeleteProduct(context.Context, *DeleteProductRequest) (*DeleteProductResponse, error)
 	// GetProduct 获取单个产品
 	GetProduct(context.Context, *GetProductRequest) (*Product, error)
+	GetProductStock(context.Context, *GetProductStockRequest) (*GetProductStockResponse, error)
 	// GetProducts 获取产品列表
 	GetProducts(context.Context, *GetProductsRequest) (*GetProductsResponse, error)
+	// GetProductsStock 获取产品库存
+	GetProductsStock(context.Context, *GetProductsStockRequest) (*GetProductsStockResponse, error)
 	// UpdateProduct 更新产品信息
 	UpdateProduct(context.Context, *UpdateProductRequest) (*UpdateProductResponse, error)
+	UpdateProductStock(context.Context, *UpdateProductStockRequest) (*UpdateProductStockResponse, error)
 }
 
 func RegisterProductServiceHTTPServer(s *http.Server, srv ProductServiceHTTPServer) {
@@ -45,6 +52,9 @@ func RegisterProductServiceHTTPServer(s *http.Server, srv ProductServiceHTTPServ
 	r.GET("/api/v1/products/{id}", _ProductService_GetProduct0_HTTP_Handler(srv))
 	r.PUT("/api/v1/products/{id}", _ProductService_UpdateProduct0_HTTP_Handler(srv))
 	r.DELETE("/api/v1/products/{id}", _ProductService_DeleteProduct0_HTTP_Handler(srv))
+	r.GET("/api/v1/products/{id}/stock", _ProductService_GetProductStock0_HTTP_Handler(srv))
+	r.PUT("/api/v1/products/{id}/stock", _ProductService_UpdateProductStock0_HTTP_Handler(srv))
+	r.GET("/api/v1/products/stock", _ProductService_GetProductsStock0_HTTP_Handler(srv))
 }
 
 func _ProductService_CreateProduct0_HTTP_Handler(srv ProductServiceHTTPServer) func(ctx http.Context) error {
@@ -157,12 +167,81 @@ func _ProductService_DeleteProduct0_HTTP_Handler(srv ProductServiceHTTPServer) f
 	}
 }
 
+func _ProductService_GetProductStock0_HTTP_Handler(srv ProductServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetProductStockRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProductServiceGetProductStock)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetProductStock(ctx, req.(*GetProductStockRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetProductStockResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProductService_UpdateProductStock0_HTTP_Handler(srv ProductServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateProductStockRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProductServiceUpdateProductStock)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateProductStock(ctx, req.(*UpdateProductStockRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateProductStockResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProductService_GetProductsStock0_HTTP_Handler(srv ProductServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetProductsStockRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProductServiceGetProductsStock)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetProductsStock(ctx, req.(*GetProductsStockRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetProductsStockResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ProductServiceHTTPClient interface {
 	CreateProduct(ctx context.Context, req *CreateProductRequest, opts ...http.CallOption) (rsp *CreateProductResponse, err error)
 	DeleteProduct(ctx context.Context, req *DeleteProductRequest, opts ...http.CallOption) (rsp *DeleteProductResponse, err error)
 	GetProduct(ctx context.Context, req *GetProductRequest, opts ...http.CallOption) (rsp *Product, err error)
+	GetProductStock(ctx context.Context, req *GetProductStockRequest, opts ...http.CallOption) (rsp *GetProductStockResponse, err error)
 	GetProducts(ctx context.Context, req *GetProductsRequest, opts ...http.CallOption) (rsp *GetProductsResponse, err error)
+	GetProductsStock(ctx context.Context, req *GetProductsStockRequest, opts ...http.CallOption) (rsp *GetProductsStockResponse, err error)
 	UpdateProduct(ctx context.Context, req *UpdateProductRequest, opts ...http.CallOption) (rsp *UpdateProductResponse, err error)
+	UpdateProductStock(ctx context.Context, req *UpdateProductStockRequest, opts ...http.CallOption) (rsp *UpdateProductStockResponse, err error)
 }
 
 type ProductServiceHTTPClientImpl struct {
@@ -212,6 +291,19 @@ func (c *ProductServiceHTTPClientImpl) GetProduct(ctx context.Context, in *GetPr
 	return &out, err
 }
 
+func (c *ProductServiceHTTPClientImpl) GetProductStock(ctx context.Context, in *GetProductStockRequest, opts ...http.CallOption) (*GetProductStockResponse, error) {
+	var out GetProductStockResponse
+	pattern := "/api/v1/products/{id}/stock"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProductServiceGetProductStock))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
 func (c *ProductServiceHTTPClientImpl) GetProducts(ctx context.Context, in *GetProductsRequest, opts ...http.CallOption) (*GetProductsResponse, error) {
 	var out GetProductsResponse
 	pattern := "/api/v1/products"
@@ -225,11 +317,37 @@ func (c *ProductServiceHTTPClientImpl) GetProducts(ctx context.Context, in *GetP
 	return &out, err
 }
 
+func (c *ProductServiceHTTPClientImpl) GetProductsStock(ctx context.Context, in *GetProductsStockRequest, opts ...http.CallOption) (*GetProductsStockResponse, error) {
+	var out GetProductsStockResponse
+	pattern := "/api/v1/products/stock"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProductServiceGetProductsStock))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
 func (c *ProductServiceHTTPClientImpl) UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...http.CallOption) (*UpdateProductResponse, error) {
 	var out UpdateProductResponse
 	pattern := "/api/v1/products/{id}"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationProductServiceUpdateProduct))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ProductServiceHTTPClientImpl) UpdateProductStock(ctx context.Context, in *UpdateProductStockRequest, opts ...http.CallOption) (*UpdateProductStockResponse, error) {
+	var out UpdateProductStockResponse
+	pattern := "/api/v1/products/{id}/stock"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationProductServiceUpdateProductStock))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {

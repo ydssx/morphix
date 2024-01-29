@@ -698,6 +698,215 @@ var _ interface {
 	ErrorName() string
 } = PayLoadTestValidationError{}
 
+// Validate checks the field values on PayLoadOrderPaymentCompleted with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PayLoadOrderPaymentCompleted) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PayLoadOrderPaymentCompleted with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PayLoadOrderPaymentCompletedMultiError, or nil if none found.
+func (m *PayLoadOrderPaymentCompleted) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PayLoadOrderPaymentCompleted) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for OrderId
+
+	if len(errors) > 0 {
+		return PayLoadOrderPaymentCompletedMultiError(errors)
+	}
+
+	return nil
+}
+
+// PayLoadOrderPaymentCompletedMultiError is an error wrapping multiple
+// validation errors returned by PayLoadOrderPaymentCompleted.ValidateAll() if
+// the designated constraints aren't met.
+type PayLoadOrderPaymentCompletedMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PayLoadOrderPaymentCompletedMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PayLoadOrderPaymentCompletedMultiError) AllErrors() []error { return m }
+
+// PayLoadOrderPaymentCompletedValidationError is the validation error returned
+// by PayLoadOrderPaymentCompleted.Validate if the designated constraints
+// aren't met.
+type PayLoadOrderPaymentCompletedValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PayLoadOrderPaymentCompletedValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PayLoadOrderPaymentCompletedValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PayLoadOrderPaymentCompletedValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PayLoadOrderPaymentCompletedValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PayLoadOrderPaymentCompletedValidationError) ErrorName() string {
+	return "PayLoadOrderPaymentCompletedValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PayLoadOrderPaymentCompletedValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPayLoadOrderPaymentCompleted.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PayLoadOrderPaymentCompletedValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PayLoadOrderPaymentCompletedValidationError{}
+
+// Validate checks the field values on PayLoadOrderTimeout with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PayLoadOrderTimeout) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PayLoadOrderTimeout with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PayLoadOrderTimeoutMultiError, or nil if none found.
+func (m *PayLoadOrderTimeout) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PayLoadOrderTimeout) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for OrderNum
+
+	if len(errors) > 0 {
+		return PayLoadOrderTimeoutMultiError(errors)
+	}
+
+	return nil
+}
+
+// PayLoadOrderTimeoutMultiError is an error wrapping multiple validation
+// errors returned by PayLoadOrderTimeout.ValidateAll() if the designated
+// constraints aren't met.
+type PayLoadOrderTimeoutMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PayLoadOrderTimeoutMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PayLoadOrderTimeoutMultiError) AllErrors() []error { return m }
+
+// PayLoadOrderTimeoutValidationError is the validation error returned by
+// PayLoadOrderTimeout.Validate if the designated constraints aren't met.
+type PayLoadOrderTimeoutValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PayLoadOrderTimeoutValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PayLoadOrderTimeoutValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PayLoadOrderTimeoutValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PayLoadOrderTimeoutValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PayLoadOrderTimeoutValidationError) ErrorName() string {
+	return "PayLoadOrderTimeoutValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PayLoadOrderTimeoutValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPayLoadOrderTimeout.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PayLoadOrderTimeoutValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PayLoadOrderTimeoutValidationError{}
+
 // Validate checks the field values on QueryTasksResponse_TaskInfo with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.

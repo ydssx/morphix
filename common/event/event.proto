@@ -10,14 +10,18 @@ enum Subject {
   CancelPayment = 2; //取消支付
 }
 
-message MessageName {
-  map<string, string> contact_info = 3;
+message Event {
+  Subject subject = 1;
+  oneof payload {
+    PayloadPaymentCompleted payment_completed = 2;
+    PayloadCancelPayment cancel_payment = 3;
+  }
 }
 
 message PayloadPaymentCompleted {
   int64 user_id = 1;
   float amount = 2;
-  string order_id = 3;
+  int64 order_id = 3;
   Subject subject = 4;
 }
 

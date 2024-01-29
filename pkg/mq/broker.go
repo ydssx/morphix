@@ -3,6 +3,7 @@ package mq
 import (
 	"time"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/nats-io/nats.go"
 )
 
@@ -16,5 +17,6 @@ func InitNats(url string) (conn *nats.Conn, cleanup func(), err error) {
 	cleanup = func() {
 		err = natsConn.Drain()
 	}
+	log.Info("init nats success")
 	return natsConn, cleanup, err
 }

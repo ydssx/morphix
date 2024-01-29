@@ -35,43 +35,129 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on MessageName with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
+// Validate checks the field values on Event with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *MessageName) Validate() error {
+func (m *Event) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on MessageName with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in MessageNameMultiError, or
-// nil if none found.
-func (m *MessageName) ValidateAll() error {
+// ValidateAll checks the field values on Event with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in EventMultiError, or nil if none found.
+func (m *Event) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *MessageName) validate(all bool) error {
+func (m *Event) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	// no validation rules for ContactInfo
+	// no validation rules for Subject
+
+	switch v := m.Payload.(type) {
+	case *Event_PaymentCompleted:
+		if v == nil {
+			err := EventValidationError{
+				field:  "Payload",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetPaymentCompleted()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, EventValidationError{
+						field:  "PaymentCompleted",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, EventValidationError{
+						field:  "PaymentCompleted",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetPaymentCompleted()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return EventValidationError{
+					field:  "PaymentCompleted",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *Event_CancelPayment:
+		if v == nil {
+			err := EventValidationError{
+				field:  "Payload",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetCancelPayment()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, EventValidationError{
+						field:  "CancelPayment",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, EventValidationError{
+						field:  "CancelPayment",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetCancelPayment()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return EventValidationError{
+					field:  "CancelPayment",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		_ = v // ensures v is used
+	}
 
 	if len(errors) > 0 {
-		return MessageNameMultiError(errors)
+		return EventMultiError(errors)
 	}
 
 	return nil
 }
 
-// MessageNameMultiError is an error wrapping multiple validation errors
-// returned by MessageName.ValidateAll() if the designated constraints aren't met.
-type MessageNameMultiError []error
+// EventMultiError is an error wrapping multiple validation errors returned by
+// Event.ValidateAll() if the designated constraints aren't met.
+type EventMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m MessageNameMultiError) Error() string {
+func (m EventMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -80,11 +166,11 @@ func (m MessageNameMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m MessageNameMultiError) AllErrors() []error { return m }
+func (m EventMultiError) AllErrors() []error { return m }
 
-// MessageNameValidationError is the validation error returned by
-// MessageName.Validate if the designated constraints aren't met.
-type MessageNameValidationError struct {
+// EventValidationError is the validation error returned by Event.Validate if
+// the designated constraints aren't met.
+type EventValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -92,22 +178,22 @@ type MessageNameValidationError struct {
 }
 
 // Field function returns field value.
-func (e MessageNameValidationError) Field() string { return e.field }
+func (e EventValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e MessageNameValidationError) Reason() string { return e.reason }
+func (e EventValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e MessageNameValidationError) Cause() error { return e.cause }
+func (e EventValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e MessageNameValidationError) Key() bool { return e.key }
+func (e EventValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e MessageNameValidationError) ErrorName() string { return "MessageNameValidationError" }
+func (e EventValidationError) ErrorName() string { return "EventValidationError" }
 
 // Error satisfies the builtin error interface
-func (e MessageNameValidationError) Error() string {
+func (e EventValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -119,14 +205,14 @@ func (e MessageNameValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sMessageName.%s: %s%s",
+		"invalid %sEvent.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = MessageNameValidationError{}
+var _ error = EventValidationError{}
 
 var _ interface {
 	Field() string
@@ -134,7 +220,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = MessageNameValidationError{}
+} = EventValidationError{}
 
 // Validate checks the field values on PayloadPaymentCompleted with the rules
 // defined in the proto definition for this message. If any rules are

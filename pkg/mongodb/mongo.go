@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/go-kratos/kratos/v2/log"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -13,9 +14,14 @@ import (
 // url 是 MongoDB 的连接字符串。
 // 返回一个 MongoDB 客户端实例和一个清理函数用于断开连接。
 // 如果连接失败会 panic。
-func InitMongoDB(url string) (*mongo.Client, func()) {
+func InitMongoDB(uri string) (*mongo.Client, func()) {
 	ctx := context.Background()
-	cli, err := mongo.Connect(ctx, options.Client().ApplyURI(url), options.Client().SetMaxPoolSize(100), options.Client().SetMaxConnIdleTime(10*time.Second))
+	cli, err := mongo.Connect(ctx,
+		options.Client().ApplyURI(uri),
+		options.Client().SetMaxPoolSize(100),
+		options.Client().SetMaxConnIdleTime(10*time.Second),
+		options.Client().SetAuth(options.Credential{Username: "root", Password: "RSeMAN7csL"}),
+	)
 	if err != nil {
 		panic("failed to connect to MongoDB: " + err.Error())
 	}
@@ -27,7 +33,7 @@ func InitMongoDB(url string) (*mongo.Client, func()) {
 		cleanup()
 		panic("failed to ping MongoDB: " + err.Error())
 	}
-
+	log.Info("init mongodb success")
 	return cli, cleanup
 }
 

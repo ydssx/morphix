@@ -42,8 +42,10 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	productServiceClient := common.NewProductClient(bootstrap)
 	paymentServiceClient := common.NewPaymentClient(bootstrap)
 	quoteServiceClient := common.NewQuoteClient(bootstrap)
-	orderUseCase := biz.NewOrderUseCase(transaction, orderRepo, productServiceClient, paymentServiceClient, quoteServiceClient)
+	jobServiceClient := common.NewJobClient(bootstrap)
+	orderUseCase := biz.NewOrderUseCase(transaction, orderRepo, productServiceClient, paymentServiceClient, quoteServiceClient, jobServiceClient)
 	orderService := service.NewOrderService(orderUseCase)
+	httpServer := server.NewHTTPServer(bootstrap, orderService)
 	grpcServer := server.NewGRPCServer(bootstrap, orderService)
 	conn, cleanup2, err := common.NewNatsConn(bootstrap)
 	if err != nil {
@@ -51,8 +53,14 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 		return nil, nil, err
 	}
 	cloudEvent := common.NewCloudEvent(conn)
-	listenerServer := listener.NewListenerServer(cloudEvent)
-	app := newApp(grpcServer, listenerServer, bootstrap)
+	listenerServer := listener.NewListenerServer(cloudEvent, orderUseCase)
+	v, err := server.NewServer(httpServer, grpcServer, listenerServer, bootstrap)
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	app := newApp(bootstrap, v...)
 	return app, func() {
 		cleanup2()
 		cleanup()
