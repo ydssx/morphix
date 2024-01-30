@@ -52,7 +52,7 @@ func RegisterOrderServiceHTTPServer(s *http.Server, srv OrderServiceHTTPServer) 
 	r.POST("/api/v1/orders/{order_id}/pay", _OrderService_PayOrder0_HTTP_Handler(srv))
 	r.DELETE("/api/v1/orders/{order_id}", _OrderService_DeleteOrder0_HTTP_Handler(srv))
 	r.GET("/api/v1/orders", _OrderService_ListOrders0_HTTP_Handler(srv))
-	r.POST("/api/v1/orders/{order_id}/cancel", _OrderService_CancelOrder0_HTTP_Handler(srv))
+	r.POST("/api/v1/orders/cancel", _OrderService_CancelOrder0_HTTP_Handler(srv))
 }
 
 func _OrderService_CreateOrder0_HTTP_Handler(srv OrderServiceHTTPServer) func(ctx http.Context) error {
@@ -199,9 +199,6 @@ func _OrderService_CancelOrder0_HTTP_Handler(srv OrderServiceHTTPServer) func(ct
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		if err := ctx.BindVars(&in); err != nil {
-			return err
-		}
 		http.SetOperation(ctx, OperationOrderServiceCancelOrder)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.CancelOrder(ctx, req.(*CancelOrderRequest))
@@ -235,7 +232,7 @@ func NewOrderServiceHTTPClient(client *http.Client) OrderServiceHTTPClient {
 
 func (c *OrderServiceHTTPClientImpl) CancelOrder(ctx context.Context, in *CancelOrderRequest, opts ...http.CallOption) (*CancelOrderResponse, error) {
 	var out CancelOrderResponse
-	pattern := "/api/v1/orders/{order_id}/cancel"
+	pattern := "/api/v1/orders/cancel"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationOrderServiceCancelOrder))
 	opts = append(opts, http.PathTemplate(pattern))

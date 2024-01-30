@@ -16,6 +16,7 @@ import (
 	"github.com/ydssx/morphix/app/order/internal/service"
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
+	"github.com/ydssx/morphix/pkg/redis"
 )
 
 import (
@@ -39,11 +40,12 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	}
 	transaction := data.NewTransaction(dataData)
 	orderRepo := data.NewOrderRepo(dataData)
+	redisLocker := redis.NewLocker(client)
 	productServiceClient := common.NewProductClient(bootstrap)
 	paymentServiceClient := common.NewPaymentClient(bootstrap)
 	quoteServiceClient := common.NewQuoteClient(bootstrap)
 	jobServiceClient := common.NewJobClient(bootstrap)
-	orderUseCase := biz.NewOrderUseCase(transaction, orderRepo, productServiceClient, paymentServiceClient, quoteServiceClient, jobServiceClient)
+	orderUseCase := biz.NewOrderUseCase(transaction, orderRepo, redisLocker, productServiceClient, paymentServiceClient, quoteServiceClient, jobServiceClient)
 	orderService := service.NewOrderService(orderUseCase)
 	httpServer := server.NewHTTPServer(bootstrap, orderService)
 	grpcServer := server.NewGRPCServer(bootstrap, orderService)

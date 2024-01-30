@@ -49,7 +49,7 @@ service OrderService {
   // 取消订单
   rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse) {
     option (google.api.http) = {
-      post: "/api/v1/orders/{order_id}/cancel"
+      post: "/api/v1/orders/cancel"
       body: "*"
     };
   }
@@ -143,7 +143,7 @@ message PayOrderResponse {
 }
 
 message CancelOrderRequest {
-  int32 order_id = 1; // 订单ID
+  string order_number = 1; // 订单编号
   string reason = 2; // 取消原因
 }
 

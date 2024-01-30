@@ -25,6 +25,8 @@ message ServiceSet {
   ServerConf order = 5;
   ServerConf job = 6;
   ServerConf aiart = 7;
+  ServerConf chat = 8;
+  ServerConf product = 9;
 }
 
 message ClientSet {
@@ -33,6 +35,7 @@ message ClientSet {
   ClientConf order_rpc_client = 3;
   ClientConf payment_rpc_client = 4;
   ClientConf job_rpc_client = 5;
+  ClientConf quote_rpc_client = 6;
 }
 
 message Server {

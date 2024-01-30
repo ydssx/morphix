@@ -591,6 +591,64 @@ func (m *ServiceSet) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetChat()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Chat",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Chat",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetChat()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ServiceSetValidationError{
+				field:  "Chat",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetProduct()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Product",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ServiceSetValidationError{
+					field:  "Product",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetProduct()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ServiceSetValidationError{
+				field:  "Product",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return ServiceSetMultiError(errors)
 	}
@@ -829,6 +887,35 @@ func (m *ClientSet) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return ClientSetValidationError{
 				field:  "JobRpcClient",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetQuoteRpcClient()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClientSetValidationError{
+					field:  "QuoteRpcClient",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClientSetValidationError{
+					field:  "QuoteRpcClient",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetQuoteRpcClient()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClientSetValidationError{
+				field:  "QuoteRpcClient",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

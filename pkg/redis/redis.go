@@ -2,9 +2,11 @@ package redis
 
 import (
 	"context"
+	"sync"
 
-	"github.com/bsm/redislock"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-redsync/redsync/v4"
+	syncredis "github.com/go-redsync/redsync/v4/redis/goredis/v9"
 	"github.com/redis/go-redis/v9"
 	"github.com/ydssx/morphix/pkg/errors"
 )
@@ -16,12 +18,8 @@ func NewRedis(opt *redis.Options) (*redis.Client, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "redis connect failed")
 	}
+	log.Info("init redis success")
 	return cli, nil
-}
-
-// NewRedisLock 创建Redis的锁Client对象
-func NewRedisLock(cli *redis.Client) *redislock.Client {
-	return redislock.New(cli)
 }
 
 // NewRedisCluster 连接Redis集群并返回ClusterClient对象
@@ -34,50 +32,73 @@ func NewRedisCluster(opt *redis.ClusterOptions) *redis.ClusterClient {
 	return cli
 }
 
-// RedisPubSub Redis的发布/订阅结构
-type RedisPubSub struct {
-	cli  *redis.Client
-	subs map[string]*redis.PubSub
+type RedisSync struct {
+	Redsync  *redsync.Redsync
+	mutexMap map[string]*redsync.Mutex
+	mutex    sync.Mutex
 }
 
-// NewRedisPubSub 创建RedisPubSub对象
-func NewRedisPubSub(cli *redis.Client) *RedisPubSub {
-	return &RedisPubSub{cli: cli, subs: make(map[string]*redis.PubSub)}
+func NewRedisSync(cli *redis.Client) *RedisSync {
+	pool := syncredis.NewPool(cli)
+	return &RedisSync{Redsync: redsync.New(pool), mutexMap: make(map[string]*redsync.Mutex)}
 }
 
-// PublishMessage publishes a message to the given topic.
-// It returns an error if the publish failed.
-func (ps *RedisPubSub) PublishMessage(topic string, message interface{}) error {
-	err := ps.cli.Publish(context.Background(), topic, message).Err()
+func (r *RedisSync) Lock(ctx context.Context, key string, opt ...LockerOption) error {
+	m := r.newMutex(opt, key)
+	err := m.LockContext(ctx)
 	if err != nil {
-		return errors.Wrap(err, "发布消息失败")
+		return errors.Wrap(err, "redisSync: lock failed")
 	}
+	r.mutexMap[key] = m
 	return nil
 }
 
-// SubscribeToTopic subscribes to the given topic and calls the handler
-// function whenever a new message is received on that topic.
-func (ps *RedisPubSub) SubscribeToTopic(topic string, handler func(message []byte)) {
-	sub := ps.cli.Subscribe(context.Background(), topic)
-	ps.subs[topic] = sub
+func (r *RedisSync) Unlock(ctx context.Context, key string) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 
-	ch := sub.Channel()
-	go func() {
-		for msg := range ch {
-			if msg != nil {
-				handler([]byte(msg.Payload))
-			}
+	if r.mutexMap[key] == nil {
+		return errors.New("redisSync: not obtain lock")
+	}
+	ok, err := r.mutexMap[key].UnlockContext(ctx)
+	if err != nil {
+		if _, is := err.(*redsync.ErrTaken); !is {
+			return errors.Errorf("redisSync: unlock %s failed: %v", r.mutexMap[key].Name(), err)
 		}
-		log.Infof("Stopped subscribing to messages on topic [%s]", topic)
-	}()
+	}
+	if !ok {
+		return errors.New("redisSync: unlock failed")
+	}
+	delete(r.mutexMap, key)
+	return nil
 }
 
-// Close 关闭RedisPubSub对象
-func (ps *RedisPubSub) Close() error {
-	var errs []error
-	for t, v := range ps.subs {
-		err := v.Close()
-		errs = append(errs, errors.Wrap(err, "关闭主题["+t+"]的订阅失败"))
+// TryLock 尝试获取锁
+func (r *RedisSync) TryLock(ctx context.Context, key string, opt ...LockerOption) error {
+	m := r.newMutex(opt, key)
+	err := m.TryLockContext(ctx)
+	if err != nil {
+		return errors.Wrap(err, "redisSync: try lock failed")
 	}
-	return errors.Join(errs...)
+	r.mutexMap[key] = m
+	return nil
+}
+
+func (r *RedisSync) newMutex(opt []LockerOption, key string) *redsync.Mutex {
+	var o lockOption
+	for _, f := range opt {
+		f(&o)
+	}
+	var opts []redsync.Option
+	if o.ttl != 0 {
+		opts = append(opts, redsync.WithExpiry(o.ttl))
+	}
+	if o.tries != 0 {
+		opts = append(opts, redsync.WithTries(o.tries))
+	}
+	if o.delay != 0 {
+		opts = append(opts, redsync.WithRetryDelay(o.delay))
+	}
+	m := r.Redsync.NewMutex(key, opts...)
+	return m
 }

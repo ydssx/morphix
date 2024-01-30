@@ -1699,7 +1699,7 @@ func (m *CancelOrderRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for OrderId
+	// no validation rules for OrderNumber
 
 	// no validation rules for Reason
 

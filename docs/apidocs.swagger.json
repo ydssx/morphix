@@ -30,9 +30,6 @@
       "name": "QuoteService"
     },
     {
-      "name": "CouponService"
-    },
-    {
       "name": "SMSService"
     },
     {
@@ -650,6 +647,39 @@
         ]
       }
     },
+    "/api/v1/orders/cancel": {
+      "post": {
+        "summary": "取消订单",
+        "operationId": "OrderService_CancelOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderv1CancelOrderResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/orderv1CancelOrderRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
     "/api/v1/orders/{orderId}": {
       "get": {
         "summary": "查询订单",
@@ -707,6 +737,47 @@
             "required": true,
             "type": "integer",
             "format": "int32"
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/orders/{orderId}/pay": {
+      "post": {
+        "summary": "支付订单",
+        "operationId": "OrderService_PayOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderv1PayOrderResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "orderId",
+            "description": "订单ID",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OrderServicePayOrderBody"
+            }
           }
         ],
         "tags": [
@@ -839,7 +910,6 @@
         "parameters": [
           {
             "name": "orderId",
-            "description": "其他字段...",
             "in": "path",
             "required": true,
             "type": "string",
@@ -981,6 +1051,43 @@
         ]
       }
     },
+    "/api/v1/products/stock": {
+      "get": {
+        "summary": "获取产品库存",
+        "operationId": "ProductService_GetProductsStock",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productv1GetProductsStockResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids",
+            "description": "产品ID列表",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      }
+    },
     "/api/v1/products/{id}": {
       "get": {
         "summary": "获取单个产品",
@@ -1081,6 +1188,75 @@
         ]
       }
     },
+    "/api/v1/products/{id}/stock": {
+      "get": {
+        "operationId": "ProductService_GetProductStock",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productv1GetProductStockResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "产品ID",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      },
+      "put": {
+        "operationId": "ProductService_UpdateProductStock",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/productv1UpdateProductStockResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "产品ID",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ProductServiceUpdateProductStockBody"
+            }
+          }
+        ],
+        "tags": [
+          "ProductService"
+        ]
+      }
+    },
     "/api/v1/quotes": {
       "get": {
         "summary": "获取报价列表",
@@ -1101,11 +1277,30 @@
         },
         "parameters": [
           {
-            "name": "productId",
+            "name": "productIds",
             "description": "可选的查询条件，例如产品ID、日期范围等",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "int64"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "dateRangeStart",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "dateRangeEnd",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
           }
         ],
         "tags": [
@@ -1299,6 +1494,15 @@
       "default": "USER_PERMISSION_ADD",
       "title": "- USER_PERMISSION_ADD: 增加用户权限\n - USER_PERMISSION_DELETE: 删除用户权限\n - USER_PERMISSION_UPDATE: 更新用户权限\n - USER_PERMISSION_REPLACE: 替换用户权限\n - ROLE_PERMISSION_ADD: 增加角色权限\n - ROLE_PERMISSION_DELETE: 删除角色权限\n - ROLE_PERMISSION_UPDATE: 更新角色权限\n - ROLE_PERMISSION_REPLACE: 替换角色权限"
     },
+    "OrderServicePayOrderBody": {
+      "type": "object",
+      "properties": {
+        "paymentMethod": {
+          "type": "string",
+          "title": "支付方式"
+        }
+      }
+    },
     "OrderServiceUpdateOrderStatusBody": {
       "type": "object",
       "properties": {
@@ -1317,8 +1521,7 @@
           "format": "double"
         },
         "currency": {
-          "type": "string",
-          "description": "其他字段..."
+          "type": "string"
         }
       },
       "title": "退款请求"
@@ -1346,6 +1549,17 @@
         }
       },
       "title": "更新产品请求"
+    },
+    "ProductServiceUpdateProductStockBody": {
+      "type": "object",
+      "properties": {
+        "stock": {
+          "type": "integer",
+          "format": "int32",
+          "title": "库存数量"
+        }
+      },
+      "title": "更新产品库存请求"
     },
     "QueryTasksResponseTaskInfo": {
       "type": "object",
@@ -1601,6 +1815,22 @@
       },
       "title": "视频上传响应"
     },
+    "orderv1CancelOrderRequest": {
+      "type": "object",
+      "properties": {
+        "orderNumber": {
+          "type": "string",
+          "title": "订单编号"
+        },
+        "reason": {
+          "type": "string",
+          "title": "取消原因"
+        }
+      }
+    },
+    "orderv1CancelOrderResponse": {
+      "type": "object"
+    },
     "orderv1CreateOrderRequest": {
       "type": "object",
       "properties": {
@@ -1728,6 +1958,15 @@
       "description": "- PENDING: 待处理\n - PROCESSING: 处理中\n - COMPLETED: 已完成\n - CANCELED: 已取消",
       "title": "订单状态枚举"
     },
+    "orderv1PayOrderResponse": {
+      "type": "object",
+      "properties": {
+        "paymentUrl": {
+          "type": "string",
+          "title": "支付链接"
+        }
+      }
+    },
     "orderv1UpdateOrderStatusResponse": {
       "type": "object",
       "properties": {
@@ -1762,8 +2001,7 @@
           "type": "string"
         },
         "status": {
-          "type": "string",
-          "description": "其他字段..."
+          "$ref": "#/definitions/paymentv1PaymentStatus"
         }
       },
       "title": "查询支付响应"
@@ -1772,15 +2010,15 @@
       "type": "object",
       "properties": {
         "orderId": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "amount": {
           "type": "number",
           "format": "double"
         },
         "currency": {
-          "type": "string",
-          "description": "其他字段..."
+          "type": "string"
         }
       },
       "title": "支付请求"
@@ -1789,14 +2027,27 @@
       "type": "object",
       "properties": {
         "orderId": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "status": {
-          "type": "string",
-          "description": "其他字段..."
+          "type": "string"
+        },
+        "paymentUrl": {
+          "type": "string"
         }
       },
       "title": "支付响应"
+    },
+    "paymentv1PaymentStatus": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "SUCCESS",
+        "FAILED"
+      ],
+      "default": "PENDING",
+      "title": "支付状态"
     },
     "paymentv1RefundResponse": {
       "type": "object",
@@ -1805,8 +2056,7 @@
           "type": "string"
         },
         "status": {
-          "type": "string",
-          "description": "其他字段..."
+          "type": "string"
         }
       },
       "title": "退款响应"
@@ -1849,6 +2099,17 @@
       "type": "object",
       "title": "删除产品响应"
     },
+    "productv1GetProductStockResponse": {
+      "type": "object",
+      "properties": {
+        "stock": {
+          "type": "integer",
+          "format": "int32",
+          "title": "库存数量"
+        }
+      },
+      "title": "获取单个产品库存响应"
+    },
     "productv1GetProductsResponse": {
       "type": "object",
       "properties": {
@@ -1859,9 +2120,28 @@
             "$ref": "#/definitions/productv1Product"
           },
           "title": "产品列表"
+        },
+        "total": {
+          "type": "string",
+          "format": "int64",
+          "title": "产品总数"
         }
       },
       "title": "获取产品列表响应"
+    },
+    "productv1GetProductsStockResponse": {
+      "type": "object",
+      "properties": {
+        "stocks": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": "产品ID与库存的映射"
+        }
+      },
+      "title": "获取产品库存响应"
     },
     "productv1Product": {
       "type": "object",
@@ -1895,6 +2175,9 @@
     "productv1UpdateProductResponse": {
       "type": "object",
       "title": "更新产品响应"
+    },
+    "productv1UpdateProductStockResponse": {
+      "type": "object"
     },
     "protobufAny": {
       "type": "object",
@@ -1957,10 +2240,12 @@
       "properties": {
         "id": {
           "type": "string",
+          "format": "int64",
           "title": "报价ID"
         },
         "productId": {
           "type": "string",
+          "format": "int64",
           "title": "产品ID"
         },
         "basePrice": {
@@ -2461,9 +2746,12 @@
       "type": "string",
       "enum": [
         "TEST_JOB",
-        "TEST_CRON_JOB"
+        "TEST_CRON_JOB",
+        "ORDER_PAYMENT_COMPLETED",
+        "ORDER_TIMEOUT"
       ],
       "default": "TEST_JOB",
+      "description": "- ORDER_PAYMENT_COMPLETED: 订单支付完成\n - ORDER_TIMEOUT: 订单超时未支付",
       "title": "任务类型定义"
     },
     "v1QueryTasksResponse": {

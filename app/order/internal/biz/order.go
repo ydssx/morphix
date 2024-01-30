@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	jobv1 "github.com/ydssx/morphix/api/job/v1"
@@ -12,6 +13,7 @@ import (
 	"github.com/ydssx/morphix/app/order/internal/model"
 	"github.com/ydssx/morphix/pkg/errors"
 	"github.com/ydssx/morphix/pkg/interceptors"
+	"github.com/ydssx/morphix/pkg/redis"
 	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -42,6 +44,7 @@ type ListOrderCond struct {
 type OrderUseCase struct {
 	repo          OrderRepo
 	tx            Transaction
+	locker        redis.Locker
 	productClient productv1.ProductServiceClient
 	paymentClient paymentv1.PaymentServiceClient
 	quoteClient   quotev1.QuoteServiceClient
@@ -51,6 +54,7 @@ type OrderUseCase struct {
 func NewOrderUseCase(
 	tx Transaction,
 	repo OrderRepo,
+	locker redis.Locker,
 	productClient productv1.ProductServiceClient,
 	paymentClient paymentv1.PaymentServiceClient,
 	quoteClient quotev1.QuoteServiceClient,
@@ -59,6 +63,7 @@ func NewOrderUseCase(
 	return &OrderUseCase{
 		repo:          repo,
 		tx:            tx,
+		locker:        locker,
 		productClient: productClient,
 		paymentClient: paymentClient,
 		quoteClient:   quoteClient,
@@ -181,12 +186,37 @@ func (b *OrderUseCase) GetOrder(ctx context.Context, req *orderv1.GetOrderReques
 func (b *OrderUseCase) UpdateOrderStatus(ctx context.Context, req *orderv1.UpdateOrderStatusRequest) (res *orderv1.UpdateOrderStatusResponse, err error) {
 	res = new(orderv1.UpdateOrderStatusResponse)
 
+	lockKey := fmt.Sprintf("order:%d", req.OrderId)
+	err = b.locker.Lock(ctx, lockKey, redis.WithTTL(time.Second*10))
+	if err != nil {
+		return nil, errors.Wrap(err, "获取订单锁失败")
+	}
+	defer b.locker.Unlock(ctx, lockKey)
+
+	order, err := b.repo.GetOrder(ctx, int64(req.OrderId))
+	if err != nil {
+		return nil, errors.Wrap(err, "查询订单失败")
+	}
+	// 检查状态转换是否有效
+	if !isStatusTransitionValid(orderv1.OrderStatus(orderv1.OrderStatus_value[order.Status]), req.Status) {
+		return nil, errors.New("订单状态转换不合法")
+	}
+
 	err = b.repo.UpdateOrderStatus(ctx, int64(req.OrderId), req.Status.String())
 	if err != nil {
 		return nil, errors.Wrap(err, "更新订单状态失败")
 	}
 
 	return
+}
+
+// isStatusTransitionValid 检查订单状态转换是否有效
+func isStatusTransitionValid(currentStatus orderv1.OrderStatus, newStatus orderv1.OrderStatus) bool {
+	// 定义状态转换规则，例如只允许从较低的状态转换到较高的状态
+	// 这里的实现应该根据业务逻辑来定义
+	// 例如，如果订单状态有一个明确的生命周期，可以按照生命周期的顺序来进行比较
+	// 如果状态转换更复杂，可能需要一个状态转换图来表示允许的转换
+	return orderv1.OrderStatus_value[currentStatus.String()] < orderv1.OrderStatus_value[newStatus.String()]
 }
 
 // 删除订单
