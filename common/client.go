@@ -9,7 +9,10 @@ import (
 	"github.com/nats-io/nats.go"
 	goredis "github.com/redis/go-redis/v9"
 	jobv1 "github.com/ydssx/morphix/api/job/v1"
+	orderv1 "github.com/ydssx/morphix/api/order/v1"
+	paymentv1 "github.com/ydssx/morphix/api/payment/v1"
 	productv1 "github.com/ydssx/morphix/api/product/v1"
+	quotev1 "github.com/ydssx/morphix/api/quote/v1"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/common/conf"
@@ -53,6 +56,29 @@ func NewProductClient(c *conf.Bootstrap) productv1.ProductServiceClient {
 	return productv1.NewProductServiceClient(conn)
 }
 
+// NewPaymentClient 创建一个 Payment 服务的客户端连接。
+// 接收配置参数 c,使用 etcd 注册中心和配置的 PaymentRpcClient 来创建一个 gRPC 连接,
+// 然后用这个连接生成一个 paymentv1.PaymentServiceClient 返回。
+func NewPaymentClient(c *conf.Bootstrap) paymentv1.PaymentServiceClient {
+	conn := createConn(c.Etcd, c.ClientSet.PaymentRpcClient)
+
+	return paymentv1.NewPaymentServiceClient(conn)
+}
+
+// NewQuoteClient 创建一个 Quote 服务的客户端连接。
+func NewQuoteClient(c *conf.Bootstrap) quotev1.QuoteServiceClient {
+	conn := createConn(c.Etcd, c.ClientSet.QuoteRpcClient)
+
+	return quotev1.NewQuoteServiceClient(conn)
+}
+
+//订单服务客户端
+func NewOrderClient(c *conf.Bootstrap) orderv1.OrderServiceClient {
+	conn := createConn(c.Etcd, c.ClientSet.OrderRpcClient)
+
+	return orderv1.NewOrderServiceClient(conn)
+}
+
 // createConn 使用给定的 etcd 配置和 RPC 客户端配置创建一个 gRPC 连接。
 // 它会新建一个 etcd 注册中心,然后使用这个注册中心和上下文来调用 CreateClientConn
 // 来实际创建连接。最后返回建立的 gRPC 客户端连接。
@@ -83,7 +109,7 @@ func CreateClientConn(ctx context.Context, rpcCliConf *conf.ClientConf, r *etcd.
 		kgrpc.WithOptions(grpc.WithKeepaliveParams(keepalive.ClientParameters{})),
 	)
 	if err != nil {
-		panic(err)
+		panic("create client connection error: " + err.Error())
 	}
 
 	return conn
