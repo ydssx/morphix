@@ -5,11 +5,13 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ydssx/morphix/common/rbac"
 	"github.com/ydssx/morphix/pkg/jwt"
 	"github.com/ydssx/morphix/pkg/util"
 )
 
 func Auth() gin.HandlerFunc {
+	e := rbac.NewCasbinEnforcer()
 	return func(ctx *gin.Context) {
 		auth := ctx.Request.Header.Get("Authorization")
 		token := strings.ReplaceAll(auth, "Bearer ", "")
@@ -17,6 +19,15 @@ func Auth() gin.HandlerFunc {
 		if err != nil {
 			ctx.Abort()
 			util.FailWithMsg(ctx, "验证失败")
+		}
+		ok, err := e.Enforce(claims.Role, ctx.Request.URL.Path, ctx.Request.Method)
+		if err != nil {
+			ctx.Abort()
+			util.FailWithError(ctx, err)
+		}
+		if !ok {
+			ctx.Abort()
+			util.FailWithMsg(ctx, "权限不足")
 		}
 		ctx.Request = ctx.Request.WithContext(NewContext(ctx.Request.Context(), claims))
 		ctx.Next()
