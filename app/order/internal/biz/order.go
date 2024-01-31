@@ -24,8 +24,8 @@ type Transaction interface {
 
 type OrderRepo interface {
 	CreateOrder(ctx context.Context, order model.Order) (orderID int64, err error)
-	GetOrder(ctx context.Context, orderID int64) (order *model.Order, err error)
-	UpdateOrderStatus(ctx context.Context, orderID int64, status string) (err error)
+	GetOrder(ctx context.Context, orderNumber string) (order *model.Order, err error)
+	UpdateOrderStatus(ctx context.Context, orderNumber string, status string) (err error)
 	DeleteOrder(ctx context.Context, orderID int64) (err error)
 	DeleteOrders(ctx context.Context, orderIDs []int64) (err error)
 	ListOrders(ctx context.Context, cond *ListOrderCond) (orders []*model.Order, total int64, err error)
@@ -186,14 +186,14 @@ func (b *OrderUseCase) GetOrder(ctx context.Context, req *orderv1.GetOrderReques
 func (b *OrderUseCase) UpdateOrderStatus(ctx context.Context, req *orderv1.UpdateOrderStatusRequest) (res *orderv1.UpdateOrderStatusResponse, err error) {
 	res = new(orderv1.UpdateOrderStatusResponse)
 
-	lockKey := fmt.Sprintf("order:%d", req.OrderId)
+	lockKey := fmt.Sprintf("order:%s", req.OrderNumber)
 	err = b.locker.Lock(ctx, lockKey, redis.WithTTL(time.Second*10))
 	if err != nil {
 		return nil, errors.Wrap(err, "获取订单锁失败")
 	}
 	defer b.locker.Unlock(ctx, lockKey)
 
-	order, err := b.repo.GetOrder(ctx, int64(req.OrderId))
+	order, err := b.repo.GetOrder(ctx, req.OrderNumber)
 	if err != nil {
 		return nil, errors.Wrap(err, "查询订单失败")
 	}
@@ -202,7 +202,7 @@ func (b *OrderUseCase) UpdateOrderStatus(ctx context.Context, req *orderv1.Updat
 		return nil, errors.New("订单状态转换不合法")
 	}
 
-	err = b.repo.UpdateOrderStatus(ctx, int64(req.OrderId), req.Status.String())
+	err = b.repo.UpdateOrderStatus(ctx, req.OrderNumber, req.Status.String())
 	if err != nil {
 		return nil, errors.Wrap(err, "更新订单状态失败")
 	}
@@ -210,13 +210,36 @@ func (b *OrderUseCase) UpdateOrderStatus(ctx context.Context, req *orderv1.Updat
 	return
 }
 
-// isStatusTransitionValid 检查订单状态转换是否有效
-func isStatusTransitionValid(currentStatus orderv1.OrderStatus, newStatus orderv1.OrderStatus) bool {
-	// 定义状态转换规则，例如只允许从较低的状态转换到较高的状态
-	// 这里的实现应该根据业务逻辑来定义
-	// 例如，如果订单状态有一个明确的生命周期，可以按照生命周期的顺序来进行比较
-	// 如果状态转换更复杂，可能需要一个状态转换图来表示允许的转换
-	return orderv1.OrderStatus_value[currentStatus.String()] < orderv1.OrderStatus_value[newStatus.String()]
+// statusTransitionMap 定义了订单状态转换的规则
+var statusTransitionMap = map[orderv1.OrderStatus]map[orderv1.OrderStatus]bool{
+	orderv1.OrderStatus_PENDING: {
+		orderv1.OrderStatus_PROCESSING: true,
+		orderv1.OrderStatus_CANCELED:   true,
+	},
+	orderv1.OrderStatus_PROCESSING: {
+		orderv1.OrderStatus_COMPLETED: true,
+		orderv1.OrderStatus_FAILED:    true,
+		orderv1.OrderStatus_CANCELED:  true,
+	},
+	orderv1.OrderStatus_COMPLETED: {
+		// 通常已完成的订单不再允许更改状态
+	},
+	orderv1.OrderStatus_FAILED: {
+		// 处理失败的订单可能允许重试，这取决于业务规则
+	},
+	orderv1.OrderStatus_CANCELED: {
+		// 已取消的订单通常不允许更改状态
+	},
+}
+
+// isStatusTransitionValid 检查从当前状态到新状态的转换是否有效
+func isStatusTransitionValid(currentStatus, newStatus orderv1.OrderStatus) bool {
+	allowedTransitions, ok := statusTransitionMap[currentStatus]
+	if !ok {
+		return false
+	}
+
+	return allowedTransitions[newStatus]
 }
 
 // 删除订单
@@ -237,7 +260,7 @@ func (b *OrderUseCase) ListOrders(ctx context.Context, req *orderv1.ListOrdersRe
 func (uc *OrderUseCase) PayOrder(ctx context.Context, req *orderv1.PayOrderRequest) (res *orderv1.PayOrderResponse, err error) {
 	res = new(orderv1.PayOrderResponse)
 
-	order, err := uc.repo.GetOrder(ctx, int64(req.OrderId))
+	order, err := uc.repo.GetOrder(ctx, req.OrderNumber)
 	if err != nil {
 		return nil, errors.Wrap(err, "查询订单失败")
 	}
@@ -247,8 +270,8 @@ func (uc *OrderUseCase) PayOrder(ctx context.Context, req *orderv1.PayOrderReque
 
 	// 调用支付系统接口，支付订单
 	paymentResp, err := uc.paymentClient.MakePayment(ctx, &paymentv1.MakePaymentRequest{
-		OrderId: int64(req.OrderId),
-		Amount:  order.Amount,
+		OrderNumber: req.OrderNumber,
+		Amount:      order.Amount,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "调用支付系统接口，支付订单失败")
@@ -262,7 +285,46 @@ func (uc *OrderUseCase) PayOrder(ctx context.Context, req *orderv1.PayOrderReque
 func (uc *OrderUseCase) CancelOrder(ctx context.Context, req *orderv1.CancelOrderRequest) (res *orderv1.CancelOrderResponse, err error) {
 	res = new(orderv1.CancelOrderResponse)
 
-	// TODO:ADD logic here and delete this line.
+	// 验证请求的有效性（例如，检查用户权限等）
 
-	return
+	// 检索订单信息
+	order, err := uc.repo.GetOrder(ctx, req.OrderNumber)
+	if err != nil {
+		// 处理错误，例如，订单不存在或数据库查询失败
+		return nil, err
+	}
+
+	// 检查订单是否可以取消
+	if order.Status != "PROCESSING" && order.Status != "PENDING" {
+		// 返回错误，订单已经在处理中或已完成，不能取消
+		return nil, errors.New("order cannot be cancelled")
+	}
+
+	// 更新订单状态为已取消
+	err = uc.repo.UpdateOrderStatus(ctx, req.OrderNumber, "CANCELED")
+	if err != nil {
+		// 处理更新失败的错误
+		return nil, err
+	}
+
+	// 如果已支付，处理退款
+	if order.Status == orderv1.OrderStatus_PAID.String() {
+		_, err = uc.paymentClient.Refund(ctx, &paymentv1.RefundRequest{
+			OrderNumber: req.OrderNumber,
+			Amount:      order.Amount,
+		})
+		if err != nil {
+			// 处理退款失败的错误
+			return nil, err
+		}
+	}
+
+	// 更新库存（如果需要）
+
+	// 发送订单取消的通知给用户
+
+	// 记录操作日志
+
+	// 返回成功响应
+	return res, nil
 }

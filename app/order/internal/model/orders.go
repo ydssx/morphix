@@ -27,6 +27,11 @@ func (m *orderModel) SetIds(ids ...int64) *orderModel {
 	return m
 }
 
+func (m *orderModel) SetOrderNumber(orderNumber string) *orderModel {
+	m.db = m.db.Where("order_number =?", orderNumber)
+	return m
+}
+
 func (m *orderModel) Order(expr string) *orderModel {
 	m.db = m.db.Order(expr)
 	return m

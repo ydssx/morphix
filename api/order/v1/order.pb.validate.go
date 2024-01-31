@@ -573,7 +573,7 @@ func (m *GetOrderRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for OrderId
+	// no validation rules for OrderNumber
 
 	if len(errors) > 0 {
 		return GetOrderRequestMultiError(errors)
@@ -804,7 +804,7 @@ func (m *UpdateOrderStatusRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for OrderId
+	// no validation rules for OrderNumber
 
 	// no validation rules for Status
 
@@ -1041,7 +1041,7 @@ func (m *DeleteOrderRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for OrderId
+	// no validation rules for OrderNumber
 
 	if len(errors) > 0 {
 		return DeleteOrderRequestMultiError(errors)
@@ -1493,7 +1493,7 @@ func (m *PayOrderRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for OrderId
+	// no validation rules for OrderNumber
 
 	// no validation rules for PaymentMethod
 

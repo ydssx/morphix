@@ -38,9 +38,9 @@ type PaymentServiceHTTPServer interface {
 func RegisterPaymentServiceHTTPServer(s *http.Server, srv PaymentServiceHTTPServer) {
 	r := s.Route("/")
 	r.POST("/api/v1/payments", _PaymentService_MakePayment0_HTTP_Handler(srv))
-	r.GET("/api/v1/payments/{order_id}", _PaymentService_GetPayment0_HTTP_Handler(srv))
-	r.DELETE("/api/v1/payments/{order_id}", _PaymentService_CancelPayment0_HTTP_Handler(srv))
-	r.POST("/api/v1/payments/{order_id}/refund", _PaymentService_Refund0_HTTP_Handler(srv))
+	r.GET("/api/v1/payments/{order_number}", _PaymentService_GetPayment0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/payments/{order_number}", _PaymentService_CancelPayment0_HTTP_Handler(srv))
+	r.POST("/api/v1/payments/{order_number}/refund", _PaymentService_Refund0_HTTP_Handler(srv))
 }
 
 func _PaymentService_MakePayment0_HTTP_Handler(srv PaymentServiceHTTPServer) func(ctx http.Context) error {
@@ -151,7 +151,7 @@ func NewPaymentServiceHTTPClient(client *http.Client) PaymentServiceHTTPClient {
 
 func (c *PaymentServiceHTTPClientImpl) CancelPayment(ctx context.Context, in *CancelPaymentRequest, opts ...http.CallOption) (*CancelPaymentResponse, error) {
 	var out CancelPaymentResponse
-	pattern := "/api/v1/payments/{order_id}"
+	pattern := "/api/v1/payments/{order_number}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPaymentServiceCancelPayment))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -164,7 +164,7 @@ func (c *PaymentServiceHTTPClientImpl) CancelPayment(ctx context.Context, in *Ca
 
 func (c *PaymentServiceHTTPClientImpl) GetPayment(ctx context.Context, in *GetPaymentRequest, opts ...http.CallOption) (*GetPaymentResponse, error) {
 	var out GetPaymentResponse
-	pattern := "/api/v1/payments/{order_id}"
+	pattern := "/api/v1/payments/{order_number}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPaymentServiceGetPayment))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -190,7 +190,7 @@ func (c *PaymentServiceHTTPClientImpl) MakePayment(ctx context.Context, in *Make
 
 func (c *PaymentServiceHTTPClientImpl) Refund(ctx context.Context, in *RefundRequest, opts ...http.CallOption) (*RefundResponse, error) {
 	var out RefundResponse
-	pattern := "/api/v1/payments/{order_id}/refund"
+	pattern := "/api/v1/payments/{order_number}/refund"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPaymentServiceRefund))
 	opts = append(opts, http.PathTemplate(pattern))

@@ -47,10 +47,10 @@ type OrderServiceHTTPServer interface {
 func RegisterOrderServiceHTTPServer(s *http.Server, srv OrderServiceHTTPServer) {
 	r := s.Route("/")
 	r.POST("/api/v1/orders", _OrderService_CreateOrder0_HTTP_Handler(srv))
-	r.GET("/api/v1/orders/{order_id}", _OrderService_GetOrder0_HTTP_Handler(srv))
-	r.PUT("/api/v1/orders/{order_id}/status", _OrderService_UpdateOrderStatus0_HTTP_Handler(srv))
-	r.POST("/api/v1/orders/{order_id}/pay", _OrderService_PayOrder0_HTTP_Handler(srv))
-	r.DELETE("/api/v1/orders/{order_id}", _OrderService_DeleteOrder0_HTTP_Handler(srv))
+	r.GET("/api/v1/orders/{order_number}", _OrderService_GetOrder0_HTTP_Handler(srv))
+	r.PUT("/api/v1/orders/status", _OrderService_UpdateOrderStatus0_HTTP_Handler(srv))
+	r.POST("/api/v1/orders/pay", _OrderService_PayOrder0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/orders/{order_number}", _OrderService_DeleteOrder0_HTTP_Handler(srv))
 	r.GET("/api/v1/orders", _OrderService_ListOrders0_HTTP_Handler(srv))
 	r.POST("/api/v1/orders/cancel", _OrderService_CancelOrder0_HTTP_Handler(srv))
 }
@@ -108,9 +108,6 @@ func _OrderService_UpdateOrderStatus0_HTTP_Handler(srv OrderServiceHTTPServer) f
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		if err := ctx.BindVars(&in); err != nil {
-			return err
-		}
 		http.SetOperation(ctx, OperationOrderServiceUpdateOrderStatus)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.UpdateOrderStatus(ctx, req.(*UpdateOrderStatusRequest))
@@ -131,9 +128,6 @@ func _OrderService_PayOrder0_HTTP_Handler(srv OrderServiceHTTPServer) func(ctx h
 			return err
 		}
 		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindVars(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationOrderServicePayOrder)
@@ -258,7 +252,7 @@ func (c *OrderServiceHTTPClientImpl) CreateOrder(ctx context.Context, in *Create
 
 func (c *OrderServiceHTTPClientImpl) DeleteOrder(ctx context.Context, in *DeleteOrderRequest, opts ...http.CallOption) (*DeleteOrderResponse, error) {
 	var out DeleteOrderResponse
-	pattern := "/api/v1/orders/{order_id}"
+	pattern := "/api/v1/orders/{order_number}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationOrderServiceDeleteOrder))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -271,7 +265,7 @@ func (c *OrderServiceHTTPClientImpl) DeleteOrder(ctx context.Context, in *Delete
 
 func (c *OrderServiceHTTPClientImpl) GetOrder(ctx context.Context, in *GetOrderRequest, opts ...http.CallOption) (*GetOrderResponse, error) {
 	var out GetOrderResponse
-	pattern := "/api/v1/orders/{order_id}"
+	pattern := "/api/v1/orders/{order_number}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationOrderServiceGetOrder))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -297,7 +291,7 @@ func (c *OrderServiceHTTPClientImpl) ListOrders(ctx context.Context, in *ListOrd
 
 func (c *OrderServiceHTTPClientImpl) PayOrder(ctx context.Context, in *PayOrderRequest, opts ...http.CallOption) (*PayOrderResponse, error) {
 	var out PayOrderResponse
-	pattern := "/api/v1/orders/{order_id}/pay"
+	pattern := "/api/v1/orders/pay"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationOrderServicePayOrder))
 	opts = append(opts, http.PathTemplate(pattern))
@@ -310,7 +304,7 @@ func (c *OrderServiceHTTPClientImpl) PayOrder(ctx context.Context, in *PayOrderR
 
 func (c *OrderServiceHTTPClientImpl) UpdateOrderStatus(ctx context.Context, in *UpdateOrderStatusRequest, opts ...http.CallOption) (*UpdateOrderStatusResponse, error) {
 	var out UpdateOrderStatusResponse
-	pattern := "/api/v1/orders/{order_id}/status"
+	pattern := "/api/v1/orders/status"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationOrderServiceUpdateOrderStatus))
 	opts = append(opts, http.PathTemplate(pattern))

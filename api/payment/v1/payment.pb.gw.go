@@ -68,14 +68,14 @@ func request_PaymentService_GetPayment_0(ctx context.Context, marshaler runtime.
 		_   = err
 	)
 
-	val, ok = pathParams["order_id"]
+	val, ok = pathParams["order_number"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "order_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "order_number")
 	}
 
-	protoReq.OrderId, err = runtime.String(val)
+	protoReq.OrderNumber, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "order_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "order_number", err)
 	}
 
 	msg, err := client.GetPayment(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -94,14 +94,14 @@ func local_request_PaymentService_GetPayment_0(ctx context.Context, marshaler ru
 		_   = err
 	)
 
-	val, ok = pathParams["order_id"]
+	val, ok = pathParams["order_number"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "order_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "order_number")
 	}
 
-	protoReq.OrderId, err = runtime.String(val)
+	protoReq.OrderNumber, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "order_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "order_number", err)
 	}
 
 	msg, err := server.GetPayment(ctx, &protoReq)
@@ -120,14 +120,14 @@ func request_PaymentService_CancelPayment_0(ctx context.Context, marshaler runti
 		_   = err
 	)
 
-	val, ok = pathParams["order_id"]
+	val, ok = pathParams["order_number"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "order_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "order_number")
 	}
 
-	protoReq.OrderId, err = runtime.Int64(val)
+	protoReq.OrderNumber, err = runtime.Int64(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "order_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "order_number", err)
 	}
 
 	msg, err := client.CancelPayment(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -146,14 +146,14 @@ func local_request_PaymentService_CancelPayment_0(ctx context.Context, marshaler
 		_   = err
 	)
 
-	val, ok = pathParams["order_id"]
+	val, ok = pathParams["order_number"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "order_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "order_number")
 	}
 
-	protoReq.OrderId, err = runtime.Int64(val)
+	protoReq.OrderNumber, err = runtime.Int64(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "order_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "order_number", err)
 	}
 
 	msg, err := server.CancelPayment(ctx, &protoReq)
@@ -176,14 +176,14 @@ func request_PaymentService_Refund_0(ctx context.Context, marshaler runtime.Mars
 		_   = err
 	)
 
-	val, ok = pathParams["order_id"]
+	val, ok = pathParams["order_number"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "order_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "order_number")
 	}
 
-	protoReq.OrderId, err = runtime.String(val)
+	protoReq.OrderNumber, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "order_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "order_number", err)
 	}
 
 	msg, err := client.Refund(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -206,14 +206,14 @@ func local_request_PaymentService_Refund_0(ctx context.Context, marshaler runtim
 		_   = err
 	)
 
-	val, ok = pathParams["order_id"]
+	val, ok = pathParams["order_number"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "order_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "order_number")
 	}
 
-	protoReq.OrderId, err = runtime.String(val)
+	protoReq.OrderNumber, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "order_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "order_number", err)
 	}
 
 	msg, err := server.Refund(ctx, &protoReq)
@@ -260,7 +260,7 @@ func RegisterPaymentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/paymentv1.PaymentService/GetPayment", runtime.WithHTTPPathPattern("/api/v1/payments/{order_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/paymentv1.PaymentService/GetPayment", runtime.WithHTTPPathPattern("/api/v1/payments/{order_number}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -285,7 +285,7 @@ func RegisterPaymentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/paymentv1.PaymentService/CancelPayment", runtime.WithHTTPPathPattern("/api/v1/payments/{order_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/paymentv1.PaymentService/CancelPayment", runtime.WithHTTPPathPattern("/api/v1/payments/{order_number}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -310,7 +310,7 @@ func RegisterPaymentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/paymentv1.PaymentService/Refund", runtime.WithHTTPPathPattern("/api/v1/payments/{order_id}/refund"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/paymentv1.PaymentService/Refund", runtime.WithHTTPPathPattern("/api/v1/payments/{order_number}/refund"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -396,7 +396,7 @@ func RegisterPaymentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/paymentv1.PaymentService/GetPayment", runtime.WithHTTPPathPattern("/api/v1/payments/{order_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/paymentv1.PaymentService/GetPayment", runtime.WithHTTPPathPattern("/api/v1/payments/{order_number}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -418,7 +418,7 @@ func RegisterPaymentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/paymentv1.PaymentService/CancelPayment", runtime.WithHTTPPathPattern("/api/v1/payments/{order_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/paymentv1.PaymentService/CancelPayment", runtime.WithHTTPPathPattern("/api/v1/payments/{order_number}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -440,7 +440,7 @@ func RegisterPaymentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/paymentv1.PaymentService/Refund", runtime.WithHTTPPathPattern("/api/v1/payments/{order_id}/refund"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/paymentv1.PaymentService/Refund", runtime.WithHTTPPathPattern("/api/v1/payments/{order_number}/refund"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -462,11 +462,11 @@ func RegisterPaymentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 var (
 	pattern_PaymentService_MakePayment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "payments"}, ""))
 
-	pattern_PaymentService_GetPayment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "payments", "order_id"}, ""))
+	pattern_PaymentService_GetPayment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "payments", "order_number"}, ""))
 
-	pattern_PaymentService_CancelPayment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "payments", "order_id"}, ""))
+	pattern_PaymentService_CancelPayment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "payments", "order_number"}, ""))
 
-	pattern_PaymentService_Refund_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "payments", "order_id", "refund"}, ""))
+	pattern_PaymentService_Refund_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "payments", "order_number", "refund"}, ""))
 )
 
 var (

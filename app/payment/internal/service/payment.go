@@ -22,7 +22,7 @@ func NewPaymentService(eventSink PaymentEventSinker) *PaymentService {
 // CancelPayment cancels an existing payment by order ID.
 // It publishes a cancel payment event and returns a response with a completed status.
 func (p *PaymentService) CancelPayment(ctx context.Context, req *paymentv1.CancelPaymentRequest) (*paymentv1.CancelPaymentResponse, error) {
-	payload := event.PayloadCancelPayment{OrderId: req.OrderId}
+	payload := event.PayloadCancelPayment{OrderId: 0}
 	err := p.eventSink.OnCancelPayment(ctx, &payload)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (p *PaymentService) MakePayment(ctx context.Context, req *paymentv1.MakePay
 		return nil, err
 	}
 
-	return &paymentv1.PaymentResponse{OrderId: req.OrderId, Status: "COMPLETED"}, nil
+	return &paymentv1.PaymentResponse{OrderNumber: req.OrderNumber, Status: "COMPLETED"}, nil
 }
 
 // Refund implements paymentv1.PaymentServiceServer.

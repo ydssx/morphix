@@ -57,7 +57,7 @@ func (m *MakePaymentRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for OrderId
+	// no validation rules for OrderNumber
 
 	// no validation rules for Amount
 
@@ -165,7 +165,7 @@ func (m *PaymentResponse) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for OrderId
+	// no validation rules for OrderNumber
 
 	// no validation rules for Status
 
@@ -271,7 +271,7 @@ func (m *GetPaymentRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for OrderId
+	// no validation rules for OrderNumber
 
 	if len(errors) > 0 {
 		return GetPaymentRequestMultiError(errors)
@@ -375,7 +375,7 @@ func (m *GetPaymentResponse) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for OrderId
+	// no validation rules for OrderNumber
 
 	// no validation rules for Amount
 
@@ -485,7 +485,7 @@ func (m *CancelPaymentRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for OrderId
+	// no validation rules for OrderNumber
 
 	if len(errors) > 0 {
 		return CancelPaymentRequestMultiError(errors)
@@ -693,7 +693,7 @@ func (m *RefundRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for OrderId
+	// no validation rules for OrderNumber
 
 	// no validation rules for Amount
 
@@ -799,7 +799,7 @@ func (m *RefundResponse) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for OrderId
+	// no validation rules for OrderNumber
 
 	// no validation rules for Status
 

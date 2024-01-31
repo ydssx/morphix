@@ -18,27 +18,27 @@ service OrderService {
 
   // 查询订单
   rpc GetOrder(GetOrderRequest) returns (GetOrderResponse) {
-    option (google.api.http) = {get: "/api/v1/orders/{order_id}"};
+    option (google.api.http) = {get: "/api/v1/orders/{order_number}"};
   }
 
   // 更新订单状态
   rpc UpdateOrderStatus(UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse) {
     option (google.api.http) = {
-      put: "/api/v1/orders/{order_id}/status"
+      put: "/api/v1/orders/status"
       body: "*"
     };
   }
   // 支付订单
   rpc PayOrder(PayOrderRequest) returns (PayOrderResponse) {
     option (google.api.http) = {
-      post: "/api/v1/orders/{order_id}/pay"
+      post: "/api/v1/orders/pay"
       body: "*"
     };
   }
 
   // 删除订单
   rpc DeleteOrder(DeleteOrderRequest) returns (DeleteOrderResponse) {
-    option (google.api.http) = {delete: "/api/v1/orders/{order_id}"};
+    option (google.api.http) = {delete: "/api/v1/orders/{order_number}"};
   }
 
   // 查询订单列表
@@ -70,6 +70,9 @@ enum OrderStatus {
   PROCESSING = 1; // 处理中
   COMPLETED = 2; // 已完成
   CANCELED = 3; // 已取消
+  FAILED = 4; // 处理失败
+  PAID = 5; // 已支付
+  REFUNDED = 6; // 已退款
 }
 
 // 订单商品消息
@@ -93,7 +96,7 @@ message CreateOrderResponse {
 
 // 查询订单请求消息
 message GetOrderRequest {
-  int32 order_id = 1; // 要查询的订单ID
+  string order_number = 1; // 要查询的订单编号
 }
 
 // 查询订单响应消息
@@ -103,7 +106,7 @@ message GetOrderResponse {
 
 // 更新订单状态请求消息
 message UpdateOrderStatusRequest {
-  int32 order_id = 1; // 要更新状态的订单ID
+  string order_number = 1; // 要更新状态的订单编号
   OrderStatus status = 2; // 新的订单状态
 }
 
@@ -114,7 +117,7 @@ message UpdateOrderStatusResponse {
 
 // 删除订单请求消息
 message DeleteOrderRequest {
-  int32 order_id = 1; // 要删除的订单ID
+  string order_number = 1; // 要删除的订单编号
 }
 
 // 删除订单响应消息
@@ -134,7 +137,7 @@ message ListOrdersResponse {
 }
 
 message PayOrderRequest {
-  int32 order_id = 1; // 订单ID
+  string order_number = 1; // 订单编号
   string payment_method = 2; // 支付方式
 }
 

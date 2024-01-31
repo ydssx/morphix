@@ -23,27 +23,26 @@ enum PaymentStatus {
 
 // 支付请求
 message MakePaymentRequest {
-  int64 order_id = 1;
+  string order_number = 1;
   double amount = 2;
   string currency = 3;
 }
 
 // 支付响应
 message PaymentResponse {
-  int64 order_id = 1;
+  string order_number = 1;
   string status = 2;
   string payment_url = 3;
 }
 
 // 查询支付请求
 message GetPaymentRequest {
-  string order_id = 1;
-  // 其他字段...
+  string order_number = 1;
 }
 
 // 查询支付响应
 message GetPaymentResponse {
-  string order_id = 1;
+  string order_number = 1;
   double amount = 2;
   string currency = 3;
   PaymentStatus status = 4;
@@ -51,7 +50,7 @@ message GetPaymentResponse {
 
 // 取消支付请求
 message CancelPaymentRequest {
-  int64 order_id = 1;
+  int64 order_number = 1;
 }
 
 // 取消支付响应
@@ -62,14 +61,14 @@ message CancelPaymentResponse {
 
 // 退款请求
 message RefundRequest {
-  string order_id = 1;
+  string order_number = 1;
   double amount = 2;
   string currency = 3;
 }
 
 // 退款响应
 message RefundResponse {
-  string order_id = 1;
+  string order_number = 1;
   string status = 2;
 }
 
@@ -85,18 +84,18 @@ service PaymentService {
 
   // 查询支付状态
   rpc GetPayment(GetPaymentRequest) returns (GetPaymentResponse) {
-    option (google.api.http) = {get: "/api/v1/payments/{order_id}"};
+    option (google.api.http) = {get: "/api/v1/payments/{order_number}"};
   }
 
   // 取消支付
   rpc CancelPayment(CancelPaymentRequest) returns (CancelPaymentResponse) {
-    option (google.api.http) = {delete: "/api/v1/payments/{order_id}"};
+    option (google.api.http) = {delete: "/api/v1/payments/{order_number}"};
   }
 
   // 退款
   rpc Refund(RefundRequest) returns (RefundResponse) {
     option (google.api.http) = {
-      post: "/api/v1/payments/{order_id}/refund"
+      post: "/api/v1/payments/{order_number}/refund"
       body: "*"
     };
   }

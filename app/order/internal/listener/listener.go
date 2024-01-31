@@ -24,7 +24,7 @@ func updateOrderStatus(ctx context.Context, e cloudevents.Event) error {
 	}
 	logger.Infof(ctx, "Got Data: %+v\n", data)
 
-	if _, err := GetUcFromContext(ctx).UpdateOrderStatus(ctx, &orderv1.UpdateOrderStatusRequest{OrderId: int32(data.OrderId), Status: orderv1.OrderStatus_COMPLETED}); err != nil {
+	if _, err := GetUcFromContext(ctx).UpdateOrderStatus(ctx, &orderv1.UpdateOrderStatusRequest{OrderNumber: "", Status: orderv1.OrderStatus_COMPLETED}); err != nil {
 		logger.Errorf(ctx, "UpdateOrderStatus Error: %s\n", err.Error())
 		return err
 	}
