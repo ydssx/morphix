@@ -3,3 +3,4 @@ bin/
 .vscode
 node_modules
 .idea
+__pycache__
