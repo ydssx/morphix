@@ -141,14 +141,25 @@ services:
     networks:
       - morphix_net
 
+  redis:
+    image: redis:alpine3.19
+    container_name: redis
+    environment:
+      - TZ=Asia/Shanghai
+      - REDIS_PASSWORD=1GyY3AHsWg
+    ports:
+      - 6379:6379
+    networks:
+      - morphix_net
+
   mysql:
     image: mysql:latest
     container_name: mysql
     ports:
-      - 3306:3306
+      - 3307:3306
     environment:
-      MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: morphix
+      MYSQL_ROOT_PASSWORD: root
+      # MYSQL_DATABASE: morphix
     volumes:
       - ./data/mysql/data:/var/lib/mysql
     networks:

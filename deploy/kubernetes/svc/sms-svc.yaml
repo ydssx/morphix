@@ -15,7 +15,7 @@ spec:
         app: sms
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "false"
-        dapr.io/enabled: "true"
+        dapr.io/enabled: "false"
         dapr.io/app-id: "sms"
         dapr.io/app-port: "9001"
         dapr.io/app-protocol: "grpc"
@@ -26,6 +26,9 @@ spec:
           imagePullPolicy: Always
           resources:
             limits:
+              memory: "50Mi"
+              cpu: "100m"
+            requests:
               memory: "50Mi"
               cpu: "100m"
           ports:
@@ -67,27 +70,17 @@ spec:
       protocol: TCP
 
 ---
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
 metadata:
-  name: sms-hpa
+  name: cpu-scaledobject
+  namespace: default
 spec:
   scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
     name: sms
-  minReplicas: 1
-  maxReplicas: 3
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 80
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+  triggers:
+    - type: cpu
+      metricType: Utilization # Allowed types are 'Utilization' or 'AverageValue'
+      metadata:
+        value: "50"
+        threshold: "10"

@@ -43,9 +43,8 @@ up:
 
 .PHONY: dashboard
 dashboard:
-	kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
 	kubectl apply -f deploy/kubernetes/dashboard-adminuser.yaml
-	kubectl -n kubernetes-dashboard create token admin-user
+	kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath={".data.token"} | base64 -d
 
 .PHONY: ingress
 ingress:

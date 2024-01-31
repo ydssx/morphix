@@ -25,7 +25,7 @@ func NewEtcdRegistry(c *conf.Etcd) *etcd.Registry {
 			Password:    c.Password,
 		})
 		if err != nil {
-			panic(err)
+			panic("failed to connect to etcd: " + err.Error())
 		}
 		registry = etcd.New(client)
 	})

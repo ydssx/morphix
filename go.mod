@@ -8,6 +8,7 @@ require (
 	github.com/axiaoxin-com/goutils v1.0.39
 	github.com/bsm/redislock v0.9.4
 	github.com/bufbuild/connect-go v1.10.0
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/casbin/casbin/v2 v2.81.0
 	github.com/casbin/gorm-adapter/v3 v3.20.0
 	github.com/cheggaaa/pb/v3 v3.1.4
@@ -27,7 +28,9 @@ require (
 	github.com/go-kratos/kratos/v2 v2.7.2
 	github.com/go-kratos/swagger-api v1.0.1
 	github.com/go-playground/validator/v10 v10.16.0
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis_rate/v10 v10.0.1
+	github.com/go-redsync/redsync/v4 v4.11.0
 	github.com/go-resty/resty/v2 v2.11.0
 	github.com/google/generative-ai-go v0.5.0
 	github.com/google/uuid v1.5.0
@@ -40,6 +43,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.18.0
 	github.com/redis/go-redis/v9 v9.4.0
+	github.com/stretchr/testify v1.8.4
 	github.com/tmc/langchaingo v0.1.3
 	go.etcd.io/etcd/client/v3 v3.5.11
 	go.mongodb.org/mongo-driver v1.13.1
@@ -168,6 +172,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.9 // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/pkoukk/tiktoken-go v0.1.2 // indirect
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20221212215047-62379fc7944b // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.45.0 // indirect
@@ -185,6 +190,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.11.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect

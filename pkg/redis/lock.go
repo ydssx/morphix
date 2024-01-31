@@ -11,7 +11,7 @@ import (
 )
 
 type Locker interface {
-	// Lock 尝试获取锁，获取成功则返回nil，否则返回error
+	// Lock 获取锁
 	Lock(ctx context.Context, key string, opt ...LockerOption) error
 	// Unlock 释放锁
 	Unlock(ctx context.Context, key string) error

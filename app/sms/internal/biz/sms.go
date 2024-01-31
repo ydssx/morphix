@@ -14,8 +14,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type SmsRepo interface {
-}
+type SmsRepo interface{}
+
+type Transaction interface{}
 
 type SmsUseCase struct {
 	rdb *redis.Client
@@ -52,4 +53,22 @@ func (s *SmsUseCase) CheckSMSStatus(ctx context.Context, req *smsv1.QuerySMSStat
 		return nil, status.Error(codes.Aborted, "验证码错误")
 	}
 	return &smsv1.QuerySMSStatusResponse{Status: true}, nil
+}
+
+// 管理短信模板
+func (uc *SmsUseCase) ManageSMSTemplate(ctx context.Context, req *smsv1.TemplateManagementRequest) (res *smsv1.TemplateManagementResponse, err error) {
+	res = new(smsv1.TemplateManagementResponse)
+
+	// TODO:ADD logic here and delete this line.
+
+	return
+}
+
+// 管理短信签名
+func (uc *SmsUseCase) ManageSMSSignature(ctx context.Context, req *smsv1.SignatureManagementRequest) (res *smsv1.SignatureManagementResponse, err error) {
+	res = new(smsv1.SignatureManagementResponse)
+
+	// TODO:ADD logic here and delete this line.
+
+	return
 }

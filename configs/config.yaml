@@ -59,6 +59,11 @@ clientSet:
     network: tcp
     addr: discovery:///job-rpc
     timeout: 2s
+  
+  quoteRpcClient:
+    network: tcp
+    addr: discovery:///quote-rpc
+    timeout: 2s
 
 serviceSet:
   # gateway配置
@@ -76,10 +81,13 @@ serviceSet:
       grpc:
         addr: 0.0.0.0:9000
         timeout: 2s
+      http:
+        addr: 0.0.0.0:9001
+        timeout: 2s
     data:
       database:
         driver: mysql
-        source: root:${MYSQL_PASSWORD}@tcp(localhost:3306)/user?parseTime=true&loc=Local
+        source: root:root@tcp(localhost:3307)/user?parseTime=true&loc=Local
       redis:
         addr: 127.0.0.1:6379
         username:
@@ -87,13 +95,28 @@ serviceSet:
         read_timeout: 2s
         write_timeout: 2s
         dial_timeout: 5s
+      mongo:
+        addr: mongodb://root:RSeMAN7csL@127.0.0.1:27017
+        username: root
+        password: RSeMAN7csL
+        database: user
+        collection: user
+        read_timeout: 2s
+        write_timeout: 2s
+        dial_timeout: 5s
+
 
   # sms服务配置
   sms:
     name: sms-rpc
+    enableRegistry: false
+    enableTracing: false
     server:
       grpc:
         addr: 0.0.0.0:9001
+        timeout: 2s
+      http:
+        addr: 0.0.0.0:9002
         timeout: 2s
     data:
       database:
@@ -129,9 +152,14 @@ serviceSet:
   # order服务配置
   order:
     name: order-rpc
+    enableRegistry: false
+    enableTracing: false
     server:
       grpc:
         addr: 0.0.0.0:9003
+        timeout: 2s
+      http:
+        addr: 0.0.0.0:9004
         timeout: 2s
     data:
       database:
@@ -173,6 +201,27 @@ serviceSet:
       http:
         addr: 0.0.0.0:9006
         timeout: 2s
+        disabled: false
+    data:
+      redis:
+        addr: 127.0.0.1:6379
+        username:
+        password: 1GyY3AHsWg
+        read_timeout: 2s
+        write_timeout: 2s
+        dial_timeout: 5s
+
+  quote:
+    name: quote-rpc
+    enableMetric: false
+    enableTracing: false
+    server:
+      grpc:
+        addr: 0.0.0.0:9007
+        timeout: 2s
+      http:
+        addr: 0.0.0.0:9008
+        timeout: 2s
         disabled: true
     data:
       redis:
@@ -182,3 +231,26 @@ serviceSet:
         read_timeout: 2s
         write_timeout: 2s
         dial_timeout: 5s
+  product:
+    name: product-rpc
+    enableRegistry: true
+    enableTracing: false
+    enableMetric: false
+    server:
+      grpc:
+        addr: 0.0.0.0:9009
+        timeout: 2s
+      http:
+        addr: 0.0.0.0:9010
+        timeout: 2s
+        disabled: true
+    data:
+      redis:
+        addr: 127.0.0.1:6379
+        username:
+        password: 1GyY3AHsWg
+        read_timeout: 2s
+        write_timeout: 2s
+      database:
+        driver: mysql
+        source: root:root@tcp(127.0.0.1:3307)/product?parseTime=true&loc=Local

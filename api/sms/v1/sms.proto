@@ -30,6 +30,8 @@ enum SmsScene {
   USER_LOGIN = 0;
   USER_REGISTER = 1;
   USER_RESET_PASSWORD = 2;
+  USER_CHANGE_MOBILE = 3;
+  USER_CHANGE_PASSWORD = 4;
 }
 
 // 发送短信请求

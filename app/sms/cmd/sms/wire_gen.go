@@ -28,8 +28,13 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	}
 	smsUseCase := biz.NewSmsUseCase(client)
 	smsService := service.NewSMSService(smsUseCase)
+	httpServer := server.NewHTTPServer(bootstrap, smsService)
 	grpcServer := server.NewGRPCServer(bootstrap, smsService)
-	app := newApp(grpcServer, bootstrap)
+	v, err := server.NewServer(httpServer, grpcServer, bootstrap)
+	if err != nil {
+		return nil, nil, err
+	}
+	app := newApp(bootstrap, v...)
 	return app, func() {
 	}, nil
 }
