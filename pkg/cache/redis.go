@@ -59,12 +59,16 @@ func (c *RedisCache) Delete(key string) error {
 	return err
 }
 
-// Clear 清空 Redis 数据库中的所有 key。
-// 如果清空数据库失败,返回错误。
+// Clear 清空缓存中的所有键值对
 func (c *RedisCache) Clear() error {
-	err := c.client.FlushDB(context.Background()).Err()
-	if err != nil {
-		return err
+
+	// 用scan扫描key
+	iter := c.client.Scan(context.Background(), 0, "*", 0).Iterator()
+	for iter.Next(context.Background()) {
+		err := c.client.Del(context.Background(), iter.Val()).Err()
+		if err != nil {
+			return errors.Wrap(err, "clear redis key error")
+		}
 	}
 	return nil
 }

@@ -7,7 +7,6 @@ import (
 
 func TestMemoryCache_Set(t *testing.T) {
 	c := NewMemoryCache()
-
 	// Set with no expiration
 	c.Set("key1", "value1", 0)
 

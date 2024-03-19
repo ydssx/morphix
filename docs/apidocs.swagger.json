@@ -582,7 +582,7 @@
           },
           {
             "name": "status",
-            "description": "可选：根据订单状态筛选订单列表\n\n - PENDING: 待处理\n - PROCESSING: 处理中\n - COMPLETED: 已完成\n - CANCELED: 已取消",
+            "description": "可选：根据订单状态筛选订单列表\n\n - PENDING: 待处理\n - PROCESSING: 处理中\n - COMPLETED: 已完成\n - CANCELED: 已取消\n - FAILED: 处理失败\n - PAID: 已支付\n - REFUNDED: 已退款",
             "in": "query",
             "required": false,
             "type": "string",
@@ -590,7 +590,10 @@
               "PENDING",
               "PROCESSING",
               "COMPLETED",
-              "CANCELED"
+              "CANCELED",
+              "FAILED",
+              "PAID",
+              "REFUNDED"
             ],
             "default": "PENDING"
           },
@@ -680,7 +683,73 @@
         ]
       }
     },
-    "/api/v1/orders/{orderId}": {
+    "/api/v1/orders/pay": {
+      "post": {
+        "summary": "支付订单",
+        "operationId": "OrderService_PayOrder",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderv1PayOrderResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/orderv1PayOrderRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/orders/status": {
+      "put": {
+        "summary": "更新订单状态",
+        "operationId": "OrderService_UpdateOrderStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/orderv1UpdateOrderStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/orderv1UpdateOrderStatusRequest"
+            }
+          }
+        ],
+        "tags": [
+          "OrderService"
+        ]
+      }
+    },
+    "/api/v1/orders/{orderNumber}": {
       "get": {
         "summary": "查询订单",
         "operationId": "OrderService_GetOrder",
@@ -700,12 +769,11 @@
         },
         "parameters": [
           {
-            "name": "orderId",
-            "description": "要查询的订单ID",
+            "name": "orderNumber",
+            "description": "要查询的订单编号",
             "in": "path",
             "required": true,
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           }
         ],
         "tags": [
@@ -731,94 +799,11 @@
         },
         "parameters": [
           {
-            "name": "orderId",
-            "description": "要删除的订单ID",
+            "name": "orderNumber",
+            "description": "要删除的订单编号",
             "in": "path",
             "required": true,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
-        "tags": [
-          "OrderService"
-        ]
-      }
-    },
-    "/api/v1/orders/{orderId}/pay": {
-      "post": {
-        "summary": "支付订单",
-        "operationId": "OrderService_PayOrder",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/orderv1PayOrderResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "orderId",
-            "description": "订单ID",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/OrderServicePayOrderBody"
-            }
-          }
-        ],
-        "tags": [
-          "OrderService"
-        ]
-      }
-    },
-    "/api/v1/orders/{orderId}/status": {
-      "put": {
-        "summary": "更新订单状态",
-        "operationId": "OrderService_UpdateOrderStatus",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/orderv1UpdateOrderStatusResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "orderId",
-            "description": "要更新状态的订单ID",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/OrderServiceUpdateOrderStatusBody"
-            }
+            "type": "string"
           }
         ],
         "tags": [
@@ -859,7 +844,7 @@
         ]
       }
     },
-    "/api/v1/payments/{orderId}": {
+    "/api/v1/payments/{orderNumber}": {
       "get": {
         "summary": "查询支付状态",
         "operationId": "PaymentService_GetPayment",
@@ -879,8 +864,7 @@
         },
         "parameters": [
           {
-            "name": "orderId",
-            "description": "其他字段...",
+            "name": "orderNumber",
             "in": "path",
             "required": true,
             "type": "string"
@@ -909,7 +893,7 @@
         },
         "parameters": [
           {
-            "name": "orderId",
+            "name": "orderNumber",
             "in": "path",
             "required": true,
             "type": "string",
@@ -921,7 +905,7 @@
         ]
       }
     },
-    "/api/v1/payments/{orderId}/refund": {
+    "/api/v1/payments/{orderNumber}/refund": {
       "post": {
         "summary": "退款",
         "operationId": "PaymentService_Refund",
@@ -941,7 +925,7 @@
         },
         "parameters": [
           {
-            "name": "orderId",
+            "name": "orderNumber",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1494,25 +1478,6 @@
       "default": "USER_PERMISSION_ADD",
       "title": "- USER_PERMISSION_ADD: 增加用户权限\n - USER_PERMISSION_DELETE: 删除用户权限\n - USER_PERMISSION_UPDATE: 更新用户权限\n - USER_PERMISSION_REPLACE: 替换用户权限\n - ROLE_PERMISSION_ADD: 增加角色权限\n - ROLE_PERMISSION_DELETE: 删除角色权限\n - ROLE_PERMISSION_UPDATE: 更新角色权限\n - ROLE_PERMISSION_REPLACE: 替换角色权限"
     },
-    "OrderServicePayOrderBody": {
-      "type": "object",
-      "properties": {
-        "paymentMethod": {
-          "type": "string",
-          "title": "支付方式"
-        }
-      }
-    },
-    "OrderServiceUpdateOrderStatusBody": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/orderv1OrderStatus",
-          "title": "新的订单状态"
-        }
-      },
-      "title": "更新订单状态请求消息"
-    },
     "PaymentServiceRefundBody": {
       "type": "object",
       "properties": {
@@ -1952,11 +1917,27 @@
         "PENDING",
         "PROCESSING",
         "COMPLETED",
-        "CANCELED"
+        "CANCELED",
+        "FAILED",
+        "PAID",
+        "REFUNDED"
       ],
       "default": "PENDING",
-      "description": "- PENDING: 待处理\n - PROCESSING: 处理中\n - COMPLETED: 已完成\n - CANCELED: 已取消",
+      "description": "- PENDING: 待处理\n - PROCESSING: 处理中\n - COMPLETED: 已完成\n - CANCELED: 已取消\n - FAILED: 处理失败\n - PAID: 已支付\n - REFUNDED: 已退款",
       "title": "订单状态枚举"
+    },
+    "orderv1PayOrderRequest": {
+      "type": "object",
+      "properties": {
+        "orderNumber": {
+          "type": "string",
+          "title": "订单编号"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "title": "支付方式"
+        }
+      }
     },
     "orderv1PayOrderResponse": {
       "type": "object",
@@ -1966,6 +1947,20 @@
           "title": "支付链接"
         }
       }
+    },
+    "orderv1UpdateOrderStatusRequest": {
+      "type": "object",
+      "properties": {
+        "orderNumber": {
+          "type": "string",
+          "title": "要更新状态的订单编号"
+        },
+        "status": {
+          "$ref": "#/definitions/orderv1OrderStatus",
+          "title": "新的订单状态"
+        }
+      },
+      "title": "更新订单状态请求消息"
     },
     "orderv1UpdateOrderStatusResponse": {
       "type": "object",
@@ -1990,7 +1985,7 @@
     "paymentv1GetPaymentResponse": {
       "type": "object",
       "properties": {
-        "orderId": {
+        "orderNumber": {
           "type": "string"
         },
         "amount": {
@@ -2009,9 +2004,8 @@
     "paymentv1MakePaymentRequest": {
       "type": "object",
       "properties": {
-        "orderId": {
-          "type": "string",
-          "format": "int64"
+        "orderNumber": {
+          "type": "string"
         },
         "amount": {
           "type": "number",
@@ -2026,9 +2020,8 @@
     "paymentv1PaymentResponse": {
       "type": "object",
       "properties": {
-        "orderId": {
-          "type": "string",
-          "format": "int64"
+        "orderNumber": {
+          "type": "string"
         },
         "status": {
           "type": "string"
@@ -2052,7 +2045,7 @@
     "paymentv1RefundResponse": {
       "type": "object",
       "properties": {
-        "orderId": {
+        "orderNumber": {
           "type": "string"
         },
         "status": {
@@ -2435,7 +2428,9 @@
       "enum": [
         "USER_LOGIN",
         "USER_REGISTER",
-        "USER_RESET_PASSWORD"
+        "USER_RESET_PASSWORD",
+        "USER_CHANGE_MOBILE",
+        "USER_CHANGE_PASSWORD"
       ],
       "default": "USER_LOGIN"
     },
