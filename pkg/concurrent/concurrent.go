@@ -10,7 +10,7 @@ type Group struct {
 	limit    int
 	eg       *errgroup.Group
 	ctx      context.Context
-	errChan  chan struct{}
+	errChan  chan error
 	fastFail bool
 }
 
@@ -33,7 +33,7 @@ func WithFastFail(fastFail bool) Opt {
 
 func NewGroup(ctx context.Context, opts ...Opt) *Group {
 	eg, ctx := errgroup.WithContext(ctx)
-	g := &Group{eg: eg, errChan: make(chan struct{}, 1), ctx: ctx}
+	g := &Group{eg: eg, errChan: make(chan error, 1), ctx: ctx}
 
 	for _, opt := range opts {
 		opt(g)
@@ -63,14 +63,16 @@ func (g *Group) Run(fs ...func() error) (err error) {
 
 	go func() {
 		err = g.eg.Wait()
-		g.errChan <- struct{}{}
+		g.errChan <- err
 		close(g.errChan)
 	}()
 
 	select {
 	case <-g.ctx.Done():
-		return g.ctx.Err()
-	case <-g.errChan:
+		if err == nil {
+			err = g.ctx.Err()
+		}
+	case err = <-g.errChan:
 	}
 	return
 }

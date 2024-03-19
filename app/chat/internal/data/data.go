@@ -57,6 +57,12 @@ func (d *Data) DB(ctx context.Context) *gorm.DB {
 	return d.db
 }
 
+// IsInTx 判断当前上下文是否在事务中
+func (d *Data) IsInTx(ctx context.Context) bool {
+	_, ok := ctx.Value(contextTxKey{}).(*gorm.DB)
+	return ok
+}
+
 func NewTransaction(d *Data) biz.Transaction {
 	return d
 }

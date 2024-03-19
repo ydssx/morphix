@@ -196,3 +196,15 @@ func SliceIntersect[T comparable](a, b []T) []T {
 	}
 	return result
 }
+
+func SliceEqualAny[T comparable](a, b []T) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for _, v := range a {
+		if !SliceContain(b, v) {
+			return false
+		}
+	}
+	return true
+}

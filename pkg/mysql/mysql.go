@@ -14,6 +14,10 @@ import (
 
 var db *gorm.DB
 
+// NewDB initializes a new MySQL database connection pool and returns the gorm.DB instance.
+// It takes the MySQL DSN as a parameter.
+// It configures the gorm logger, prepares statements, sets connection pool limits and logs success.
+// Returns the gorm.DB instance and any error.
 func NewDB(dsn string) (*gorm.DB, error) {
 	var err error
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
@@ -29,6 +33,7 @@ func NewDB(dsn string) (*gorm.DB, error) {
 	}
 	sqlDB.SetMaxIdleConns(100)
 	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	logger.Info(context.Background(), "init mysql success")
 	return db, nil
 }
