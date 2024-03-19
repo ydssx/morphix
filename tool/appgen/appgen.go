@@ -24,37 +24,37 @@ import (
 )
 
 var (
-	//go:embed template/dockerfile.tpl
+	//go:embed template/dockerfile.tmpl
 	Dockerfile string
 
-	//go:embed template/cmd/main.tpl
+	//go:embed template/cmd/main.tmpl
 	mainFile string
 
-	//go:embed template/cmd/wire.tpl
+	//go:embed template/cmd/wire.tmpl
 	wireFile string
 
-	//go:embed template/server/server.tpl
+	//go:embed template/server/server.tmpl
 	serverFile string
 
-	//go:embed template/server/grpc.tpl
+	//go:embed template/server/grpc.tmpl
 	grpcFile string
 
-	//go:embed template/server/http.tpl
+	//go:embed template/server/http.tmpl
 	httpFile string
 
-	//go:embed template/service/service.tpl
+	//go:embed template/service/service.tmpl
 	serviceFile string
 
-	//go:embed template/service/service_set.tpl
+	//go:embed template/service/service_set.tmpl
 	serviceSetFile string
 
-	//go:embed template/biz/biz.tpl
+	//go:embed template/biz/biz.tmpl
 	bizFile string
 
-	//go:embed template/biz/biz_set.tpl
+	//go:embed template/biz/biz_set.tmpl
 	bizSetFile string
 
-	//go:embed template/data/data.tpl
+	//go:embed template/data/data.tmpl
 	dataFile string
 )
 

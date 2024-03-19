@@ -1,7 +1,6 @@
-./data
 bin/
 .vscode
 node_modules
 .idea
 __pycache__
-data
+*.pyc
