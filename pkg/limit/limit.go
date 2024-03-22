@@ -23,16 +23,17 @@ type option struct {
 	burst         int
 }
 
-func defaultConfig() *option {
-	return &option{ratePerSecond: 10, burst: 20}
-}
-
 type Option func(*option)
 
+// WithRatePerSecond returns an Option that sets the maximum number of requests
+// allowed per second. This can be used to rate limit requests.
 func WithRatePerSecond(ratePerSecond int) Option {
 	return func(o *option) { o.ratePerSecond = ratePerSecond }
 }
 
+// WithBurst returns an Option that sets the maximum number of requests allowed
+// to burst before rate limiting applies. This can be used in conjunction with
+// WithRatePerSecond to allow short bursts above the sustained rate limit.
 func WithBurst(burst int) Option {
 	return func(o *option) { o.burst = burst }
 }
@@ -60,11 +61,12 @@ func (l *RedisLimiter) Limit(ctx context.Context) error {
 	return errors.New("rate limited.")
 }
 
-// Allow 检查给定的 key 是否可以进行操作。它接受 key 和选项作为参数。
-// 它会应用提供的选项来配置速率限制器,然后使用 Allow 方法检查 key 是否被允许。
-// 如果允许,它会返回 true,否则返回 false。
+// Allow checks if the given key is allowed by the rate limiter.
+// It applies the given options to configure the rate and burst limits.
+// It uses the redis client to check against the limiter and returns
+// whether the request is allowed.
 func (l *RedisLimiter) Allow(key string, opts ...Option) bool {
-	opt := defaultConfig()
+	opt := &option{ratePerSecond: 10, burst: 20}
 	for _, v := range opts {
 		v(opt)
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	registry *etcd.Registry
+	etcdRegistry *etcd.Registry
 	once     sync.Once
 )
 
@@ -27,8 +27,8 @@ func NewEtcdRegistry(c *conf.Etcd) *etcd.Registry {
 		if err != nil {
 			panic("failed to connect to etcd: " + err.Error())
 		}
-		registry = etcd.New(client)
+		etcdRegistry = etcd.New(client)
 	})
 
-	return registry
+	return etcdRegistry
 }

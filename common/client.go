@@ -4,7 +4,6 @@ import (
 	"context"
 
 	_ "github.com/dtm-labs/driver-kratos"
-	"github.com/go-kratos/kratos/contrib/registry/etcd/v2"
 	kgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/nats-io/nats.go"
 	goredis "github.com/redis/go-redis/v9"
@@ -21,6 +20,7 @@ import (
 	"github.com/ydssx/morphix/pkg/redis"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
+	"github.com/go-kratos/kratos/v2/registry"
 )
 
 // NewSMSClient 创建一个 SMS 服务的客户端连接。
@@ -72,7 +72,7 @@ func NewQuoteClient(c *conf.Bootstrap) quotev1.QuoteServiceClient {
 	return quotev1.NewQuoteServiceClient(conn)
 }
 
-//订单服务客户端
+// 订单服务客户端
 func NewOrderClient(c *conf.Bootstrap) orderv1.OrderServiceClient {
 	conn := createConn(c.Etcd, c.ClientSet.OrderRpcClient)
 
@@ -92,7 +92,7 @@ func createConn(etcdConf *conf.Etcd, rpcCliConf *conf.ClientConf) *grpc.ClientCo
 // 接收上下文,客户端配置和服务发现注册中心作为参数。
 // 使用 kgrpc 封装的 gRPC dial 函数建立连接,配置 interceptor、超时、发现等信息。
 // 返回建立的 gRPC 客户端连接。如果发生错误会 panic。
-func CreateClientConn(ctx context.Context, rpcCliConf *conf.ClientConf, r *etcd.Registry) *grpc.ClientConn {
+func CreateClientConn(ctx context.Context, rpcCliConf *conf.ClientConf, r registry.Discovery) *grpc.ClientConn {
 	conn, err := kgrpc.DialInsecure(ctx,
 		kgrpc.WithEndpoint(rpcCliConf.Addr),
 		kgrpc.WithTimeout(rpcCliConf.Timeout.AsDuration()),
