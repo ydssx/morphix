@@ -8,10 +8,9 @@ import (
 
 type Producer struct {
 	producer sarama.SyncProducer
-	topic    string
 }
 
-func NewProducer(brokers []string, topic string) (*Producer, error) {
+func NewProducer(brokers []string) (*Producer, error) {
 	config := sarama.NewConfig()
 	config.Producer.Return.Successes = true
 	producer, err := sarama.NewSyncProducer(brokers, config)
@@ -19,7 +18,7 @@ func NewProducer(brokers []string, topic string) (*Producer, error) {
 		return nil, err
 	}
 
-	return &Producer{producer: producer, topic: topic}, nil
+	return &Producer{producer: producer}, nil
 }
 
 func (p *Producer) Close() error {
@@ -29,9 +28,9 @@ func (p *Producer) Close() error {
 // SendMessage sends a message using the Producer.
 //
 // It takes a string `message` as a parameter and returns an error.
-func (p *Producer) SendMessage(message string) error {
+func (p *Producer) SendMessage(topic, message string) error {
 	_, _, err := p.producer.SendMessage(&sarama.ProducerMessage{
-		Topic: p.topic,
+		Topic: topic,
 		Value: sarama.StringEncoder(message),
 	})
 	return err

@@ -38,14 +38,14 @@ func WithBurst(burst int) Option {
 }
 
 type Limiter interface {
-	Allow() bool
+	Allow(key string, opts ...Option) bool
 }
 
 type RedisLimiter struct {
 	*redis_rate.Limiter
 }
 
-func NewRedisLimiter(rdb *redis.Client) *RedisLimiter {
+func NewRedisLimiter(rdb *redis.Client) Limiter {
 	return &RedisLimiter{redis_rate.NewLimiter(rdb)}
 }
 

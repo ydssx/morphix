@@ -19,6 +19,7 @@ import (
 	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/docs"
+	"github.com/ydssx/morphix/pkg/limit"
 	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -41,7 +42,7 @@ func registerRPCHandler(c *conf.Bootstrap) {
 	handlers[clientSet.JobRpcClient] = jobv1.RegisterJobServiceHandler
 }
 
-func NewHTTPServer(ctx context.Context, c *conf.Bootstrap) *khttp.Server {
+func NewHTTPServer(ctx context.Context, c *conf.Bootstrap, limiter limit.Limiter) *khttp.Server {
 	httpSrv := khttp.NewServer(
 		khttp.Address(c.ServiceSet.Gateway.Server.Http.Addr),
 	)
@@ -49,20 +50,19 @@ func NewHTTPServer(ctx context.Context, c *conf.Bootstrap) *khttp.Server {
 	openAPIhandler := openapiv2.NewHandler()
 	httpSrv.HandlePrefix("/q/", openAPIhandler)
 
-	ginHandler := newGinHandler(ctx, c)
+	ginHandler := newGinHandler(ctx, c, limiter)
 	httpSrv.HandlePrefix("/", ginHandler)
 
 	return httpSrv
 }
 
-func newGinHandler(ctx context.Context, conf *conf.Bootstrap) *gin.Engine {
+func newGinHandler(ctx context.Context, conf *conf.Bootstrap, limiter limit.Limiter) *gin.Engine {
 	server := gin.New()
 	server.ContextWithFallback = true
-	redisClient := common.MustNewRedisClient(conf)
 	server.Use(
 		gin.Logger(),
 		ginprom.PromMiddleware(nil),
-		middleware.RateLimit(redisClient),
+		middleware.RateLimit(limiter),
 		gin.Recovery(),
 	)
 	server.GET("/metrics", gin.WrapH(promhttp.Handler()))

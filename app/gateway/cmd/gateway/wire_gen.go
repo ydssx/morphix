@@ -10,13 +10,17 @@ import (
 	"context"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/ydssx/morphix/app/gateway/internal/server"
+	"github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
+	"github.com/ydssx/morphix/pkg/limit"
 )
 
 // Injectors from wire.go:
 
 func wireApp(ctx context.Context, bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
-	httpServer := server.NewHTTPServer(ctx, bootstrap)
+	client := common.MustNewRedisClient(bootstrap)
+	limiter := limit.NewRedisLimiter(client)
+	httpServer := server.NewHTTPServer(ctx, bootstrap, limiter)
 	app := newApp(httpServer, bootstrap)
 	return app, func() {
 	}, nil

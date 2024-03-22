@@ -208,6 +208,7 @@ func (uc *UserUseCase) ListUser(ctx context.Context, req *userv1.UserListRequest
 	users := uc.repo.ListUser(ctx, &ListUserCond{Page: req.Page, Limit: req.Limit})
 
 	resp := new(userv1.UserListResponse)
+	resp.Users = make([]*userv1.User, 0, len(users))
 	for _, user := range users {
 		resp.Users = append(resp.Users, &userv1.User{
 			Id:       int64(user.ID),
@@ -359,6 +360,7 @@ func (uc *UserUseCase) GetUserList(ctx context.Context, req *userv1.UserListRequ
 	res = new(userv1.UserListResponse)
 
 	users := uc.repo.ListUser(ctx, &ListUserCond{Page: req.Page, Limit: req.Limit})
+	res.Users = make([]*userv1.User, 0, len(users))
 	for _, user := range users {
 		res.Users = append(res.Users, &userv1.User{
 			Id:       int64(user.ID),
@@ -429,13 +431,13 @@ func (uc *UserUseCase) LogActivity(ctx context.Context, req *userv1.LogEntry) (r
 //
 // 如果存储库查询失败,将返回错误。
 func (uc *UserUseCase) GetUserActivity(ctx context.Context, req *userv1.GetUserActivityRequest) (*userv1.UserActivityListResponse, error) {
-	res := &userv1.UserActivityListResponse{
-		Activity: make([]*userv1.UserActivity, 0),
-	}
-
 	activities, err := uc.repo.GetUserActivity(ctx, int(req.UserId), req.Page, req.Limit)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get user activities: %v", err)
+	}
+
+	res := &userv1.UserActivityListResponse{
+		Activity: make([]*userv1.UserActivity, 0, len(activities)),
 	}
 
 	for _, activity := range activities {
