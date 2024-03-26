@@ -1,4 +1,4 @@
-package listener
+package handler
 
 import (
 	"context"
@@ -6,12 +6,15 @@ import (
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	orderv1 "github.com/ydssx/morphix/api/order/v1"
+	"github.com/ydssx/morphix/app/job/internal/common"
 	"github.com/ydssx/morphix/common/event"
 	"github.com/ydssx/morphix/pkg/logger"
 	"github.com/ydssx/morphix/pkg/mq"
 )
 
-var subjectHandlerMap = map[event.Subject]mq.EventHandler{
+// PubsubHandlerMap maps event subjects to event handlers.
+// It is used to dispatch events received on the pubsub subscription to the appropriate handler.
+var PubsubHandlerMap = map[event.Subject]mq.EventHandler{
 	event.Subject_PaymentCompleted: updateOrderStatus,
 	event.Subject_CancelPayment:    updateOrderStatus,
 }
@@ -24,7 +27,7 @@ func updateOrderStatus(ctx context.Context, e cloudevents.Event) error {
 	}
 	logger.Infof(ctx, "Got Data: %+v\n", data)
 
-	if _, err := GetUcFromContext(ctx).UpdateOrderStatus(ctx, &orderv1.UpdateOrderStatusRequest{OrderNumber: "", Status: orderv1.OrderStatus_COMPLETED}); err != nil {
+	if _, err := common.ClientSetFromContext(ctx).UpdateOrderStatus(ctx, &orderv1.UpdateOrderStatusRequest{OrderNumber: "", Status: orderv1.OrderStatus_COMPLETED}); err != nil {
 		logger.Errorf(ctx, "UpdateOrderStatus Error: %s\n", err.Error())
 		return err
 	}

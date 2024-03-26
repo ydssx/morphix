@@ -38,7 +38,8 @@ func (ps *RedisPubSub) SubscribeToTopic(topic string, handler func(message []byt
 	go func() {
 		for msg := range ch {
 			if msg != nil {
-				handler([]byte(msg.Payload))
+				msg := msg
+				go handler([]byte(msg.Payload))
 			}
 		}
 		log.Infof("Stopped subscribing to messages on topic [%s]", topic)

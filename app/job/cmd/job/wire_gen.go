@@ -11,6 +11,7 @@ import (
 	"github.com/ydssx/morphix/app/job/internal/common"
 	"github.com/ydssx/morphix/app/job/internal/server"
 	"github.com/ydssx/morphix/app/job/internal/service"
+	common2 "github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
 )
 
@@ -27,7 +28,14 @@ func wireApp(bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
 	inspector := common.NewAsynqInspector(bootstrap)
 	jobService := service.NewJobService(client, inspector)
 	grpcServer := server.NewGRPCServer(bootstrap, jobService)
-	app := newApp(jobServer, grpcServer, bootstrap)
+	conn, cleanup, err := common2.NewNatsConn(bootstrap)
+	if err != nil {
+		return nil, nil, err
+	}
+	cloudEvent := common2.NewCloudEvent(conn)
+	listenerServer := server.NewListenerServer(cloudEvent, serviceClientSet)
+	app := newApp(jobServer, grpcServer, listenerServer, bootstrap)
 	return app, func() {
+		cleanup()
 	}, nil
 }

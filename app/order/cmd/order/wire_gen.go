@@ -11,7 +11,6 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/ydssx/morphix/app/order/internal/biz"
 	"github.com/ydssx/morphix/app/order/internal/data"
-	"github.com/ydssx/morphix/app/order/internal/listener"
 	"github.com/ydssx/morphix/app/order/internal/server"
 	"github.com/ydssx/morphix/app/order/internal/service"
 	"github.com/ydssx/morphix/common"
@@ -49,22 +48,13 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	orderService := service.NewOrderService(orderUseCase)
 	httpServer := server.NewHTTPServer(bootstrap, orderService)
 	grpcServer := server.NewGRPCServer(bootstrap, orderService)
-	conn, cleanup2, err := common.NewNatsConn(bootstrap)
+	v, err := server.NewServer(httpServer, grpcServer, bootstrap)
 	if err != nil {
-		cleanup()
-		return nil, nil, err
-	}
-	cloudEvent := common.NewCloudEvent(conn)
-	listenerServer := listener.NewListenerServer(cloudEvent, orderUseCase)
-	v, err := server.NewServer(httpServer, grpcServer, listenerServer, bootstrap)
-	if err != nil {
-		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
 	app := newApp(bootstrap, v...)
 	return app, func() {
-		cleanup2()
 		cleanup()
 	}, nil
 }

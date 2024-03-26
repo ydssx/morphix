@@ -31,5 +31,5 @@ func (e *eventSender) OnMakePayment(ctx context.Context, payload *event.PayloadP
 
 // OnCancelPayment implements PaymentEvents.
 func (e *eventSender) OnCancelPayment(ctx context.Context, payload *event.PayloadCancelPayment) error {
-	return e.ce.PublishEvent(ctx, event.Subject_CancelPayment.String(), payload)
+	return e.ce.PublishMessage(ctx, event.Subject_CancelPayment.String(), payload)
 }

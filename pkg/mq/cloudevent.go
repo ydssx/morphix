@@ -22,7 +22,7 @@ func NewCloudEvent(conn *nats.Conn) *CloudEvent {
 	return &CloudEvent{natsConn: conn}
 }
 
-// PublishEvent 发布一个云事件到指定的主题。
+// PublishMessage 发布一个云事件到指定的主题。
 //
 // 参数:
 //   - ctx: 上下文
@@ -36,7 +36,7 @@ func NewCloudEvent(conn *nats.Conn) *CloudEvent {
 //   - 如果发送事件失败
 //
 // 发布成功则返回 nil。
-func (c *CloudEvent) PublishEvent(ctx context.Context, subject string, payload interface{}, opts ...Option) error {
+func (c *CloudEvent) PublishMessage(ctx context.Context, subject string, payload interface{}, opts ...Option) error {
 	p, err := cenats.NewSenderFromConn(c.natsConn, subject)
 	if err != nil {
 		return fmt.Errorf("Failed to create nats protocol, %s", err.Error())
@@ -62,7 +62,7 @@ func (c *CloudEvent) PublishEvent(ctx context.Context, subject string, payload i
 	return nil
 }
 
-// AddEventListener adds an event listener to the CloudEvent.
+// SubscribeToTopic adds an event listener to the CloudEvent.
 //
 // It takes the following parameters:
 //   - ctx: the context.Context object for the function.
@@ -75,7 +75,7 @@ func (c *CloudEvent) PublishEvent(ctx context.Context, subject string, payload i
 //   - creating the client
 //   - starting the nats receiver
 //   - closing the consumer
-func (c *CloudEvent) AddEventListener(ctx context.Context, subject string, handler EventHandler, opts ...cenats.ConsumerOption) error {
+func (c *CloudEvent) SubscribeToTopic(ctx context.Context, subject string, handler EventHandler, opts ...cenats.ConsumerOption) error {
 	consumer, err := cenats.NewConsumerFromConn(c.natsConn, subject, opts...)
 	if err != nil {
 		return fmt.Errorf("failed to create nats protocol: %s", err)
@@ -94,11 +94,11 @@ func (c *CloudEvent) AddEventListener(ctx context.Context, subject string, handl
 	return nil
 }
 
-// AddEventListenerAsync adds an asynchronous event listener to the CloudEvent.
+// SubscribeToTopicAsync adds an asynchronous event listener to the CloudEvent.
 // It takes the same parameters as AddEventListener, but returns immediately
 // and runs the listener in a new goroutine. The context is used to control
 // cancelation and timeout.
-func (c *CloudEvent) AddEventListenerAsync(ctx context.Context, subject string, handler EventHandler, opts ...cenats.ConsumerOption) (err error) {
+func (c *CloudEvent) SubscribeToTopicAsync(ctx context.Context, subject string, handler EventHandler, opts ...cenats.ConsumerOption) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 	defer cancel()
 
@@ -106,7 +106,7 @@ func (c *CloudEvent) AddEventListenerAsync(ctx context.Context, subject string, 
 
 	go func() {
 		defer close(errChan)
-		errChan <- c.AddEventListener(ctx, subject, handler, opts...)
+		errChan <- c.SubscribeToTopic(ctx, subject, handler, opts...)
 	}()
 
 	select {

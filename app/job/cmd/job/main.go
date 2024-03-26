@@ -40,14 +40,14 @@ func main() {
 	}
 }
 
-func newApp(ls *server.JobServer, gs *grpc.Server, c *conf.Bootstrap) *kratos.App {
+func newApp(ls *server.JobServer, gs *grpc.Server, ps *server.ListenerServer, c *conf.Bootstrap) *kratos.App {
 	etcdRegistry := common.NewEtcdRegistry(c.Etcd)
 	traceProvider, _ := provider.InitTraceProvider(c.Otelcol.Addr, "morphix-job")
 
 	return kratos.New(
 		kratos.Name("morphix-job"),
 		kratos.Metadata(map[string]string{}),
-		kratos.Server(gs, ls),
+		kratos.Server(gs, ls, ps),
 		kratos.Registrar(etcdRegistry),
 		kratos.BeforeStart(func(_ context.Context) error {
 			return nil
