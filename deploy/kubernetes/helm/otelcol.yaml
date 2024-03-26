@@ -3,10 +3,13 @@
 # Declare variables to be passed into your templates.
 
 nameOverride: ""
-fullnameOverride: "otelcol"
+fullnameOverride: ""
 
 # Valid values are "daemonset", "deployment", and "statefulset".
-mode: "deployment"
+mode: ""
+
+# Specify which namespace should be used to deploy the resources into
+namespaceOverride: ""
 
 # Handles basic configuration of components that
 # also require k8s modifications to work correctly.
@@ -22,6 +25,7 @@ presets:
   # Adds the filelog receiver to the logs pipeline
   # and adds the necessary volumes and volume mounts.
   # Best used with mode = daemonset.
+  # See https://opentelemetry.io/docs/kubernetes/collector/components/#filelog-receiver for details on the receiver.
   logsCollection:
     enabled: false
     includeCollectorLogs: false
@@ -35,31 +39,42 @@ presets:
   # Adds the hostmetrics receiver to the metrics pipeline
   # and adds the necessary volumes and volume mounts.
   # Best used with mode = daemonset.
+  # See https://opentelemetry.io/docs/kubernetes/collector/components/#host-metrics-receiver for details on the receiver.
   hostMetrics:
     enabled: false
   # Configures the Kubernetes Processor to add Kubernetes metadata.
   # Adds the k8sattributes processor to all the pipelines
   # and adds the necessary rules to ClusteRole.
   # Best used with mode = daemonset.
+  # See https://opentelemetry.io/docs/kubernetes/collector/components/#kubernetes-attributes-processor for details on the receiver.
   kubernetesAttributes:
+    enabled: false
+    # When enabled the processor will extra all labels for an associated pod and add them as resource attributes.
+    # The label's exact name will be the key.
+    extractAllPodLabels: false
+    # When enabled the processor will extra all annotations for an associated pod and add them as resource attributes.
+    # The annotation's exact name will be the key.
+    extractAllPodAnnotations: false
+  # Configures the collector to collect node, pod, and container metrics from the API server on a kubelet..
+  # Adds the kubeletstats receiver to the metrics pipeline
+  # and adds the necessary rules to ClusteRole.
+  # Best used with mode = daemonset.
+  # See https://opentelemetry.io/docs/kubernetes/collector/components/#kubeletstats-receiver for details on the receiver.
+  kubeletMetrics:
     enabled: false
   # Configures the collector to collect kubernetes events.
   # Adds the k8sobject receiver to the logs pipeline
   # and collects kubernetes events by default.
   # Best used with mode = deployment or statefulset.
+  # See https://opentelemetry.io/docs/kubernetes/collector/components/#kubernetes-objects-receiver for details on the receiver.
   kubernetesEvents:
     enabled: false
   # Configures the Kubernetes Cluster Receiver to collect cluster-level metrics.
   # Adds the k8s_cluster receiver to the metrics pipeline
   # and adds the necessary rules to ClusteRole.
   # Best used with mode = deployment or statefulset.
+  # See https://opentelemetry.io/docs/kubernetes/collector/components/#kubernetes-cluster-receiver for details on the receiver.
   clusterMetrics:
-    enabled: false
-  # Configures the collector to collect Kubelet metrics.
-  # Adds the kubeletstats receiver to the metrics pipeline
-  # and adds the necessary rules to ClusteRole.
-  # Best used with mode = daemonset.
-  kubeletMetrics:
     enabled: false
 
 configMap:
@@ -70,20 +85,11 @@ configMap:
 # Supports templating. To escape existing instances of {{ }}, use {{` <original content> `}}.
 # For example, {{ REDACTED_EMAIL }} becomes {{` {{ REDACTED_EMAIL }} `}}.
 config:
-  connectors:
-    spanmetrics: null
   exporters:
+    debug: {}
+    # Will be removed in a future release.
+    # Use the debug exporter instead.
     logging: {}
-    otlp:
-      endpoint: 'jaeger.morphix:4317'
-      tls:
-        insecure: true
-    prometheus:
-      enable_open_metrics: true
-      endpoint: 0.0.0.0:9464
-      resource_to_telemetry_conversion:
-        enabled: true
-
   extensions:
     # The health_check extension is mandatory for this chart.
     # Without the health_check extension the collector will fail the readiness and liveliness probes.
@@ -129,7 +135,7 @@ config:
     pipelines:
       logs:
         exporters:
-          - logging
+          - debug
         processors:
           - memory_limiter
           - batch
@@ -137,20 +143,16 @@ config:
           - otlp
       metrics:
         exporters:
-          - logging
-          - prometheus
+          - debug
         processors:
           - memory_limiter
           - batch
         receivers:
           - otlp
           - prometheus
-          - spanmetrics
       traces:
         exporters:
-          - otlp
-          - logging
-          - spanmetrics
+          - debug
         processors:
           - memory_limiter
           - batch
@@ -286,12 +288,16 @@ ports:
 resources: {}
 # resources:
 #   limits:
-#     cpu: 256m
+#     cpu: 250m
 #     memory: 512Mi
 
 podAnnotations: {}
 
 podLabels: {}
+
+# Common labels to add to all otel-collector resources. Evaluated as a template.
+additionalLabels: {}
+#  app.kubernetes.io/part-of: my-app
 
 # Host networking requested for this pod. Use the host's network namespace.
 hostNetwork: false
@@ -561,3 +567,11 @@ networkPolicy:
   #    ports:
   #      - port: 1234
   #        protocol: TCP
+
+# When enabled, the chart will set the GOMEMLIMIT env var to 80% of the configured
+# resources.limits.memory and remove the memory ballast extension.
+# If no resources.limits.memory are defined enabling does nothing.
+# In a future release this setting will be enabled by default.
+# See https://github.com/open-telemetry/opentelemetry-helm-charts/issues/891
+# for more details.
+useGOMEMLIMIT: true

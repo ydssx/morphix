@@ -71,7 +71,6 @@ func NewOrderUseCase(
 	}
 }
 
-// 创建订单
 func (b *OrderUseCase) CreateOrder(ctx context.Context, req *orderv1.CreateOrderRequest) (res *orderv1.CreateOrderResponse, err error) {
 	res = new(orderv1.CreateOrderResponse)
 	claim, _ := interceptors.AuthFromContext(ctx)
@@ -142,7 +141,7 @@ func (b *OrderUseCase) CreateOrder(ctx context.Context, req *orderv1.CreateOrder
 		}
 
 		// 创建订单项
-		orderItems := make([]model.OrderItem, 0)
+		orderItems := make([]model.OrderItem, 0, len(req.Items))
 		for _, item := range req.Items {
 			orderItem := model.OrderItem{
 				OrderId:   int(orderID),

@@ -49,7 +49,7 @@ func (l *Logger) Log(level log.Level, keyvals ...interface{}) error {
 		return nil
 	}
 
-	var data []zap.Field
+	data := make([]zap.Field, 0, len(keyvals)/2)
 	for i := 0; i < len(keyvals); i += 2 {
 		data = append(data, zap.Any(fmt.Sprint(keyvals[i]), keyvals[i+1]))
 	}

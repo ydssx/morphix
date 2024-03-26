@@ -107,7 +107,7 @@ func (r *RedisLocker) Unlock(ctx context.Context, key string) error {
 }
 
 func (r *RedisLocker) TryLock(ctx context.Context, key string, opt ...LockerOption) error {
-	ctx, cancel := context.WithTimeout(ctx, time.Millisecond)
+	ctx, cancel := context.WithTimeout(ctx, time.Millisecond*100)
 	defer cancel()
 	return r.Lock(ctx, key, opt...)
 }
