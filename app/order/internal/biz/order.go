@@ -13,7 +13,7 @@ import (
 	"github.com/ydssx/morphix/app/order/internal/model"
 	"github.com/ydssx/morphix/pkg/errors"
 	"github.com/ydssx/morphix/pkg/interceptors"
-	"github.com/ydssx/morphix/pkg/redis"
+	"github.com/ydssx/morphix/pkg/lock"
 	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -44,7 +44,7 @@ type ListOrderCond struct {
 type OrderUseCase struct {
 	repo          OrderRepo
 	tx            Transaction
-	locker        redis.Locker
+	locker        lock.Locker
 	productClient productv1.ProductServiceClient
 	paymentClient paymentv1.PaymentServiceClient
 	quoteClient   quotev1.QuoteServiceClient
@@ -54,7 +54,7 @@ type OrderUseCase struct {
 func NewOrderUseCase(
 	tx Transaction,
 	repo OrderRepo,
-	locker redis.Locker,
+	locker lock.Locker,
 	productClient productv1.ProductServiceClient,
 	paymentClient paymentv1.PaymentServiceClient,
 	quoteClient quotev1.QuoteServiceClient,
@@ -186,7 +186,7 @@ func (b *OrderUseCase) UpdateOrderStatus(ctx context.Context, req *orderv1.Updat
 	res = new(orderv1.UpdateOrderStatusResponse)
 
 	lockKey := fmt.Sprintf("order:%s", req.OrderNumber)
-	err = b.locker.Lock(ctx, lockKey, redis.WithTTL(time.Second*10))
+	err = b.locker.Lock(ctx, lockKey, lock.WithTTL(time.Second*10))
 	if err != nil {
 		return nil, errors.Wrap(err, "获取订单锁失败")
 	}

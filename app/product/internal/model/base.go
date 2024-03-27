@@ -2,7 +2,7 @@ package model
 
 import (
 	"github.com/Gre-Z/common/jtime"
-	"github.com/ydssx/morphix/pkg/mysql"
+	"github.com/ydssx/morphix/pkg/client/mysql"
 	"gorm.io/gorm"
 )
 

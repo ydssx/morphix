@@ -9,12 +9,12 @@ import (
 	"github.com/ydssx/morphix/app/job/internal/common"
 	"github.com/ydssx/morphix/common/event"
 	"github.com/ydssx/morphix/pkg/logger"
-	"github.com/ydssx/morphix/pkg/mq"
+	"github.com/ydssx/morphix/pkg/pubsub"
 )
 
 // PubsubHandlerMap maps event subjects to event handlers.
 // It is used to dispatch events received on the pubsub subscription to the appropriate handler.
-var PubsubHandlerMap = map[event.Subject]mq.EventHandler{
+var PubsubHandlerMap = map[event.Subject]pubsub.EventHandler{
 	event.Subject_PaymentCompleted: updateOrderStatus,
 	event.Subject_CancelPayment:    updateOrderStatus,
 }

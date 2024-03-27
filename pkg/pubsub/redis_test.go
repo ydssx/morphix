@@ -1,4 +1,4 @@
-package redis
+package pubsub
 
 import (
 	"encoding/json"
@@ -7,11 +7,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/redis/go-redis/v9"
+	goredis "github.com/redis/go-redis/v9"
+	"github.com/ydssx/morphix/pkg/client/redis"
 )
 
 func TestRedisPubSub_PublishMessage(t *testing.T) {
-	cli, _ := NewRedis(&redis.Options{Addr: "localhost:6379"})
+	cli, _ := redis.NewRedis(&goredis.Options{Addr: "localhost:6379"})
 	pubsub := NewRedisPubSub(cli)
 	pubsub.SubscribeToTopic("test", func(message []byte) {
 		time.Sleep(time.Second * 1)

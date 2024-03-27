@@ -5,7 +5,7 @@ import (
 
 	goredis "github.com/redis/go-redis/v9"
 	"github.com/ydssx/morphix/common/conf"
-	"github.com/ydssx/morphix/pkg/redis"
+	"github.com/ydssx/morphix/pkg/client/redis"
 )
 
 // ProviderSet is biz providers.

@@ -1,4 +1,4 @@
-package redis
+package lock
 
 import (
 	"context"
@@ -6,11 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/redis/go-redis/v9"
+	goredis "github.com/redis/go-redis/v9"
+	"github.com/ydssx/morphix/pkg/client/redis"
 )
 
 func TestRedisLocker_Lock(t *testing.T) {
-	cli, _ := NewRedis(&redis.Options{Addr: "localhost:6379"})
+	cli, _ := redis.NewRedis(&goredis.Options{Addr: "localhost:6379"})
 	r := NewLocker(cli)
 	// err := r.Lock(context.Background(), "test", WithTries(0), WithDelay(time.Second), WithTTL(time.Second*3))
 	// if err != nil {

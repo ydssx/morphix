@@ -9,8 +9,8 @@ import (
 	"github.com/ydssx/morphix/app/chat/internal/biz"
 	"github.com/ydssx/morphix/common/conf"
 	"github.com/ydssx/morphix/pkg/cache"
-	"github.com/ydssx/morphix/pkg/mysql"
-	"github.com/ydssx/morphix/pkg/redis"
+	"github.com/ydssx/morphix/pkg/client/mysql"
+	"github.com/ydssx/morphix/pkg/client/redis"
 	"gorm.io/gorm"
 )
 
@@ -86,4 +86,3 @@ func NewMysqlDB(c *conf.Bootstrap) (*gorm.DB, error) {
 func NewRedisCache(client *goredis.Client) cache.Cache {
 	return cache.NewRedisCache(client)
 }
-

@@ -1,4 +1,4 @@
-package mq
+package pubsub
 
 import (
 	"github.com/nats-io/nats.go"

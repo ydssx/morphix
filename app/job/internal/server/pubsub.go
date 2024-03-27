@@ -5,15 +5,15 @@ import (
 
 	"github.com/ydssx/morphix/app/job/internal/common"
 	"github.com/ydssx/morphix/app/job/internal/handler"
-	"github.com/ydssx/morphix/pkg/mq"
+	"github.com/ydssx/morphix/pkg/pubsub"
 )
 
 type ListenerServer struct {
-	ce        *mq.CloudEvent
+	ce        *pubsub.CloudEvent
 	clientSet *common.ServiceClientSet
 }
 
-func NewListenerServer(ce *mq.CloudEvent, clientSet *common.ServiceClientSet) *ListenerServer {
+func NewListenerServer(ce *pubsub.CloudEvent, clientSet *common.ServiceClientSet) *ListenerServer {
 	return &ListenerServer{ce: ce, clientSet: clientSet}
 }
 

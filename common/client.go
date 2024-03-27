@@ -4,6 +4,7 @@ import (
 	"context"
 
 	_ "github.com/dtm-labs/driver-kratos"
+	"github.com/go-kratos/kratos/v2/registry"
 	kgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/nats-io/nats.go"
 	goredis "github.com/redis/go-redis/v9"
@@ -15,12 +16,12 @@ import (
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/common/conf"
+	"github.com/ydssx/morphix/pkg/client/redis"
+	cnats "github.com/ydssx/morphix/pkg/client/nats"
 	"github.com/ydssx/morphix/pkg/interceptors"
-	"github.com/ydssx/morphix/pkg/mq"
-	"github.com/ydssx/morphix/pkg/redis"
+	"github.com/ydssx/morphix/pkg/pubsub"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
-	"github.com/go-kratos/kratos/v2/registry"
 )
 
 // NewSMSClient 创建一个 SMS 服务的客户端连接。
@@ -154,9 +155,9 @@ func MustNewRedisClient(c *conf.Bootstrap) *goredis.Client {
 }
 
 func NewNatsConn(c *conf.Bootstrap) (conn *nats.Conn, cleanup func(), err error) {
-	return mq.InitNats(c.Nats.Addr)
+	return cnats.InitNats(c.Nats.Addr)
 }
 
-func NewCloudEvent(conn *nats.Conn) *mq.CloudEvent {
-	return mq.NewCloudEvent(conn)
+func NewCloudEvent(conn *nats.Conn) *pubsub.CloudEvent {
+	return pubsub.NewCloudEvent(conn)
 }

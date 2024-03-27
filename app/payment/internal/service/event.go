@@ -5,7 +5,7 @@ import (
 
 	"github.com/ydssx/morphix/common/dapr"
 	"github.com/ydssx/morphix/common/event"
-	"github.com/ydssx/morphix/pkg/mq"
+	"github.com/ydssx/morphix/pkg/pubsub"
 )
 
 type PaymentEventSinker interface {
@@ -17,10 +17,10 @@ var _ PaymentEventSinker = (*eventSender)(nil)
 
 type eventSender struct {
 	*dapr.DaprClient
-	ce *mq.CloudEvent
+	ce *pubsub.CloudEvent
 }
 
-func NewEventSender(daprClient *dapr.DaprClient, ce *mq.CloudEvent) PaymentEventSinker {
+func NewEventSender(daprClient *dapr.DaprClient, ce *pubsub.CloudEvent) PaymentEventSinker {
 	return &eventSender{DaprClient: daprClient, ce: ce}
 }
 
