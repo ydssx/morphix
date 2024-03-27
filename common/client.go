@@ -16,8 +16,8 @@ import (
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
 	userv1 "github.com/ydssx/morphix/api/user/v1"
 	"github.com/ydssx/morphix/common/conf"
-	"github.com/ydssx/morphix/pkg/client/redis"
 	cnats "github.com/ydssx/morphix/pkg/client/nats"
+	"github.com/ydssx/morphix/pkg/client/redis"
 	"github.com/ydssx/morphix/pkg/interceptors"
 	"github.com/ydssx/morphix/pkg/pubsub"
 	"google.golang.org/grpc"
@@ -158,6 +158,6 @@ func NewNatsConn(c *conf.Bootstrap) (conn *nats.Conn, cleanup func(), err error)
 	return cnats.InitNats(c.Nats.Addr)
 }
 
-func NewCloudEvent(conn *nats.Conn) *pubsub.CloudEvent {
-	return pubsub.NewCloudEvent(conn)
+func NewCloudEvent(conn *nats.Conn) *pubsub.CloudEventer {
+	return pubsub.NewCloudEventer(conn)
 }

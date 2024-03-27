@@ -17,10 +17,10 @@ var _ PaymentEventSinker = (*eventSender)(nil)
 
 type eventSender struct {
 	*dapr.DaprClient
-	ce *pubsub.CloudEvent
+	ce *pubsub.CloudEventer
 }
 
-func NewEventSender(daprClient *dapr.DaprClient, ce *pubsub.CloudEvent) PaymentEventSinker {
+func NewEventSender(daprClient *dapr.DaprClient, ce *pubsub.CloudEventer) PaymentEventSinker {
 	return &eventSender{DaprClient: daprClient, ce: ce}
 }
 

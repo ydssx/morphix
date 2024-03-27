@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	orderv1 "github.com/ydssx/morphix/api/order/v1"
 	"github.com/ydssx/morphix/app/job/internal/common"
 	"github.com/ydssx/morphix/common/event"
@@ -19,7 +18,7 @@ var PubsubHandlerMap = map[event.Subject]pubsub.EventHandler{
 	event.Subject_CancelPayment:    updateOrderStatus,
 }
 
-func updateOrderStatus(ctx context.Context, e cloudevents.Event) error {
+func updateOrderStatus(ctx context.Context, e *pubsub.CloudEvent) error {
 	fmt.Printf("Got Event Context: %+v\n", e.Context)
 	data := &event.PayloadPaymentCompleted{}
 	if err := e.DataAs(data); err != nil {

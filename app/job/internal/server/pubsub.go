@@ -9,18 +9,18 @@ import (
 )
 
 type ListenerServer struct {
-	ce        *pubsub.CloudEvent
+	sub       pubsub.Subscriber
 	clientSet *common.ServiceClientSet
 }
 
-func NewListenerServer(ce *pubsub.CloudEvent, clientSet *common.ServiceClientSet) *ListenerServer {
-	return &ListenerServer{ce: ce, clientSet: clientSet}
+func NewListenerServer(sub pubsub.Subscriber, clientSet *common.ServiceClientSet) *ListenerServer {
+	return &ListenerServer{sub: sub, clientSet: clientSet}
 }
 
 func (l *ListenerServer) Start(ctx context.Context) error {
 	ctx = common.NewContextWithServiceClientSet(ctx, l.clientSet)
 	for subject, handler := range handler.PubsubHandlerMap {
-		err := l.ce.SubscribeToTopicAsync(ctx, subject.String(), handler)
+		err := l.sub.SubscribeAsync(ctx, subject.String(), handler)
 		if err != nil {
 			return err
 		}

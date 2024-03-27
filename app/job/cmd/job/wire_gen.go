@@ -13,6 +13,7 @@ import (
 	"github.com/ydssx/morphix/app/job/internal/service"
 	common2 "github.com/ydssx/morphix/common"
 	"github.com/ydssx/morphix/common/conf"
+	"github.com/ydssx/morphix/pkg/pubsub"
 )
 
 import (
@@ -28,14 +29,13 @@ func wireApp(bootstrap *conf.Bootstrap) (*kratos.App, func(), error) {
 	inspector := common.NewAsynqInspector(bootstrap)
 	jobService := service.NewJobService(client, inspector)
 	grpcServer := server.NewGRPCServer(bootstrap, jobService)
-	conn, cleanup, err := common2.NewNatsConn(bootstrap)
+	redisClient, err := common2.NewRedisClient(bootstrap)
 	if err != nil {
 		return nil, nil, err
 	}
-	cloudEvent := common2.NewCloudEvent(conn)
-	listenerServer := server.NewListenerServer(cloudEvent, serviceClientSet)
+	redisPubSub := pubsub.NewRedisPubSub(redisClient)
+	listenerServer := server.NewListenerServer(redisPubSub, serviceClientSet)
 	app := newApp(jobServer, grpcServer, listenerServer, bootstrap)
 	return app, func() {
-		cleanup()
 	}, nil
 }

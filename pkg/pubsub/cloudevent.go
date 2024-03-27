@@ -12,14 +12,12 @@ import (
 	"github.com/ydssx/morphix/pkg/logger"
 )
 
-type EventHandler func(ctx context.Context, event cloudevents.Event) error
-
-type CloudEvent struct {
+type CloudEventer struct {
 	natsConn *nats.Conn
 }
 
-func NewCloudEvent(conn *nats.Conn) *CloudEvent {
-	return &CloudEvent{natsConn: conn}
+func NewCloudEventer(conn *nats.Conn) *CloudEventer {
+	return &CloudEventer{natsConn: conn}
 }
 
 // PublishMessage 发布一个云事件到指定的主题。
@@ -36,7 +34,7 @@ func NewCloudEvent(conn *nats.Conn) *CloudEvent {
 //   - 如果发送事件失败
 //
 // 发布成功则返回 nil。
-func (c *CloudEvent) PublishMessage(ctx context.Context, subject string, payload interface{}, opts ...Option) error {
+func (c *CloudEventer) PublishMessage(ctx context.Context, subject string, payload interface{}, opts ...Option) error {
 	p, err := cenats.NewSenderFromConn(c.natsConn, subject)
 	if err != nil {
 		return fmt.Errorf("Failed to create nats protocol, %s", err.Error())
@@ -75,8 +73,17 @@ func (c *CloudEvent) PublishMessage(ctx context.Context, subject string, payload
 //   - creating the client
 //   - starting the nats receiver
 //   - closing the consumer
-func (c *CloudEvent) SubscribeToTopic(ctx context.Context, subject string, handler EventHandler, opts ...cenats.ConsumerOption) error {
-	consumer, err := cenats.NewConsumerFromConn(c.natsConn, subject, opts...)
+func (c *CloudEventer) Subscribe(ctx context.Context, subject string, handler EventHandler, opts ...Subscription) error {
+	cons := new(Consumer)
+	for _, opt := range opts {
+		opt(cons)
+	}
+	var opt []cenats.ConsumerOption
+	if cons.Queue != "" {
+		opt = append(opt, cenats.WithQueueSubscriber(cons.Queue))
+	}
+
+	consumer, err := cenats.NewConsumerFromConn(c.natsConn, subject, opt...)
 	if err != nil {
 		return fmt.Errorf("failed to create nats protocol: %s", err)
 	}
@@ -98,7 +105,7 @@ func (c *CloudEvent) SubscribeToTopic(ctx context.Context, subject string, handl
 // It takes the same parameters as AddEventListener, but returns immediately
 // and runs the listener in a new goroutine. The context is used to control
 // cancelation and timeout.
-func (c *CloudEvent) SubscribeToTopicAsync(ctx context.Context, subject string, handler EventHandler, opts ...cenats.ConsumerOption) (err error) {
+func (c *CloudEventer) SubscribeAsync(ctx context.Context, subject string, handler EventHandler, opts ...Subscription) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 	defer cancel()
 
@@ -106,7 +113,7 @@ func (c *CloudEvent) SubscribeToTopicAsync(ctx context.Context, subject string, 
 
 	go func() {
 		defer close(errChan)
-		errChan <- c.SubscribeToTopic(ctx, subject, handler, opts...)
+		errChan <- c.Subscribe(ctx, subject, handler, opts...)
 	}()
 
 	select {
