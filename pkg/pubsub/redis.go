@@ -106,3 +106,20 @@ func (ps *RedisPubSub) Close() error {
 	}
 	return errors.Join(errs...)
 }
+
+func (ps *RedisPubSub) Unsubscribe(ctx context.Context, subject string) error {
+	sub, ok := ps.subs[subject]
+	if !ok {
+		return errors.New("主题[" + subject + "]不存在")
+	}
+	err := sub.Close()
+	if err != nil {
+		return errors.Wrap(err, "关闭主题["+subject+"]的订阅失败")
+	}
+	delete(ps.subs, subject)
+	return nil
+}
+
+func (ps *RedisPubSub) UnsubscribeAll(ctx context.Context) error {
+	return ps.Close()
+}

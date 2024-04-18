@@ -77,6 +77,6 @@ func (mq *NATSMessageQueueService) StreamSubscribe(subj string, cb nats.MsgHandl
 }
 
 // Close 关闭与 NATS 服务器的连接
-func (mq *NATSMessageQueueService) Close() {
-	mq.nc.Drain()
+func (mq *NATSMessageQueueService) Close() error{
+	return mq.nc.Drain()
 }

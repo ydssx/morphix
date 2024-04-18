@@ -28,6 +28,7 @@ func (l *ListenerServer) Start(ctx context.Context) error {
 	return nil
 }
 
-func (*ListenerServer) Stop(context.Context) error {
-	return nil
+func (l *ListenerServer) Stop(ctx context.Context) error {
+	return l.sub.UnsubscribeAll(ctx)
 }
+

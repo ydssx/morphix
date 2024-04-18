@@ -56,11 +56,6 @@ func WithEventType(t string) Option {
 	return func(e *Event) { e.eventType = t }
 }
 
-// NewEvent 创建一个新的事件。
-// ctx 是上下文。
-// payload 是事件的数据。
-// opts 是可选的配置选项。
-// 返回事件和错误。
 func NewEvent(ctx context.Context, payload interface{}, opts ...Option) (event.Event, error) {
 	ev := newDefaultEvent(ctx)
 	for _, v := range opts {

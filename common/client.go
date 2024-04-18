@@ -21,6 +21,7 @@ import (
 	"github.com/ydssx/morphix/pkg/interceptors"
 	"github.com/ydssx/morphix/pkg/pubsub"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/keepalive"
 )
 
@@ -51,10 +52,14 @@ func NewJobClient(c *conf.Bootstrap) jobv1.JobServiceClient {
 	return jobv1.NewJobServiceClient(conn)
 }
 
-func NewProductClient(c *conf.Bootstrap) productv1.ProductServiceClient {
+func NewProductClient(c *conf.Bootstrap) (productv1.ProductServiceClient, func()) {
 	conn := createConn(c.Etcd, c.ClientSet.JobRpcClient)
 
-	return productv1.NewProductServiceClient(conn)
+	cleanup := func() {
+		_ = conn.Close()
+	}
+
+	return productv1.NewProductServiceClient(conn), cleanup
 }
 
 // NewPaymentClient 创建一个 Payment 服务的客户端连接。

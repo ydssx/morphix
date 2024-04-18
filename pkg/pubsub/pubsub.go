@@ -12,11 +12,14 @@ type EventHandler func(ctx context.Context, event *CloudEvent) error
 
 type Publisher interface {
 	PublishMessage(ctx context.Context, subject string, payload interface{}, opts ...Option) error
+	Close() error
 }
 
 type Subscriber interface {
 	Subscribe(ctx context.Context, subject string, handler EventHandler, opts ...Subscription) error
 	SubscribeAsync(ctx context.Context, subject string, handler EventHandler, opts ...Subscription) error
+	Unsubscribe(ctx context.Context, subject string) error
+	UnsubscribeAll(ctx context.Context) error
 }
 
 type Consumer struct {

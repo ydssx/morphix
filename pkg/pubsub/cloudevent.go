@@ -125,3 +125,7 @@ func (c *CloudEventer) SubscribeAsync(ctx context.Context, subject string, handl
 
 	return err
 }
+
+func (c *CloudEventer) Close() error {
+	return c.natsConn.Drain()
+}

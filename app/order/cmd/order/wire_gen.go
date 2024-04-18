@@ -40,7 +40,7 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	transaction := data.NewTransaction(dataData)
 	orderRepo := data.NewOrderRepo(dataData)
 	redisLocker := lock.NewLocker(client)
-	productServiceClient := common.NewProductClient(bootstrap)
+	productServiceClient, cleanup2 := common.NewProductClient(bootstrap)
 	paymentServiceClient := common.NewPaymentClient(bootstrap)
 	quoteServiceClient := common.NewQuoteClient(bootstrap)
 	jobServiceClient := common.NewJobClient(bootstrap)
@@ -50,11 +50,13 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	grpcServer := server.NewGRPCServer(bootstrap, orderService)
 	v, err := server.NewServer(httpServer, grpcServer, bootstrap)
 	if err != nil {
+		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
 	app := newApp(bootstrap, v...)
 	return app, func() {
+		cleanup2()
 		cleanup()
 	}, nil
 }
