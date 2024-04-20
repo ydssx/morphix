@@ -9,24 +9,26 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func NewZapLogger() *zap.Logger {
+func NewZapLogger(callerSkip int) *zap.Logger {
 	cfg := zap.NewProductionEncoderConfig()
 	cfg.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05")
-	cfg.EncodeLevel = zapcore.CapitalLevelEncoder
+	cfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	cfg.MessageKey = ""
 
 	core := zapcore.NewCore(zapcore.NewJSONEncoder(cfg), zapcore.Lock(os.Stdout), zap.InfoLevel)
 
-	logger := zap.New(core)
+	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(callerSkip), zap.AddStacktrace(zap.DPanicLevel),zap.Hooks(func(e zapcore.Entry) error {
+		return nil
+	}))
 	return logger
 }
 
 var _ log.Logger = (*Logger)(nil)
 
-var DefaultLogger = NewLogger(NewZapLogger())
+var DefaultLogger = NewLogger(NewZapLogger(2))
 
 func init() {
-	logger := log.With(DefaultLogger, "caller", log.Caller(5))
+	logger := log.With(NewLogger(NewZapLogger(3)))
 	log.SetLogger(logger)
 }
 

@@ -24,56 +24,56 @@ func TraceIDFromContext(ctx context.Context) (string, bool) {
 
 func Info(ctx context.Context, msg ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, fmt.Sprint(msg...)}
-	log.Log(log.LevelInfo, append(kv, logTraceID(ctx)...))
+	DefaultLogger.Log(log.LevelInfo, append(kv, logTraceID(ctx)...))
 }
 
 func Infof(ctx context.Context, format string, msg ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, fmt.Sprintf(format, msg...)}
-	log.Log(log.LevelInfo, append(kv, logTraceID(ctx)...))
+	DefaultLogger.Log(log.LevelInfo, append(kv, logTraceID(ctx)...))
 }
 
 func Error(ctx context.Context, msg ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, fmt.Sprint(msg...)}
-	log.Log(log.LevelError, append(kv, logTraceID(ctx)...))
+	DefaultLogger.Log(log.LevelError, append(kv, logTraceID(ctx)...))
 }
 
 func Errorf(ctx context.Context, format string, msg ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, fmt.Sprintf(format, msg...)}
-	log.Log(log.LevelError, append(kv, logTraceID(ctx)...))
+	DefaultLogger.Log(log.LevelError, append(kv, logTraceID(ctx)...))
 }
 
 func Fatalf(ctx context.Context, format string, msg ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, fmt.Sprintf(format, msg...)}
-	log.Log(log.LevelFatal, append(kv, logTraceID(ctx)...))
+	DefaultLogger.Log(log.LevelFatal, append(kv, logTraceID(ctx)...))
 }
 
 func Fatal(ctx context.Context, msg ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, fmt.Sprint(msg...)}
-	log.Log(log.LevelFatal, append(kv, logTraceID(ctx)...))
+	DefaultLogger.Log(log.LevelFatal, append(kv, logTraceID(ctx)...))
 }
 
 func Log(ctx context.Context, level log.Level, msg string, keyvals ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, msg}
 	kv = append(kv, logTraceID(ctx)...)
-	log.Log(level, append(kv, keyvals...))
+	DefaultLogger.Log(level, append(kv, keyvals...))
 }
 
 func Debug(ctx context.Context, msg ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, fmt.Sprint(msg...)}
-	log.Log(log.LevelDebug, append(kv, logTraceID(ctx)...))
+	DefaultLogger.Log(log.LevelDebug, append(kv, logTraceID(ctx)...))
 }
 
 func Debugf(ctx context.Context, format string, msg ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, fmt.Sprintf(format, msg...)}
-	log.Log(log.LevelDebug, append(kv, logTraceID(ctx)...))
+	DefaultLogger.Log(log.LevelDebug, append(kv, logTraceID(ctx)...))
 }
 
 func Warn(ctx context.Context, msg ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, fmt.Sprint(msg...)}
-	log.Log(log.LevelWarn, append(kv, logTraceID(ctx)...))
+	DefaultLogger.Log(log.LevelWarn, append(kv, logTraceID(ctx)...))
 }
 
 func Warnf(ctx context.Context, format string, msg ...interface{}) {
 	kv := []interface{}{log.DefaultMessageKey, fmt.Sprintf(format, msg...)}
-	log.Log(log.LevelWarn, append(kv, logTraceID(ctx)...))
+	DefaultLogger.Log(log.LevelWarn, append(kv, logTraceID(ctx)...))
 }
