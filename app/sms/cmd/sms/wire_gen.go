@@ -10,9 +10,12 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/ydssx/morphix/app/sms/internal/biz"
+	"github.com/ydssx/morphix/app/sms/internal/data"
 	"github.com/ydssx/morphix/app/sms/internal/server"
 	"github.com/ydssx/morphix/app/sms/internal/service"
 	"github.com/ydssx/morphix/common/conf"
+	"github.com/ydssx/morphix/pkg/cache"
+	"github.com/ydssx/morphix/pkg/client/tencentcloud"
 )
 
 import (
@@ -22,19 +25,32 @@ import (
 // Injectors from wire.go:
 
 func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
-	client, err := biz.NewSmsRedisClient(bootstrap)
+	client, err := data.NewRedisCLient(bootstrap)
 	if err != nil {
 		return nil, nil, err
 	}
-	smsUseCase := biz.NewSmsUseCase(client)
+	cacheCache := cache.NewRedisCache(client)
+	db, err := data.NewMysqlDB(bootstrap)
+	if err != nil {
+		return nil, nil, err
+	}
+	dataData, cleanup, err := data.NewData(logger, db)
+	if err != nil {
+		return nil, nil, err
+	}
+	tencentCloud := tencentcloud.New()
+	smsRepo := data.NewSmsRepo(dataData, tencentCloud)
+	smsUseCase := biz.NewSmsUseCase(cacheCache, smsRepo)
 	smsService := service.NewSMSService(smsUseCase)
 	httpServer := server.NewHTTPServer(bootstrap, smsService)
 	grpcServer := server.NewGRPCServer(bootstrap, smsService)
 	v, err := server.NewServer(httpServer, grpcServer, bootstrap)
 	if err != nil {
+		cleanup()
 		return nil, nil, err
 	}
 	app := newApp(bootstrap, v...)
 	return app, func() {
+		cleanup()
 	}, nil
 }

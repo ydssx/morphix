@@ -11,6 +11,7 @@ import (
 	"github.com/ydssx/morphix/pkg/cache"
 	"github.com/ydssx/morphix/pkg/client/mysql"
 	"github.com/ydssx/morphix/pkg/client/redis"
+	"github.com/ydssx/morphix/pkg/client/tencentcloud"
 	"gorm.io/gorm"
 )
 
@@ -18,25 +19,25 @@ import (
 var ProviderSet = wire.NewSet(
 	NewData,
 	NewRedisCLient,
-	NewRedisCache,
 	NewMysqlDB,
-	NewTransaction,
+	// NewTransaction,
+	tencentcloud.New,
+	NewSmsRepo,
 )
 
 // Data .
 type Data struct {
-	rdb *goredis.Client
-	db  *gorm.DB
+	db *gorm.DB
 }
 
 type contextTxKey struct{}
 
 // NewData .
-func NewData(logger log.Logger, rdb *goredis.Client, db *gorm.DB) (*Data, func(), error) {
+func NewData(logger log.Logger, db *gorm.DB) (*Data, func(), error) {
 	cleanup := func() {
 		log.NewHelper(logger).Info("closing the data resources")
 	}
-	return &Data{rdb: rdb, db: db}, cleanup, nil
+	return &Data{db: db}, cleanup, nil
 }
 
 func (d *Data) InTx(ctx context.Context, fn func(ctx context.Context) error) error {

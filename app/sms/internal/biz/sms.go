@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/redis/go-redis/v9"
 	smsv1 "github.com/ydssx/morphix/api/sms/v1"
+	"github.com/ydssx/morphix/pkg/cache"
 	"github.com/ydssx/morphix/pkg/util"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -14,27 +14,48 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type SmsRepo interface{}
+type SmsRepo interface {
+	SendSMS(ctx context.Context, req *SendSMSRequest) (string, error)
+}
+
+type SendSMSRequest struct {
+	MobileNumber string
+	Scene        smsv1.SmsScene
+	Code         string
+	Provider     string // 短信服务商，如：aliyun, tencent, etc.
+}
 
 type Transaction interface{}
 
 type SmsUseCase struct {
-	rdb *redis.Client
+	cache cache.Cache
+	repo  SmsRepo
 }
 
-func NewSmsUseCase(rdb *redis.Client) *SmsUseCase {
-	return &SmsUseCase{rdb: rdb}
+func NewSmsUseCase(cache cache.Cache, repo SmsRepo) *SmsUseCase {
+	return &SmsUseCase{cache: cache, repo: repo}
 }
 
 func (s *SmsUseCase) SendSMS(ctx context.Context, req *smsv1.SendSMSRequest) (resp *smsv1.SendSMSResponse, err error) {
 	span := trace.SpanFromContext(ctx)
 
 	code := util.GenerateCode(6)
-	key := fmt.Sprintf("%s-%s", req.MobileNumber, req.Scene)
-	_, err = s.rdb.Set(ctx, key, code, time.Minute*10).Result()
+
+	_, err = s.repo.SendSMS(ctx, &SendSMSRequest{
+		MobileNumber: req.MobileNumber,
+		Scene:        req.Scene,
+		Code:         code,
+	})
 	if err != nil {
 		return nil, err
 	}
+
+	key := fmt.Sprintf("%s-%s", req.MobileNumber, req.Scene)
+	err = s.cache.Set(key, code, time.Minute*10)
+	if err != nil {
+		return nil, err
+	}
+
 	span.AddEvent("sms code sended", trace.WithAttributes(attribute.String("scene", req.Scene.String()), attribute.String("code", code)))
 
 	return &smsv1.SendSMSResponse{Success: true}, nil
@@ -42,10 +63,8 @@ func (s *SmsUseCase) SendSMS(ctx context.Context, req *smsv1.SendSMSRequest) (re
 
 func (s *SmsUseCase) CheckSMSStatus(ctx context.Context, req *smsv1.QuerySMSStatusRequest) (*smsv1.QuerySMSStatusResponse, error) {
 	key := fmt.Sprintf("%s-%s", req.MobileNumber, req.Scene)
-	code, err := s.rdb.Get(ctx, key).Result()
-	if err == redis.Nil {
-		return nil, status.Error(codes.NotFound, "验证码不存在或已失效")
-	}
+	var code string
+	err := s.cache.Get(key, &code)
 	if err != nil {
 		return nil, err
 	}
