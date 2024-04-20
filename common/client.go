@@ -21,7 +21,6 @@ import (
 	"github.com/ydssx/morphix/pkg/interceptors"
 	"github.com/ydssx/morphix/pkg/pubsub"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/keepalive"
 )
 
