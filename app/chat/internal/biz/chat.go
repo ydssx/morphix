@@ -9,6 +9,10 @@ import (
 	"github.com/ydssx/morphix/pkg/llm"
 )
 
+type Transaction interface {
+	InTx(context.Context, func(ctx context.Context) error) error
+}
+
 type ChatUseCase struct {
 	llm *llm.LLM
 }
@@ -42,6 +46,6 @@ func (uc *ChatUseCase) ReceiveMessage(req *chat.ClientMessage, stream chat.ChatS
 		}),
 	)
 	log.Printf("resp: %s", resp)
-
+	
 	return err
 }
