@@ -23,6 +23,7 @@ import (
 	"github.com/ydssx/morphix/pkg/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type registerFn func(ctx context.Context, mux *gwruntime.ServeMux, conn *grpc.ClientConn) (err error)
@@ -110,9 +111,16 @@ func newGateway(ctx context.Context, c *conf.Bootstrap) http.Handler {
 
 	r := common.NewEtcdRegistry(c.Etcd)
 
-	muxOpts := []gwruntime.ServeMuxOption{withMeta}
+	muxOpts := []gwruntime.ServeMuxOption{
+		withMeta,
+		gwruntime.WithMarshalerOption(gwruntime.MIMEWildcard, &gwruntime.JSONPb{
+			MarshalOptions:   protojson.MarshalOptions{UseProtoNames: true},
+			UnmarshalOptions: protojson.UnmarshalOptions{DiscardUnknown: true},
+		}),
+		
+	}
 	mux := gwruntime.NewServeMux(muxOpts...)
-
+	
 	for clientConf, handlerFunc := range handlers {
 		clientConn := common.CreateClientConn(ctx, clientConf, r)
 		if err := handlerFunc(ctx, mux, clientConn); err != nil {

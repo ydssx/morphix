@@ -254,3 +254,26 @@ serviceSet:
       database:
         driver: mysql
         source: root:root@tcp(127.0.0.1:3307)/product?parseTime=true&loc=Local
+  chat:
+    name: chat
+    enableRegistry: false
+    enableTracing: false
+    enableMetric: false
+    server:
+      grpc:
+        addr: 0.0.0.0:9009
+        timeout: 2s
+      http:
+        addr: 0.0.0.0:9010
+        timeout: 2s
+        disabled: true
+    data:
+      redis:
+        addr: 127.0.0.1:6379
+        username:
+        password: 1GyY3AHsWg
+        read_timeout: 2s
+        write_timeout: 2s
+      database:
+        driver: mysql
+        source: root:root@tcp(127.0.0.1:3307)/product?parseTime=true&loc=Local

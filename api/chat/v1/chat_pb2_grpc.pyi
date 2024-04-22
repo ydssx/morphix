@@ -29,6 +29,11 @@ class ChatServiceStub:
         api.chat.v1.chat_pb2.ChatMessage,
     ]
     """双向流，用于实现聊天"""
+    ReceiveMessage: grpc.UnaryStreamMultiCallable[
+        api.chat.v1.chat_pb2.ClientMessage,
+        api.chat.v1.chat_pb2.ServerMessage,
+    ]
+    """服务器到客户端的流，用于接收消息"""
 
 class ChatServiceAsyncStub:
     SendMessage: grpc.aio.StreamUnaryMultiCallable[
@@ -41,6 +46,11 @@ class ChatServiceAsyncStub:
         api.chat.v1.chat_pb2.ChatMessage,
     ]
     """双向流，用于实现聊天"""
+    ReceiveMessage: grpc.aio.UnaryStreamMultiCallable[
+        api.chat.v1.chat_pb2.ClientMessage,
+        api.chat.v1.chat_pb2.ServerMessage,
+    ]
+    """服务器到客户端的流，用于接收消息"""
 
 class ChatServiceServicer(metaclass=abc.ABCMeta):
     @abc.abstractmethod
@@ -57,5 +67,12 @@ class ChatServiceServicer(metaclass=abc.ABCMeta):
         context: _ServicerContext,
     ) -> typing.Union[collections.abc.Iterator[api.chat.v1.chat_pb2.ChatMessage], collections.abc.AsyncIterator[api.chat.v1.chat_pb2.ChatMessage]]:
         """双向流，用于实现聊天"""
+    @abc.abstractmethod
+    def ReceiveMessage(
+        self,
+        request: api.chat.v1.chat_pb2.ClientMessage,
+        context: _ServicerContext,
+    ) -> typing.Union[collections.abc.Iterator[api.chat.v1.chat_pb2.ServerMessage], collections.abc.AsyncIterator[api.chat.v1.chat_pb2.ServerMessage]]:
+        """服务器到客户端的流，用于接收消息"""
 
 def add_ChatServiceServicer_to_server(servicer: ChatServiceServicer, server: typing.Union[grpc.Server, grpc.aio.Server]) -> None: ...

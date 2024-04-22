@@ -519,6 +519,48 @@
         ]
       }
     },
+    "/api/v1/chat/receive": {
+      "post": {
+        "summary": "服务器到客户端的流，用于接收消息",
+        "operationId": "ChatService_ReceiveMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/chatServerMessage"
+                },
+                "error": {
+                  "$ref": "#/definitions/rpcStatus"
+                }
+              },
+              "title": "Stream result of chatServerMessage"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chatClientMessage"
+            }
+          }
+        ],
+        "tags": [
+          "ChatService"
+        ]
+      }
+    },
     "/api/v1/chat/send": {
       "post": {
         "summary": "客户端到服务器的流，用于发送消息",

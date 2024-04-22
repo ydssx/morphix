@@ -24,6 +24,11 @@ class ChatServiceStub(object):
                 request_serializer=api_dot_chat_dot_v1_dot_chat__pb2.ChatMessage.SerializeToString,
                 response_deserializer=api_dot_chat_dot_v1_dot_chat__pb2.ChatMessage.FromString,
                 )
+        self.ReceiveMessage = channel.unary_stream(
+                '/chat.ChatService/ReceiveMessage',
+                request_serializer=api_dot_chat_dot_v1_dot_chat__pb2.ClientMessage.SerializeToString,
+                response_deserializer=api_dot_chat_dot_v1_dot_chat__pb2.ServerMessage.FromString,
+                )
 
 
 class ChatServiceServicer(object):
@@ -43,6 +48,13 @@ class ChatServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ReceiveMessage(self, request, context):
+        """服务器到客户端的流，用于接收消息
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ChatServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -55,6 +67,11 @@ def add_ChatServiceServicer_to_server(servicer, server):
                     servicer.Chat,
                     request_deserializer=api_dot_chat_dot_v1_dot_chat__pb2.ChatMessage.FromString,
                     response_serializer=api_dot_chat_dot_v1_dot_chat__pb2.ChatMessage.SerializeToString,
+            ),
+            'ReceiveMessage': grpc.unary_stream_rpc_method_handler(
+                    servicer.ReceiveMessage,
+                    request_deserializer=api_dot_chat_dot_v1_dot_chat__pb2.ClientMessage.FromString,
+                    response_serializer=api_dot_chat_dot_v1_dot_chat__pb2.ServerMessage.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -97,5 +114,22 @@ class ChatService(object):
         return grpc.experimental.stream_stream(request_iterator, target, '/chat.ChatService/Chat',
             api_dot_chat_dot_v1_dot_chat__pb2.ChatMessage.SerializeToString,
             api_dot_chat_dot_v1_dot_chat__pb2.ChatMessage.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ReceiveMessage(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/chat.ChatService/ReceiveMessage',
+            api_dot_chat_dot_v1_dot_chat__pb2.ClientMessage.SerializeToString,
+            api_dot_chat_dot_v1_dot_chat__pb2.ServerMessage.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

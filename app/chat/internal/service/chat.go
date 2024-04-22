@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-
 	chat "github.com/ydssx/morphix/api/chat/v1"
 	"github.com/ydssx/morphix/app/chat/internal/biz"
 )
@@ -11,7 +10,6 @@ var _ = context.Background()
 
 type ChatService struct {
 	uc *biz.ChatUseCase
-
 	chat.UnimplementedChatServiceServer
 }
 
@@ -27,4 +25,9 @@ func (s *ChatService) SendMessage(stream chat.ChatService_SendMessageServer) (er
 // 双向流，用于实现聊天
 func (s *ChatService) Chat(stream chat.ChatService_ChatServer) (err error) {
 	return s.uc.Chat(stream)
+}
+
+// 服务器到客户端的流，用于接收消息
+func (s *ChatService) ReceiveMessage(req *chat.ClientMessage, stream chat.ChatService_ReceiveMessageServer) (err error) {
+	return s.uc.ReceiveMessage(req, stream)
 }

@@ -17,6 +17,14 @@ service ChatService {
 
   // 双向流，用于实现聊天
   rpc Chat(stream ChatMessage) returns (stream ChatMessage);
+
+  // 服务器到客户端的流，用于接收消息
+  rpc ReceiveMessage(ClientMessage) returns (stream ServerMessage) {
+    option (google.api.http) = {
+      post: "/api/v1/chat/receive"
+      body: "*"
+    };
+  }
 }
 
 // 客户端发送的消息

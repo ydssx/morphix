@@ -37,6 +37,9 @@ const (
 	ChatServiceSendMessageProcedure = "/chat.ChatService/SendMessage"
 	// ChatServiceChatProcedure is the fully-qualified name of the ChatService's Chat RPC.
 	ChatServiceChatProcedure = "/chat.ChatService/Chat"
+	// ChatServiceReceiveMessageProcedure is the fully-qualified name of the ChatService's
+	// ReceiveMessage RPC.
+	ChatServiceReceiveMessageProcedure = "/chat.ChatService/ReceiveMessage"
 )
 
 // ChatServiceClient is a client for the chat.ChatService service.
@@ -45,6 +48,8 @@ type ChatServiceClient interface {
 	SendMessage(context.Context) *connect_go.ClientStreamForClient[v1.ClientMessage, v1.ServerMessage]
 	// 双向流，用于实现聊天
 	Chat(context.Context) *connect_go.BidiStreamForClient[v1.ChatMessage, v1.ChatMessage]
+	// 服务器到客户端的流，用于接收消息
+	ReceiveMessage(context.Context, *connect_go.Request[v1.ClientMessage]) (*connect_go.ServerStreamForClient[v1.ServerMessage], error)
 }
 
 // NewChatServiceClient constructs a client for the chat.ChatService service. By default, it uses
@@ -67,13 +72,19 @@ func NewChatServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts
 			baseURL+ChatServiceChatProcedure,
 			opts...,
 		),
+		receiveMessage: connect_go.NewClient[v1.ClientMessage, v1.ServerMessage](
+			httpClient,
+			baseURL+ChatServiceReceiveMessageProcedure,
+			opts...,
+		),
 	}
 }
 
 // chatServiceClient implements ChatServiceClient.
 type chatServiceClient struct {
-	sendMessage *connect_go.Client[v1.ClientMessage, v1.ServerMessage]
-	chat        *connect_go.Client[v1.ChatMessage, v1.ChatMessage]
+	sendMessage    *connect_go.Client[v1.ClientMessage, v1.ServerMessage]
+	chat           *connect_go.Client[v1.ChatMessage, v1.ChatMessage]
+	receiveMessage *connect_go.Client[v1.ClientMessage, v1.ServerMessage]
 }
 
 // SendMessage calls chat.ChatService.SendMessage.
@@ -86,12 +97,19 @@ func (c *chatServiceClient) Chat(ctx context.Context) *connect_go.BidiStreamForC
 	return c.chat.CallBidiStream(ctx)
 }
 
+// ReceiveMessage calls chat.ChatService.ReceiveMessage.
+func (c *chatServiceClient) ReceiveMessage(ctx context.Context, req *connect_go.Request[v1.ClientMessage]) (*connect_go.ServerStreamForClient[v1.ServerMessage], error) {
+	return c.receiveMessage.CallServerStream(ctx, req)
+}
+
 // ChatServiceHandler is an implementation of the chat.ChatService service.
 type ChatServiceHandler interface {
 	// 客户端到服务器的流，用于发送消息
 	SendMessage(context.Context, *connect_go.ClientStream[v1.ClientMessage]) (*connect_go.Response[v1.ServerMessage], error)
 	// 双向流，用于实现聊天
 	Chat(context.Context, *connect_go.BidiStream[v1.ChatMessage, v1.ChatMessage]) error
+	// 服务器到客户端的流，用于接收消息
+	ReceiveMessage(context.Context, *connect_go.Request[v1.ClientMessage], *connect_go.ServerStream[v1.ServerMessage]) error
 }
 
 // NewChatServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -110,12 +128,19 @@ func NewChatServiceHandler(svc ChatServiceHandler, opts ...connect_go.HandlerOpt
 		svc.Chat,
 		opts...,
 	)
+	chatServiceReceiveMessageHandler := connect_go.NewServerStreamHandler(
+		ChatServiceReceiveMessageProcedure,
+		svc.ReceiveMessage,
+		opts...,
+	)
 	return "/chat.ChatService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ChatServiceSendMessageProcedure:
 			chatServiceSendMessageHandler.ServeHTTP(w, r)
 		case ChatServiceChatProcedure:
 			chatServiceChatHandler.ServeHTTP(w, r)
+		case ChatServiceReceiveMessageProcedure:
+			chatServiceReceiveMessageHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -131,4 +156,8 @@ func (UnimplementedChatServiceHandler) SendMessage(context.Context, *connect_go.
 
 func (UnimplementedChatServiceHandler) Chat(context.Context, *connect_go.BidiStream[v1.ChatMessage, v1.ChatMessage]) error {
 	return connect_go.NewError(connect_go.CodeUnimplemented, errors.New("chat.ChatService.Chat is not implemented"))
+}
+
+func (UnimplementedChatServiceHandler) ReceiveMessage(context.Context, *connect_go.Request[v1.ClientMessage], *connect_go.ServerStream[v1.ServerMessage]) error {
+	return connect_go.NewError(connect_go.CodeUnimplemented, errors.New("chat.ChatService.ReceiveMessage is not implemented"))
 }

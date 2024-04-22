@@ -22,7 +22,8 @@ import (
 // Injectors from wire.go:
 
 func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
-	chatUseCase := biz.NewChatUseCase()
+	llm := biz.NewLlm()
+	chatUseCase := biz.NewChatUseCase(llm)
 	chatService := service.NewChatService(chatUseCase)
 	httpServer := server.NewHTTPServer(bootstrap, chatService)
 	grpcServer := server.NewGRPCServer(bootstrap, chatService)

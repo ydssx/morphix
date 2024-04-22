@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ChatService_SendMessage_FullMethodName = "/chat.ChatService/SendMessage"
-	ChatService_Chat_FullMethodName        = "/chat.ChatService/Chat"
+	ChatService_SendMessage_FullMethodName    = "/chat.ChatService/SendMessage"
+	ChatService_Chat_FullMethodName           = "/chat.ChatService/Chat"
+	ChatService_ReceiveMessage_FullMethodName = "/chat.ChatService/ReceiveMessage"
 )
 
 // ChatServiceClient is the client API for ChatService service.
@@ -31,6 +32,8 @@ type ChatServiceClient interface {
 	SendMessage(ctx context.Context, opts ...grpc.CallOption) (ChatService_SendMessageClient, error)
 	// 双向流，用于实现聊天
 	Chat(ctx context.Context, opts ...grpc.CallOption) (ChatService_ChatClient, error)
+	// 服务器到客户端的流，用于接收消息
+	ReceiveMessage(ctx context.Context, in *ClientMessage, opts ...grpc.CallOption) (ChatService_ReceiveMessageClient, error)
 }
 
 type chatServiceClient struct {
@@ -106,6 +109,38 @@ func (x *chatServiceChatClient) Recv() (*ChatMessage, error) {
 	return m, nil
 }
 
+func (c *chatServiceClient) ReceiveMessage(ctx context.Context, in *ClientMessage, opts ...grpc.CallOption) (ChatService_ReceiveMessageClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ChatService_ServiceDesc.Streams[2], ChatService_ReceiveMessage_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &chatServiceReceiveMessageClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type ChatService_ReceiveMessageClient interface {
+	Recv() (*ServerMessage, error)
+	grpc.ClientStream
+}
+
+type chatServiceReceiveMessageClient struct {
+	grpc.ClientStream
+}
+
+func (x *chatServiceReceiveMessageClient) Recv() (*ServerMessage, error) {
+	m := new(ServerMessage)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // ChatServiceServer is the server API for ChatService service.
 // All implementations should embed UnimplementedChatServiceServer
 // for forward compatibility
@@ -114,6 +149,8 @@ type ChatServiceServer interface {
 	SendMessage(ChatService_SendMessageServer) error
 	// 双向流，用于实现聊天
 	Chat(ChatService_ChatServer) error
+	// 服务器到客户端的流，用于接收消息
+	ReceiveMessage(*ClientMessage, ChatService_ReceiveMessageServer) error
 }
 
 // UnimplementedChatServiceServer should be embedded to have forward compatible implementations.
@@ -125,6 +162,9 @@ func (UnimplementedChatServiceServer) SendMessage(ChatService_SendMessageServer)
 }
 func (UnimplementedChatServiceServer) Chat(ChatService_ChatServer) error {
 	return status.Errorf(codes.Unimplemented, "method Chat not implemented")
+}
+func (UnimplementedChatServiceServer) ReceiveMessage(*ClientMessage, ChatService_ReceiveMessageServer) error {
+	return status.Errorf(codes.Unimplemented, "method ReceiveMessage not implemented")
 }
 
 // UnsafeChatServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -190,6 +230,27 @@ func (x *chatServiceChatServer) Recv() (*ChatMessage, error) {
 	return m, nil
 }
 
+func _ChatService_ReceiveMessage_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ClientMessage)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ChatServiceServer).ReceiveMessage(m, &chatServiceReceiveMessageServer{stream})
+}
+
+type ChatService_ReceiveMessageServer interface {
+	Send(*ServerMessage) error
+	grpc.ServerStream
+}
+
+type chatServiceReceiveMessageServer struct {
+	grpc.ServerStream
+}
+
+func (x *chatServiceReceiveMessageServer) Send(m *ServerMessage) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // ChatService_ServiceDesc is the grpc.ServiceDesc for ChatService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -208,6 +269,11 @@ var ChatService_ServiceDesc = grpc.ServiceDesc{
 			Handler:       _ChatService_Chat_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
+		},
+		{
+			StreamName:    "ReceiveMessage",
+			Handler:       _ChatService_ReceiveMessage_Handler,
+			ServerStreams: true,
 		},
 	},
 	Metadata: "api/chat/v1/chat.proto",
