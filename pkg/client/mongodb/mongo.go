@@ -10,12 +10,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-// InitMongoDB 初始化一个 MongoDB 连接。
-// url 是 MongoDB 的连接字符串。
-// 返回一个 MongoDB 客户端实例和一个清理函数用于断开连接。
-// 如果连接失败会 panic。
+
+// InitMongoDB initializes a MongoDB client and returns a client and a cleanup function.
+// The cleanup function must be called when the client is no longer needed.
 func InitMongoDB(uri string) (*mongo.Client, func()) {
 	ctx := context.Background()
+	// Create a new MongoDB client.
 	cli, err := mongo.Connect(ctx,
 		options.Client().ApplyURI(uri),
 		options.Client().SetMaxPoolSize(100),
@@ -26,13 +26,16 @@ func InitMongoDB(uri string) (*mongo.Client, func()) {
 		panic("failed to connect to MongoDB: " + err.Error())
 	}
 
+	// Define a cleanup function to disconnect from MongoDB.
 	cleanup := func() { cli.Disconnect(ctx) }
 
+	// Ping the primary to test the connection.
 	err = cli.Ping(ctx, readpref.Primary())
 	if err != nil {
 		cleanup()
 		panic("failed to ping MongoDB: " + err.Error())
 	}
+
 	log.Info("init mongodb success")
 	return cli, cleanup
 }
