@@ -61,7 +61,6 @@ func (c *RedisCache) Delete(key string) error {
 
 // Clear 清空缓存中的所有键值对
 func (c *RedisCache) Clear() error {
-
 	// 用scan扫描key
 	iter := c.client.Scan(context.Background(), 0, "*", 0).Iterator()
 	for iter.Next(context.Background()) {

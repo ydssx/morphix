@@ -71,6 +71,7 @@ func NewOrderUseCase(
 	}
 }
 
+// CreateOrder 创建订单
 func (b *OrderUseCase) CreateOrder(ctx context.Context, req *orderv1.CreateOrderRequest) (res *orderv1.CreateOrderResponse, err error) {
 	res = new(orderv1.CreateOrderResponse)
 	claim, _ := interceptors.AuthFromContext(ctx)
@@ -85,6 +86,8 @@ func (b *OrderUseCase) CreateOrder(ctx context.Context, req *orderv1.CreateOrder
 	if err != nil {
 		return nil, errors.Wrap(err, "查询商品库存失败")
 	}
+
+	// 检查商品库存是否充足
 	for _, item := range req.Items {
 		if productStockResp.Stocks[int64(item.ProductId)] < int32(item.Quantity) {
 			return nil, errors.Errorf("商品库存不足 [%d]", item.ProductId)
@@ -133,8 +136,14 @@ func (b *OrderUseCase) CreateOrder(ctx context.Context, req *orderv1.CreateOrder
 	if err != nil {
 		return nil, errors.Wrap(err, "生成订单号失败")
 	}
+
+	// 使用事务创建订单
 	err = b.tx.InTx(ctx, func(ctx context.Context) error {
-		order := model.Order{OrderNumber: orderNum, UserId: int(claim.Uid), Amount: totalPrice}
+		order := model.Order{
+			OrderNumber: orderNum,
+			UserId:      int(claim.Uid),
+			Amount:      totalPrice,
+		}
 		orderID, err := b.repo.CreateOrder(ctx, order)
 		if err != nil {
 			return errors.Wrap(err, "创建订单失败")

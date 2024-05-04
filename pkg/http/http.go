@@ -123,7 +123,6 @@ func (r *Request) Post(url string, payload interface{}, result interface{}) erro
 	return r.handleResponse(resp, result)
 }
 
-// Put sends a PUT request.
 func (r *Request) Put(url string, payload interface{}, result interface{}) error {
 	req := r.client.R()
 	r.addHeaders(req)
@@ -136,7 +135,12 @@ func (r *Request) Put(url string, payload interface{}, result interface{}) error
 	return r.handleResponse(resp, result)
 }
 
-// Delete sends a DELETE request.
+// Delete sends a DELETE request to the specified URL with the given result interface{} and handles the response.
+//
+//   - url: The URL to send the DELETE request to.
+//   - result: A pointer to the variable where the response will be stored.
+// Returns:
+//   - error: An error if there was a problem sending the request or handling the response.
 func (r *Request) Delete(url string, result interface{}) error {
 	req := r.client.R()
 	r.addHeaders(req)

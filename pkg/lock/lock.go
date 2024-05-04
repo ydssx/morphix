@@ -71,6 +71,19 @@ func NewLocker(cli *redis.Client) *RedisLocker {
 	return &RedisLocker{Client: redislock.New(cli), lockMap: make(map[string]*redislock.Lock)}
 }
 
+
+// Lock 获取锁
+//
+// 实现了分布式锁的功能，通过Redis实现。
+//
+// ctx: 上下文
+// key: 锁的key
+// opt: 可选参数
+//
+// 可选参数:
+//   WithTTL(ttl time.Duration): 设置锁的有效期，默认10s。
+//   WithTries(tries int): 设置重试次数，默认3次。
+//   WithDelay(delay time.Duration): 设置重试间隔，默认500ms。
 func (r *RedisLocker) Lock(ctx context.Context, key string, opt ...LockerOption) error {
 	lo := &lockOption{
 		ttl:   10 * time.Second,
@@ -86,28 +99,62 @@ func (r *RedisLocker) Lock(ctx context.Context, key string, opt ...LockerOption)
 	if err != nil {
 		return errors.Errorf("redislock: lock %s failed: %v", key, err)
 	}
+
+	// Add the lock to the map
 	r.mu.Lock()
 	r.lockMap[key] = lock
 	r.mu.Unlock()
 	return nil
 }
 
+
+// Unlock releases the lock obtained by Lock or TryLock.
+// Returns an error if the lock is not held or the underlying Redis
+// command fails.
+//
+// It returns an error with the message "redislock: not obtain lock"
+// if the lock is not held.
 func (r *RedisLocker) Unlock(ctx context.Context, key string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
+	// We can't unlock if we never locked
 	if r.lockMap[key] == nil {
 		return errors.New("redislock: not obtain lock")
 	}
+
+	// Release the lock
 	if err := r.lockMap[key].Release(ctx); err != nil && !errors.Is(err, redislock.ErrLockNotHeld) {
 		return errors.Errorf("redislock: unlock %s failed: %v", r.lockMap[key].Key(), err)
 	}
 
+	// Remove the lock from the map
 	delete(r.lockMap, key)
 	return nil
 }
 
+
+// TryLock tries to obtain a lock for the given key. It returns
+// nil if the lock is obtained, otherwise it returns an error.
+//
+// The context will be used to establish a deadline for the lock
+// acquisition.
+//
+// The key will be locked for the duration specified in the options
+// parameter (WithTTL). If no duration is specified, the lock will
+// be obtained with a default TTL of 10s.
+//
+// If the lock is not obtained within the specified deadline, an
+// error is returned.
 func (r *RedisLocker) TryLock(ctx context.Context, key string, opt ...LockerOption) error {
+	// Set a deadline for the lock acquisition
 	ctx, cancel := context.WithTimeout(ctx, time.Millisecond*100)
 	defer cancel()
-	return r.Lock(ctx, key, opt...)
+
+	// Try to obtain the lock
+	if err := r.Lock(ctx, key, opt...); err != nil {
+		return errors.Wrapf(err, "redislock: try lock %s failed", key)
+	}
+
+	return nil
 }

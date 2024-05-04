@@ -41,4 +41,5 @@ var (
 	As     = serrors.As
 	Wrap   = errors.Wrap
 	Errorf = errors.Errorf
+	Wrapf  = errors.Wrapf
 )

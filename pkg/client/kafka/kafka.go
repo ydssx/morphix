@@ -13,6 +13,7 @@ type Producer struct {
 func NewProducer(brokers []string) (*Producer, error) {
 	config := sarama.NewConfig()
 	config.Producer.Return.Successes = true
+	config.Producer.Return.Errors = true
 	producer, err := sarama.NewSyncProducer(brokers, config)
 	if err != nil {
 		return nil, err

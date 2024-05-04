@@ -356,22 +356,32 @@ func (uc *UserUseCase) Authorize(ctx context.Context, req *userv1.AuthorizationR
 	return
 }
 
+// GetUserList 获取用户列表。
+//
+// 根据请求中的分页参数获取用户列表。
+// 它通过存储库接口与数据层交互。
+// 如果存储库操作失败,将返回错误。
+// 成功后,它会返回用户列表。
 func (uc *UserUseCase) GetUserList(ctx context.Context, req *userv1.UserListRequest) (res *userv1.UserListResponse, err error) {
 	res = new(userv1.UserListResponse)
 
+	// List users from the repository
 	users := uc.repo.ListUser(ctx, &ListUserCond{Page: req.Page, Limit: req.Limit})
+
+	// Convert the users to the gRPC user list response format
 	res.Users = make([]*userv1.User, 0, len(users))
 	for _, user := range users {
 		res.Users = append(res.Users, &userv1.User{
-			Id:       int64(user.ID),
-			Username: user.Username,
-			Email:    user.Email,
-			Phone:    user.Phone,
+			Id:       int64(user.ID), // Convert the user ID to int64
+			Username: user.Username,  // Copy the user name
+			Email:    user.Email,     // Copy the email
+			Phone:    user.Phone,     // Copy the phone number
 		})
 	}
 
 	return
 }
+
 
 // ManageUserPermission 根据请求更新用户的权限。
 //

@@ -222,15 +222,32 @@ func (r *userRepo) GetUserRole(ctx context.Context, userID int) ([]models.Role, 
 	return roles, nil
 }
 
+// GetUserRoles 根据用户ID获取用户角色关系列表
+// 从数据库中查询用户角色关系表
+// 返回用户角色关系列表
 func (r *userRepo) getUserRoles(ctx context.Context, userID int) ([]models.UserRole, error) {
-	return models.NewUserRoleModel(r.data.DB(ctx)).WithContext(ctx).SetUserId(userID).ListAll()
+	// 使用 WithContext 方法设置上下文
+	// 传入用户ID, 查询用户角色关系表, 返回用户角色关系列表
+	return models.NewUserRoleModel(r.data.DB(ctx)).
+		WithContext(ctx).
+		SetUserId(userID).
+		ListAll()
 }
 
+
+// extractRoleIDs extracts role ids from user roles
+//
+// This function takes a slice of user role model and returns a slice of role ids
 func extractRoleIDs(userRoles []models.UserRole) []int {
-	var roleIDs []int
+	var roleIDs []int // slice to store role ids
+
+	// iterate through each user role
 	for _, userRole := range userRoles {
+		// append role id to the slice
 		roleIDs = append(roleIDs, userRole.RoleId)
 	}
+
+	// return the slice of role ids
 	return roleIDs
 }
 
