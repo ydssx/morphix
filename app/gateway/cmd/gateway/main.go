@@ -12,6 +12,8 @@ import (
 
 var configFile = flag.String("f", "../../../../configs/config.yaml", "the config file")
 
+// main 函数是应用程序的入口点。它解析命令行标志、加载配置、初始化应用程序并运行它。
+// 如果在初始化或运行过程中出现任何错误,它会立即panic。
 func main() {
 	flag.Parse()
 
@@ -30,6 +32,10 @@ func main() {
 	}
 }
 
+// newApp creates a new Kratos application.
+//
+// It takes an http.Server and a conf.Bootstrap as parameters.
+// Returns a pointer to a kratos.App.
 func newApp(hs *http.Server, c *conf.Bootstrap) *kratos.App {
 	tp, err := provider.InitTraceProvider(c.Otelcol.Addr, c.ServiceSet.Gateway.Name)
 	if err != nil {

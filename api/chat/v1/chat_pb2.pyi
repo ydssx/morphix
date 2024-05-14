@@ -22,15 +22,18 @@ class ClientMessage(google.protobuf.message.Message):
 
     USER_ID_FIELD_NUMBER: builtins.int
     MESSAGE_TEXT_FIELD_NUMBER: builtins.int
+    IMG_URL_FIELD_NUMBER: builtins.int
     user_id: builtins.str
     message_text: builtins.str
+    img_url: builtins.str
     def __init__(
         self,
         *,
         user_id: builtins.str = ...,
         message_text: builtins.str = ...,
+        img_url: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["message_text", b"message_text", "user_id", b"user_id"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["img_url", b"img_url", "message_text", b"message_text", "user_id", b"user_id"]) -> None: ...
 
 global___ClientMessage = ClientMessage
 

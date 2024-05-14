@@ -4,8 +4,9 @@ import (
 	"context"
 	"log"
 
-	"github.com/tmc/langchaingo/llms"
+	"github.com/tmc/langchaingo/chains"
 	chat "github.com/ydssx/morphix/api/chat/v1"
+	"github.com/ydssx/morphix/pkg/errors"
 	"github.com/ydssx/morphix/pkg/llm"
 )
 
@@ -37,15 +38,17 @@ func (uc *ChatUseCase) Chat(stream chat.ChatService_ChatServer) (err error) {
 
 // 服务器到客户端的流，用于接收消息
 func (uc *ChatUseCase) ReceiveMessage(req *chat.ClientMessage, stream chat.ChatService_ReceiveMessageServer) (err error) {
-	resp, err := uc.llm.Generate(
+	resp, err := uc.llm.GenerateFromText(
 		stream.Context(),
 		req.MessageText,
-		llms.WithTemperature(0.8),
-		llms.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
+		chains.WithTemperature(0.8),
+		chains.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
 			return stream.Send(&chat.ServerMessage{MessageText: string(chunk)})
 		}),
 	)
 	log.Printf("resp: %s", resp)
-	
-	return err
+	if err != nil {
+		return errors.Wrap(err, "failed to generate text")
+	}
+	return nil
 }

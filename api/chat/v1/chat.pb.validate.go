@@ -61,6 +61,8 @@ func (m *ClientMessage) validate(all bool) error {
 
 	// no validation rules for MessageText
 
+	// no validation rules for ImgUrl
+
 	if len(errors) > 0 {
 		return ClientMessageMultiError(errors)
 	}

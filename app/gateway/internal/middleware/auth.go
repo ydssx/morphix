@@ -10,6 +10,11 @@ import (
 	"github.com/ydssx/morphix/pkg/util"
 )
 
+// Auth 是一个 Gin 中间件,用于验证 JWT 令牌并执行 RBAC 权限检查。
+// 它从请求头中获取 Authorization 头,提取 Bearer 令牌,并使用 jwt.VerifyToken 验证令牌。
+// 如果令牌有效,它会从令牌中提取角色信息,并使用 casbin 执行 RBAC 权限检查。
+// 如果权限检查通过,它会将 JWT 声明添加到请求上下文中,并调用下一个中间件。
+// 如果令牌无效或权限不足,它会中止请求并返回相应的错误。
 func Auth() gin.HandlerFunc {
 	e := rbac.NewCasbinEnforcer()
 	return func(ctx *gin.Context) {
