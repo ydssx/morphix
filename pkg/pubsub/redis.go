@@ -2,6 +2,7 @@ package pubsub
 
 import (
 	"context"
+	"sync"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/redis/go-redis/v9"
@@ -66,18 +67,46 @@ func (ps *RedisPubSub) SubscribeToTopic(ctx context.Context, topic string, handl
 }
 
 func (ps *RedisPubSub) SubscribeToQueue(ctx context.Context, queue string, handler EventHandler) error {
-	for {
-		msg := ps.cli.BLPop(context.Background(), 0, queue).Val()
-		if msg != nil {
-			msg := msg[0]
-			data := new(CloudEvent)
-			err := data.UnmarshalJSON([]byte(msg))
-			if err != nil {
-				logger.Errorf(ctx, "Failed to unmarshal message: %s", err.Error())
-				continue
-			}
+	// 创建一个同步池来重用 CloudEvent 实例
+	pool := &sync.Pool{
+		New: func() interface{} {
+			return new(CloudEvent)
+		},
+	}
 
-			handler(ctx, data)
+	// 创建一个错误通道用于处理解码错误
+	errCh := make(chan error, 100)
+	go func() {
+		for err := range errCh {
+			// 将错误推送到另一个队列或进行其他处理
+			logger.Errorf(ctx, "Failed to unmarshal message: %s", err.Error())
+		}
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			// 上下文被取消,退出循环
+			return ctx.Err()
+		default:
+			// 从对象池获取 CloudEvent 实例
+			data := pool.Get().(*CloudEvent)
+			msg := ps.cli.BLPop(ctx, 0, queue).Val()
+			if msg != nil {
+				msg := msg[0]
+				err := data.UnmarshalJSON([]byte(msg))
+				if err != nil {
+					// 将解码错误推送到错误通道
+					errCh <- err
+					// 将 CloudEvent 实例放回对象池
+					pool.Put(data)
+					continue
+				}
+
+				handler(ctx, data)
+				// 将 CloudEvent 实例放回对象池
+				pool.Put(data)
+			}
 		}
 	}
 }
