@@ -15,7 +15,12 @@ type RedisCache struct {
 	client *redis.Client
 }
 
-func NewRedisCache(client *redis.Client) Cache {
+var (
+	_           Cache = (*RedisCache)(nil)
+	cachePrefix       = "morphix:"
+)
+
+func NewRedisCache(client *redis.Client) *RedisCache {
 	return &RedisCache{client: client}
 }
 
@@ -23,7 +28,7 @@ func NewRedisCache(client *redis.Client) Cache {
 // 如果key不存在,将返回key not found错误
 // 如果发生其他错误,将直接返回错误
 func (c *RedisCache) Get(key string, result interface{}) error {
-	val, err := c.client.Get(context.Background(), key).Result()
+	val, err := c.client.Get(context.Background(), cachePrefix+key).Result()
 	if err == redis.Nil {
 		return fmt.Errorf("key %s not found", key)
 	}
@@ -45,7 +50,7 @@ func (c *RedisCache) Set(key string, value interface{}, expire time.Duration) er
 
 	randomExpire := expire + time.Duration(rand.Int63n(int64(time.Second)))
 
-	err = c.client.Set(context.Background(), key, string(data), randomExpire).Err()
+	err = c.client.Set(context.Background(), cachePrefix+key, string(data), randomExpire).Err()
 	if err != nil {
 		return errors.Wrap(err, "set redis key error")
 	}
@@ -55,14 +60,14 @@ func (c *RedisCache) Set(key string, value interface{}, expire time.Duration) er
 // Delete deletes the key from redis.
 // It returns an error if there was a problem deleting the key.
 func (c *RedisCache) Delete(key string) error {
-	err := c.client.Del(context.Background(), key).Err()
+	err := c.client.Del(context.Background(), cachePrefix+key).Err()
 	return err
 }
 
 // Clear 清空缓存中的所有键值对
 func (c *RedisCache) Clear() error {
 	// 用scan扫描key
-	iter := c.client.Scan(context.Background(), 0, "*", 0).Iterator()
+	iter := c.client.Scan(context.Background(), 0, cachePrefix+"*", 0).Iterator()
 	for iter.Next(context.Background()) {
 		err := c.client.Del(context.Background(), iter.Val()).Err()
 		if err != nil {

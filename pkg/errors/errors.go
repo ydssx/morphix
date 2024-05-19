@@ -6,10 +6,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type MultiErr struct {
-	errs []error
-}
-
 var (
 	// ErrNotFound 资源不存在
 	ErrNotFound = New("resource not found")
