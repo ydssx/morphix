@@ -1,11 +1,14 @@
+import json
 import os
+from typing import Dict, List
 
+import chainlit as cl
 from langchain import hub
 from langchain.agents import (
     AgentExecutor,
+    create_react_agent,
     create_structured_chat_agent,
     create_tool_calling_agent,
-    create_react_agent,
     tool,
 )
 from langchain.chains import RetrievalQA
@@ -13,42 +16,55 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains.history_aware_retriever import create_history_aware_retriever
 from langchain.chains.retrieval import create_retrieval_chain
 from langchain.chains.summarize import load_summarize_chain
-from langchain.memory import ChatMessageHistory, FileChatMessageHistory
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.retrievers.multi_query import MultiQueryRetriever
+from langchain.schema.runnable.config import RunnableConfig
 from langchain.tools.retriever import create_retriever_tool
-from langchain.vectorstores.chroma import Chroma
+from langchain_community.chat_message_histories import RedisChatMessageHistory
 from langchain_community.chat_models import ChatOllama
-from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.document_loaders import (
+    Docx2txtLoader,
+    OnlinePDFLoader,
+    PyMuPDFLoader,
+    UnstructuredWordDocumentLoader,
+    WebBaseLoader,
+)
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_community.vectorstores import Chroma
+from langchain_core.messages import AIMessage, HumanMessage,AIMessageChunk
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableBranch, RunnablePassthrough
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+
+SYSTEM_TEMPLATE = """You are a helpful assistant. Answer the user's questions in Simplified Chinese based on the below context if possible. If the context doesn't contain any relevant information to the question, don't make something up and just say "I don't know":\n\n{context}"""
 prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            "You are a helpful assistant. Answer the user's questions in Simplified Chinese based on the below context:\n\n{context}",
+            SYSTEM_TEMPLATE,
         ),
         MessagesPlaceholder(variable_name="chat_history"),
         ("user", "{input}"),
         MessagesPlaceholder(variable_name="agent_scratchpad", optional=True),
     ]
 )
+sessions = ["foo", "bar"]
 
 
 class ChatBot:
-    def __init__(self, model="llama3:instruct"):
+    def __init__(self, session_id: str, model="llama3:instruct"):
         self.model = model
         self.chatbot = ChatOllama(model=model)
-        self.chat_history = FileChatMessageHistory("chat_history.json")
+        self.session_id = session_id
+        self.chat_history = RedisChatMessageHistory(session_id, ttl=60 * 60)
         self.retriever = None
         self.chain = prompt | self.chatbot
         self.agent = None
 
-    def chat(self, message: str, stream: bool = True):
+    def chat(self, message: str, stream: bool = True, context=[]):
         """
         Generate an answer based on the given message.
 
@@ -66,41 +82,55 @@ class ChatBot:
             The generated answer, either in a single string or
             in a series of strings
         """
-        # docs = self.retriever.invoke(message)
+        # if self.retriever:
+        #     context = self.retriever.invoke(message)
         input_ = {
             "chat_history": self.chat_history.messages,
-            "context": [],
+            # "context": context,
             "input": message,
         }
+        if not self.retriever:
+            input_["context"] = context
+
         # If the chain is a RunnableWithMessageHistory, then we don't
         # need to pass the chat history to the input. The RunnableWithMessageHistory
         # will handle the history internally.
         if isinstance(self.chain, RunnableWithMessageHistory):
             input_.pop("chat_history")
+        else:
+            self.chat_history.add_user_message(message)
 
         if stream:
             # Generate an answer in a streaming fashion
             # using the Chain's stream method
             response = self.chain.stream(
                 input_,
-                {"configurable": {"session_id": "bar"}},
+                config=RunnableConfig(
+                    # callbacks=[cl.LangchainCallbackHandler(stream_final_answer=True)],
+                    configurable={"session_id": self.session_id},
+                ),
             )
             for r in response:
                 # Yield each response as it comes
-                yield r.content
+                # output = r.get("answer") or r.content
+                # print(r)
+                if isinstance(r,AIMessageChunk):
+                    yield r.content
+                else:
+                    yield r.get("answer", "")
         else:
             # Generate an answer in a single string
             # using the Chain's invoke method
             response = self.chain.invoke(
                 input_,
-                {"configurable": {"session_id": "bar"}},
+                {"configurable": {"session_id": self.session_id}},
             )
             # Extract the answer from the Chain's response
-            output = response.content or response["answer"]
+            output = response.get("answer") or response.content
             # Yield the single answer
             yield output
 
-    def create_retriever(self, url: str):
+    def create_retriever(self, docs):
         """
         Create a retriever based on the documents from the given URL
 
@@ -114,23 +144,44 @@ class ChatBot:
         Retriever
             The created retriever
         """
-        loader = WebBaseLoader(url)
-        docs = loader.load()
 
         # Split the documents into smaller chunks for training
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000)
         all_splits = text_splitter.split_documents(docs)
 
         # Create a Chroma vector store from the split documents
         vectorstore = Chroma.from_documents(
             documents=all_splits,
             # Use the Ollama embeddings model to generate embeddings for the documents
-            embedding=OllamaEmbeddings(model=self.model),
+            embedding=OllamaEmbeddings(model="nomic-embed-text:latest"),
         )
 
         # Create a retriever from the vector store
-        retriever = vectorstore.as_retriever(k=4)
-        self.retriever = retriever
+        retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
+        # retriever = MultiQueryRetriever.from_llm(retriever, llm=self.chatbot)
+
+        query_transform_prompt = ChatPromptTemplate.from_messages(
+            [
+                MessagesPlaceholder(variable_name="chat_history"),
+                # ("human","{input}"),
+                (
+                    "user",
+                    "Given the above conversation and a follow-up user input: {input}.\n\nRephrase the user input to be more informative, generate a search query to look up in order to get information relevant to the user input and the conversation. Only respond with the query, nothing else.",
+                ),
+            ]
+        )
+        query_transforming_retriever_chain = RunnableBranch(
+            (
+                # Both empty string and empty list evaluate to False
+                lambda x: not x.get("chat_history", False),
+                # If no chat history, then we just pass input to retriever
+                (lambda x: x["input"]) | retriever,
+            ),
+            # If messages, then we pass inputs to LLM chain to transform the query, then pass to retriever
+            query_transform_prompt | self.chatbot | StrOutputParser() | retriever,
+        ).with_config(run_name="chat_retriever_chain")
+
+        self.retriever = query_transforming_retriever_chain
 
         return retriever
 
@@ -187,7 +238,7 @@ class ChatBot:
         if with_history:
             agent_executor = RunnableWithMessageHistory(
                 agent_executor,
-                lambda session_id: self.chat_history,
+                self.get_session_history,
                 input_messages_key="input",
                 output_messages_key="answer",
                 history_messages_key="chat_history",
@@ -214,7 +265,11 @@ class ChatBot:
         """
         if len(self.chat_history.messages) > max_history:
             # Remove the oldest messages from the chat history
-            self.chat_history.messages = self.chat_history.messages[-max_history:]
+            msg = self.chat_history.messages[-max_history:]
+            self.chat_history.clear()
+            self.chat_history.add_messages(msg)
+        # Append the new message to the chat history
+        self.chat_history.add_user_message(message)
 
     def create_chain(self, retriever=None, with_history=True):
         """
@@ -257,12 +312,26 @@ class ChatBot:
 
             # If with_history is True, wrap the retriever with a history-aware retriever
             if with_history:
-                retriever = create_history_aware_retriever(
-                    self.chatbot, retriever, prompt
+                self.chain = RunnablePassthrough.assign(
+                    context=retriever,
+                ).assign(
+                    answer=document_chain,
                 )
 
-            # Create a chain that executes the retriever and the chatbot
-            self.chain = create_retrieval_chain(retriever, document_chain)
+                self.chain = RunnableWithMessageHistory(
+                    self.chain,
+                    self.get_session_history,
+                    input_messages_key="input",
+                    history_messages_key="chat_history",
+                    output_messages_key="answer",
+                )
+
+                # retriever = create_history_aware_retriever(
+                #     self.chatbot, retriever, prompt
+                # )
+            else:
+                # Create a chain that executes the retriever and the chatbot
+                self.chain = create_retrieval_chain(retriever, document_chain)
         else:
             if with_history:
                 self.chain = RunnableWithMessageHistory(
@@ -274,6 +343,9 @@ class ChatBot:
                 )
 
         return self.chain
+
+    def create_summarize_chain(self):
+        chain = load_summarize_chain(llm=self.chatbot, chain_type="map_reduce")
 
     def get_prompt(self, usecase: str = None):
         if usecase is None or usecase == "chat":
@@ -293,6 +365,31 @@ class ChatBot:
     def get_session_history(self, session_id):
         return self.chat_history
 
+    @classmethod
+    def get_session_ids(cls):
+        return sessions
+
+    @classmethod
+    def create_session(cls, session_id):
+        if session_id not in sessions:
+            sessions.append(session_id)
+
+    @classmethod
+    def load_pdf(cls,urls: List[str]):
+        docs = []
+        for url in urls:
+            do = PyMuPDFLoader(
+                url,
+                extract_images=False,
+            ).load()
+            docs.append(do[0])
+        print("docs:", len(docs))
+        return docs
+
+
+def parse_retriever_input(params: Dict):
+    return params["messages"][-1].content
+
 
 class PromptManager:
     def __init__(self, prompt: str):
@@ -302,10 +399,15 @@ class PromptManager:
         return self.prompt
 
 
+urls = [
+    "https://oss.emakerzone.com/reptile-chip-notebook/ucc14130-q11704936259.576965.pdf",
+]
+
 if __name__ == "__main__":
-    bot = ChatBot(model="llama3:instruct")
-    # retriever = bot.create_retriever("https://docs.smith.langchain.com/user_guide")
-    chain = bot.create_chain(with_history=True)
+    bot = ChatBot("bar", model="llama3:instruct")
+    docs = bot.load_pdf(urls)
+    retriever = bot.create_retriever(docs)
+    chain = bot.create_chain(retriever, with_history=True)
     while True:
         message = input("User: ")
         if message == "quit":

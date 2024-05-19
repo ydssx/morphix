@@ -1763,6 +1763,9 @@
         },
         "messageText": {
           "type": "string"
+        },
+        "imgUrl": {
+          "type": "string"
         }
       },
       "title": "客户端发送的消息"

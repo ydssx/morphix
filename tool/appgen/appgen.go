@@ -282,6 +282,10 @@ func parseProto(protoFile string) (info ServiceInfo, supportHttp bool) {
 	return
 }
 
+// convertRequest 根据请求类型返回相应的类型和导入路径。
+// 如果请求类型为 google.protobuf.Empty、google.protobuf.Timestamp 或 google.protobuf.Duration，
+// 则返回相应的 protobuf 类型和导入路径。
+// 否则返回包名加上请求类型作为类型名称,导入路径为空。
 func convertRequest(pkgName, reqType string) (string, string) {
 	switch reqType {
 	case "google.protobuf.Empty":
@@ -382,6 +386,13 @@ func isFunctionExists(file *dst.File, functionName string) (index int, exist boo
 	return -1, false
 }
 
+// reWrite 将 *dst.File 结构体中的内容写入到指定的文件中。
+// 如果文件不存在则创建，如果存在则会覆盖原有内容。
+// 如果写入过程中发生错误，会返回相应的错误信息。
+//
+// filename: 要写入的文件名
+// file: *dst.File 结构体，要写入的内容
+// 返回: error，如果写入过程中发生错误，则返回相应的错误信息，否则返回 nil
 func reWrite(filename string, file *dst.File) error {
 	outputFile, err := os.OpenFile(filename, os.O_WRONLY|os.O_TRUNC, 0o644)
 	if err != nil {
